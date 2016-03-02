@@ -15,7 +15,7 @@ tokens = (
     'MIPROGRAMA','IDENTIFICADOR','ENDLINE',
 	'OPENEXP','CLOSEEXP','CREARPERSONAJE','SIES',
 	'OPENCOND','CLOSECOND','REPETIRHASTA',
-    'PUNTO','PARAR','RESPONDER','CTEDECISION1','CTEDECISION2','ATRAS',
+    'PUNTO','PARAR','RESPONDER','CTEDECISION1','CTEDECISION2','CTEESCRITA','ATRAS',
     'ADELANTE','DERECHA','IZQUIERDA','VAR','EQUALS','COMA',
     'PARED','LIBRE','META','IGUALA','DIFERENTEA',
     'SUMA','RESTA','DIVISION','MULTIPLICACION',
@@ -24,7 +24,7 @@ tokens = (
 
 # Tokens
 t_MIPROGRAMA = r'miPrograma'
-t_IDENTIFICADOR = r'[a-zA-Z][_a-zA-Z0-9]*'
+t_IDENTIFICADOR = r'[A-Z][_a-zA-Z0-9]*'
 t_ENDLINE = r';'
 t_OPENEXP = r'{'
 t_CLOSEEXP = r'}'
@@ -33,19 +33,19 @@ t_SIES = r'siEs'
 t_OPENCOND = r'\('
 t_CLOSECOND = r'\)'
 t_REPETIRHASTA = r'repetirHasta'
-t_PUNTO = r'.'
+t_PUNTO = r'\.'
 t_PARAR = r'parar'
 t_RESPONDER = r'responder'
-r_CTEDECISION1 = r'verdadero'
-r_CTEDECISION2 = r'falso'
-
+t_CTEDECISION1 = r'verdadero'
+t_CTEDECISION2 = r'falso'
+t_CTEESCRITA = r'\"[a-zA-Z0-9]*\"'
 t_ATRAS = r'atras'
 t_ADELANTE = r'adelante'
 t_DERECHA = r'derecha'
 t_IZQUIERDA = r'izquierda'
 t_VAR = r'var'
 t_EQUALS = r'='
-t_COMA = r','
+t_COMA = r'\,'
 t_PARED = r'pared'
 t_LIBRE = r'libre'
 t_META = r'meta'
@@ -62,7 +62,7 @@ t_TIPODECISION = r'decision'
 
 t_ignore = " \t"
 
-
+# Error handling
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count("\n")
@@ -74,101 +74,104 @@ def t_error(t):
 # Build the lexer
 import ply.lex as lex
 lex.lex()
-
+#Debbuging instruction
+#lex.runmain()
 
 # Parsing rules
 
 def p_programa(p):
-    '''program : MIPROGRAMA IDENTIFICADOR ENDLINE OPENEXP personaje modulo CLOSEEXP'''
-    pass
+        '''program : MIPROGRAMA IDENTIFICADOR ENDLINE OPENEXP personaje modulo CLOSEEXP'''
+        pass
+def p_programa_error(p):
+        '''program : MIPROGRAMA error ENDLINE OPENEXP personaje modulo CLOSEEXP'''
+        print("Incorrect identifier " )
+    
 def p_personaje(p):
-    '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars
-                | CREARPERSONAJE IDENTIFICADOR ENDLINE'''
-    pass
-# DUDAS
+        '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
+        pass
+
 def p_modulo(p):
 	'''modulo : moduloaux1 OPENCOND laberinto CLOSECOND OPENEXP modulo moduloaux2
-				| instruccion'''
+				| instruccion
+                                | instruccion modulo'''
 	pass
 def p_moduloaux1(p):
 	'''moduloaux1 : SIES
 					| REPETIRHASTA'''
 	pass
 def p_moduloaux2(p):
-	'''moduloaux2 : modulo CLOSEEXP modulo
+	'''moduloaux2 : modulo CLOSEEXP
 					| CLOSEEXP modulo
-					| CLOSEEXP'''
+                                        | CLOSEEXP'''
 	pass
-	
-	
+
 def p_instruccion(p):
-	'''instruccion : IDENTIFICADOR PUNTO instruccion1 instruccion2'''
+	'''instruccion : IDENTIFICADOR PUNTO instruccion1 ENDLINE'''
 	pass
 
 def p_instruccion1(p):
 	'''instruccion1 : PARAR
-					| mover OPENCOND expresion CLOSECOND
-					| RESPONDER OPENCOND instruccion3 CLOSECOND'''
+			| mover OPENCOND expresion CLOSECOND
+			| RESPONDER OPENCOND instruccion2 CLOSECOND'''
 	pass
-
+    
 def p_instruccion2(p):
-	'''instruccion2 : ENDLINE instruccion
-					| ENDLINE'''
-	pass
-
-def p_instruccion3(p):
-	'''instruccion3 : IDENTIFICADOR
-					| CTEDECISION1
-					| CTEDECISION2'''
-	pass
-
+        '''instruccion2 : CTEESCRITA
+                        | IDENTIFICADOR'''
+        pass
 def p_mover(p):
-	'''mover : ATRAS
-				| ADELANTE
-				| DERECHA
-				| IZQUIERDA'''
-	pass
-
+        '''mover : ATRAS
+		| ADELANTE
+		| DERECHA
+		| IZQUIERDA'''
+        pass
 def p_vars(p):
-	'''vars : VAR IDENTIFICADOR tipo EQUALS vars1 vars2'''
-	pass
+        '''vars : 
+                | VAR IDENTIFICADOR tipo EQUALS varcte vars1
+                | VAR IDENTIFICADOR tipo EQUALS CTEESCRITA vars1'''
+        pass
+def p_vars_error(p):
+	'''vars : error IDENTIFICADOR tipo EQUALS varcte vars1'''
+	print("Incorrect declaration " )
+        
 def p_vars1(p):
-	'''vars1 : varcte
-				| varcte2'''
-	pass
-
-def p_vars2(p):
-	'''vars2 : COMA vars
-				| ENDLINE'''
+	'''vars1 : COMA vars
+		| ENDLINE'''
 	pass
 	
 def p_laberinto(p):
-	'''laberinto : laberinto1 laberinto2 laberinto3'''
+	'''laberinto : laberinto1 laberinto2 varcte'''
 	pass
 def p_laberinto1(p):
 	'''laberinto1 : PARED
-					| LIBRE
-					| META'''
+			| LIBRE
+			| META'''
 	pass
 def p_laberinto2(p):
 	'''laberinto2 : DIFERENTEA
-					| IGUALA'''
-	pass
-def p_laberinto3(p):
-	'''laberinto3 : IDENTIFICADOR
-					| CTEDECISION1
-					| CTEDECISION2'''
+			| IGUALA'''
 	pass
 def p_expresion(p):
-	'''expresion : termino SUMA
-					| termino RESTA
-					| termino'''
+	'''expresion : termino exp
+                        | termino'''
 	pass
+def p_exp(p):
+	'''exp : RESTA expresion
+		| SUMA expresion'''
+	pass
+def p_exp_error(p):
+        '''exp : error expresion'''
+        print("not a valid operator" )  
+        
 def p_termino(p):
-	'''termino : varcte DIVISION
-				| varcte MULTIPLICACION
-				| varcte'''
+	'''termino : DIVISION varcte
+                    | MULTIPLICACION varcte
+                    | varcte'''
 	pass
+#Specific error generation
+def p_termino_error(p):
+        '''termino : error varcte'''
+        print("not a valid operator" )
 def p_tipo(p):
 	'''tipo : TIPONUMERO
 			| TIPOESCRITA
@@ -176,19 +179,18 @@ def p_tipo(p):
 	pass
 def p_varcte(p):
 	'''varcte : IDENTIFICADOR
-				| CTEENTERA'''
-	pass
-def p_varcte2(p):
-	'''varcte2 : CTEENTERA
-				| CTEDECISION1
+				| CTEENTERA
+                                | CTEDECISION1
 				| CTEDECISION2'''
 	pass
 	
 	
-
+#Error handling
 def p_error(p):
     if p:
-        print("Syntax error at '%s'" % p.value)
+        print("Syntax error near '%s'" % p.value)
+        print("On line ",p.lineno)
+        
     else:
         print("Syntax error at EOF")
 
