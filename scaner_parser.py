@@ -1,7 +1,8 @@
 # -----------------------------------------------------------------------------
-# Escaner y Parser: lenguaje patito
-# Tarea 3
-# A01089996
+# Escaner y Parser: Xilarius
+# Proyecto
+# Ana Arellano   		A01089996
+# Ana Karen Reyna		A01280310
 # -----------------------------------------------------------------------------
 
 import sys
@@ -11,42 +12,53 @@ if sys.version_info[0] >= 3:
     raw_input = input
 #Token ids
 tokens = (
-    'PROGRAM','IDENTIFIER','ASSIGN','EQUALS',
-    'ENDLINE','OPENCOND','CLOSECOND','OPENEXP',
-    'CLOSEEXP','SEPARATE',
-    'LESSTHAN','MORETHAN','DIFFERENT','PLUS','MINUS',
-    'TIMES','DIVIDE','IF','ELSE','PRINT','TYPEINT',
-    'TYPEFLOAT','VARIABLE',
-    'INTEGER','FLOATNUM','STRING'
+    'MIPROGRAMA','IDENTIFICADOR','ENDLINE',
+	'OPENEXP','CLOSEEXP','CREARPERSONAJE','SIES',
+	'OPENCOND','CLOSECOND','REPETIRHASTA',
+    'PUNTO','PARAR','RESPONDER','CTEDECISION1','CTEDECISION2','ATRAS',
+    'ADELANTE','DERECHA','IZQUIERDA','VAR','EQUALS','COMA',
+    'PARED','LIBRE','META','IGUALA','DIFERENTEA',
+    'SUMA','RESTA','DIVISION','MULTIPLICACION',
+	'CTEENTERA','TIPONUMERO','TIPOESCRITA','TIPODECISION'
     )
 
 # Tokens
-t_ASSIGN = r':'
-t_EQUALS =r'='
-t_ENDLINE =r';'
+t_MIPROGRAMA = r'miPrograma'
+t_IDENTIFICADOR = r'[a-zA-Z][_a-zA-Z0-9]*'
+t_ENDLINE = r';'
+t_OPENEXP = r'{'
+t_CLOSEEXP = r'}'
+t_CREARPERSONAJE = r'crearPersonaje'
+t_SIES = r'siEs'
 t_OPENCOND = r'\('
-t_CLOSECOND =r'\)'
-t_OPENEXP =r'{'
-t_CLOSEEXP =r'}'
-t_SEPARATE = r','
-t_LESSTHAN=r'<'
-t_MORETHAN=r'>'
-t_DIFFERENT=r'<>'
-t_PLUS=r'\+'
-t_MINUS=r'-'
-t_TIMES=r'\*'
-t_DIVIDE= r'/'
-t_TYPEINT= r'int'
-t_TYPEFLOAT=r'float'
-t_IF =r'if'
-t_ELSE =r'else'
-t_PRINT = r'print'
-t_VARIABLE =r'var'
-t_PROGRAM = r'program'
-t_IDENTIFIER=r'[_][a-zA-Z0-9]*'
-t_STRING    = r'[A-Z][a-zA-Z]*'
-t_INTEGER = r'[0-9][0-9]*'
-t_FLOATNUM =r'[0-9][0-9]*\.?[0-9][0-9]*'
+t_CLOSECOND = r'\)'
+t_REPETIRHASTA = r'repetirHasta'
+t_PUNTO = r'.'
+t_PARAR = r'parar'
+t_RESPONDER = r'responder'
+r_CTEDECISION1 = r'verdadero'
+r_CTEDECISION2 = r'falso'
+
+t_ATRAS = r'atras'
+t_ADELANTE = r'adelante'
+t_DERECHA = r'derecha'
+t_IZQUIERDA = r'izquierda'
+t_VAR = r'var'
+t_EQUALS = r'='
+t_COMA = r','
+t_PARED = r'pared'
+t_LIBRE = r'libre'
+t_META = r'meta'
+t_IGUALA = r'=='
+t_DIFERENTEA = r'<>'
+t_SUMA = r'\+'
+t_RESTA = r'-'
+t_DIVISION = r'/'
+t_MULTIPLICACION = r'\*'
+t_CTEENTERA = r'[0-9][0-9]*'
+t_TIPONUMERO = r'numero'
+t_TIPOESCRITA = r'escrita'
+t_TIPODECISION = r'decision'
 
 t_ignore = " \t"
 
@@ -66,117 +78,113 @@ lex.lex()
 
 # Parsing rules
 
-def p_program(p):
-    '''program : PROGRAM IDENTIFIER ENDLINE program1'''
+def p_programa(p):
+    '''program : MIPROGRAMA IDENTIFICADOR ENDLINE OPENEXP personaje modulo CLOSEEXP'''
     pass
-def p_program1(p):
-    '''program1 : vars program2 
-                | program2'''
+def p_personaje(p):
+    '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars
+                | CREARPERSONAJE IDENTIFICADOR ENDLINE'''
     pass
-def p_program2(p):
-    '''program2 : block'''
-    pass
-def p_vars(p):
-    "vars : VARIABLE vars1"
-    pass
-def p_vars1(p):
-    "vars1 : IDENTIFIER vars2"
-    pass
-def p_vars1_error(p):
-    "vars1 : error vars2"
-    print("Missing identifier for variable")
-def p_vars2(p):
-    '''vars2 : vars3 
-            | SEPARATE vars1 '''
-    pass
-def p_vars3(p):
-    '''vars3 : ASSIGN TYPEINT ENDLINE 
-            | ASSIGN TYPEFLOAT ENDLINE 
-            | ASSIGN TYPEINT ENDLINE vars1 
-            | ASSIGN TYPEFLOAT ENDLINE vars1 '''
-    pass
-#Version with error detection
-def p_vars3_error(p):
-    '''vars3 : ASSIGN TYPEINT error 
-            | ASSIGN TYPEFLOAT error 
-            | ASSIGN TYPEINT error vars1 
-            | ASSIGN TYPEFLOAT error vars1 '''
-    print("Missing ';' ")
-def p_block(p):
-    "block : OPENEXP block1"
-    pass
-def p_block1(p):
-    '''block1 : estat block1 
-                | CLOSEEXP'''
-    pass
-def p_estat(p):
-    '''estat : asignation 
-               | condition 
-               | writing'''
-    pass
-def p_asignation(p):
-    "asignation : IDENTIFIER EQUALS expression ENDLINE"
-    pass
-def p_condition(p):
-    '''condition : IF OPENCOND expression CLOSECOND block condition1 ENDLINE'''
-    pass
-def p_condition_error(p):
-    '''condition : IF error expression CLOSECOND block condition1 ENDLINE'''
-    print ("Missing '(' in condition ")
+# DUDAS
+def p_modulo(p):
+	'''modulo : moduloaux1 OPENCOND laberinto CLOSECOND OPENEXP modulo moduloaux2
+				| instruccion'''
+	pass
+def p_moduloaux1(p):
+	'''moduloaux1 : SIES
+					| REPETIRHASTA'''
+	pass
+def p_moduloaux2(p):
+	'''moduloaux2 : modulo CLOSEEXP modulo
+					| CLOSEEXP modulo
+					| CLOSEEXP'''
+	pass
+	
+	
+def p_instruccion(p):
+	'''instruccion : IDENTIFICADOR PUNTO instruccion1 instruccion2'''
+	pass
 
-def p_condition1(p):
-    '''condition1 : empty
-                    | ELSE block'''
-    pass
-def p_writing(p):
-    "writing : PRINT OPENCOND writing1 CLOSECOND ENDLINE"
-    pass
-def p_writing1(p):
-    '''writing1 : expression 
-                | expression SEPARATE writing1 
-                | STRING'''
-    pass
-def p_writing_error(p):
-    "writing : PRINT OPENCOND writing1 CLOSECOND error"
-    print("Missing ';'")
-def p_expression(p):
-    ''' expression : exp LESSTHAN exp 
-                    | exp MORETHAN exp 
-                    | exp DIFFERENT exp
-                    | exp'''
-    pass
-def p_empty(p):
-    "empty :"
-    pass
-def p_exp(p):
-    '''exp : term exp1 
-            | term'''
-    pass
-def p_exp1(p):
-    '''exp1 : MINUS exp 
-            | PLUS exp'''
-    pass
-def p_exp1_error(p):
-    '''exp1 : error exp'''
-    print("not a valid operator" )
-def p_term(p):
-    '''term : factor term1 
-            | factor'''
-    pass
-def p_term1(p):
-    '''term1 : TIMES term 
-            | DIVIDE term'''
-def p_factor(p):
-    '''factor : OPENCOND expression CLOSECOND 
-                | factor1 
-                | MINUS factor1 
-                | PLUS factor1'''
-def p_factor1(p):
-    "factor1 : constant"
-def p_constant(p):
-    '''constant : IDENTIFIER 
-                | INTEGER
-                | FLOATNUM'''
+def p_instruccion1(p):
+	'''instruccion1 : PARAR
+					| mover OPENCOND expresion CLOSECOND
+					| RESPONDER OPENCOND instruccion3 CLOSECOND'''
+	pass
+
+def p_instruccion2(p):
+	'''instruccion2 : ENDLINE instruccion
+					| ENDLINE'''
+	pass
+
+def p_instruccion3(p):
+	'''instruccion3 : IDENTIFICADOR
+					| CTEDECISION1
+					| CTEDECISION2'''
+	pass
+
+def p_mover(p):
+	'''mover : ATRAS
+				| ADELANTE
+				| DERECHA
+				| IZQUIERDA'''
+	pass
+
+def p_vars(p):
+	'''vars : VAR IDENTIFICADOR tipo EQUALS vars1 vars2'''
+	pass
+def p_vars1(p):
+	'''vars1 : varcte
+				| varcte2'''
+	pass
+
+def p_vars2(p):
+	'''vars2 : COMA vars
+				| ENDLINE'''
+	pass
+	
+def p_laberinto(p):
+	'''laberinto : laberinto1 laberinto2 laberinto3'''
+	pass
+def p_laberinto1(p):
+	'''laberinto1 : PARED
+					| LIBRE
+					| META'''
+	pass
+def p_laberinto2(p):
+	'''laberinto2 : DIFERENTEA
+					| IGUALA'''
+	pass
+def p_laberinto3(p):
+	'''laberinto3 : IDENTIFICADOR
+					| CTEDECISION1
+					| CTEDECISION2'''
+	pass
+def p_expresion(p):
+	'''expresion : termino SUMA
+					| termino RESTA
+					| termino'''
+	pass
+def p_termino(p):
+	'''termino : varcte DIVISION
+				| varcte MULTIPLICACION
+				| varcte'''
+	pass
+def p_tipo(p):
+	'''tipo : TIPONUMERO
+			| TIPOESCRITA
+			| TIPODECISION'''
+	pass
+def p_varcte(p):
+	'''varcte : IDENTIFICADOR
+				| CTEENTERA'''
+	pass
+def p_varcte2(p):
+	'''varcte2 : CTEENTERA
+				| CTEDECISION1
+				| CTEDECISION2'''
+	pass
+	
+	
 
 def p_error(p):
     if p:
