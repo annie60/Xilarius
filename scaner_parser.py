@@ -6,6 +6,7 @@
 # -----------------------------------------------------------------------------
 
 import sys
+from semantica_variables import agregar_variable
 sys.path.insert(0,"../..")
 
 if sys.version_info[0] >= 3:
@@ -147,6 +148,9 @@ def p_vars2_error(p):
 def p_vars2(p):
         '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1
                 | VAR IDENTIFICADOR tipo EQUALS CTEESCRITA vars1'''
+        #Posible manera de incrustar la tabla de variables
+        #TODO especificar en caso de error de semantica
+        agregar_variable(p[2],p[5],p[3])
         pass
 def p_laberinto(p):
 	'''laberinto : laberinto1 laberinto2 varcte'''
