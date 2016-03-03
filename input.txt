@@ -1,14 +1,18 @@
 miPrograma Primerprograma;
 {
 crearPersonaje Ana;
-var Mivar decision = falso, var Miotravar numero =3;
+var Mivar decision = falso, var Miotravar numero = 3 ;
 siEs(pared == verdadero){
 Ana.parar;
 }
-repetirHasta(libre == falso){
+repetirHasta(libre == Mivar){
 Ana.atras(3+5);
 Ana.derecha(4);
+siEs(pared <> Mivar){
+Ana.derecha(Miotravar);
+}
 }
 Ana.responder("Hola");
+Ana.responder("Como estas?");
 Ana.parar;
 }

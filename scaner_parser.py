@@ -38,7 +38,7 @@ t_PARAR = r'parar'
 t_RESPONDER = r'responder'
 t_CTEDECISION1 = r'verdadero'
 t_CTEDECISION2 = r'falso'
-t_CTEESCRITA = r'\"[a-zA-Z0-9]*\"'
+t_CTEESCRITA = r'\"[a-zA-Z0-9 \?\']*\"'
 t_ATRAS = r'atras'
 t_ADELANTE = r'adelante'
 t_DERECHA = r'derecha'
@@ -82,31 +82,29 @@ lex.lex()
 def p_programa(p):
         '''program : MIPROGRAMA IDENTIFICADOR ENDLINE OPENEXP personaje modulo CLOSEEXP'''
         pass
+#Specific error handling
 def p_programa_error(p):
         '''program : MIPROGRAMA error ENDLINE OPENEXP personaje modulo CLOSEEXP'''
         print("Incorrect identifier " )
-    
+   
 def p_personaje(p):
         '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
         pass
-
 def p_modulo(p):
-	'''modulo : moduloaux1 OPENCOND laberinto CLOSECOND OPENEXP modulo moduloaux2
-				| instruccion
-                                | instruccion modulo'''
+	'''modulo : moduloaux1 OPENCOND laberinto CLOSECOND OPENEXP instruccionaux CLOSEEXP instruccionaux
+				| instruccion'''
 	pass
 def p_moduloaux1(p):
 	'''moduloaux1 : SIES
-					| REPETIRHASTA'''
-	pass
-def p_moduloaux2(p):
-	'''moduloaux2 : modulo CLOSEEXP
-					| CLOSEEXP modulo
-                                        | CLOSEEXP'''
+			| REPETIRHASTA'''
 	pass
 
 def p_instruccion(p):
-	'''instruccion : IDENTIFICADOR PUNTO instruccion1 ENDLINE'''
+	'''instruccion : IDENTIFICADOR PUNTO instruccion1 ENDLINE instruccionaux'''
+	pass
+def p_instruccionaux(p):
+	'''instruccionaux : 
+                            | modulo'''
 	pass
 
 def p_instruccion1(p):
@@ -127,18 +125,29 @@ def p_mover(p):
         pass
 def p_vars(p):
         '''vars : 
-                | VAR IDENTIFICADOR tipo EQUALS varcte vars1
-                | VAR IDENTIFICADOR tipo EQUALS CTEESCRITA vars1'''
+                | vars2'''
         pass
+#Specific error handling
 def p_vars_error(p):
 	'''vars : error IDENTIFICADOR tipo EQUALS varcte vars1'''
 	print("Incorrect declaration " )
+#Specific error handling
+def p_vars_error2(p):
+	'''vars : CREARPERSONAJE error'''
+	print("More than one character declare" )
         
 def p_vars1(p):
-	'''vars1 : COMA vars
+	'''vars1 : COMA vars2
 		| ENDLINE'''
 	pass
-	
+#Specific error handling
+def p_vars2_error(p):
+	'''vars1 : COMA error ENDLINE'''
+	print("Extra ',' " )
+def p_vars2(p):
+        '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1
+                | VAR IDENTIFICADOR tipo EQUALS CTEESCRITA vars1'''
+        pass
 def p_laberinto(p):
 	'''laberinto : laberinto1 laberinto2 varcte'''
 	pass
@@ -155,10 +164,16 @@ def p_expresion(p):
 	'''expresion : termino exp
                         | termino'''
 	pass
+#Specific error generation
+def p_expresion_error(p):
+        '''expresion : error exp
+                        | termino error'''
+        print("not a valid expresion" )  
 def p_exp(p):
 	'''exp : RESTA expresion
 		| SUMA expresion'''
 	pass
+#Specific error generation
 def p_exp_error(p):
         '''exp : error expresion'''
         print("not a valid operator" )  
@@ -183,7 +198,6 @@ def p_varcte(p):
                                 | CTEDECISION1
 				| CTEDECISION2'''
 	pass
-	
 	
 #Error handling
 def p_error(p):
