@@ -1,0 +1,6 @@
+# Build and Release Folders
+__pycache__/
+
+# Other files and folders
+*.out
+
