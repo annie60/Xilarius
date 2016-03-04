@@ -13,15 +13,8 @@ class Stack:
          return self.items == [] #esta vacia la lista T|F
 
      def push(self, item):
-         #metodo append nativo en python
-         #append(elemento): agrega un elemento
-         #al inicio de la lista
          self.items.append(item) 
      def pop(self):
-         #metodo pop nativo en python
-         #pop(indice): elimina el objeto que se encuentre
-         #al inicio o bien que este en la posicion del indice
-         #por lo tanto el indice es opcional
          return self.items.pop() 
      def size(self):
          #Regresa el numero de elementos en la lista
@@ -33,13 +26,8 @@ class Queue:
     def isEmpty(self):
         return self.items ==[]
     def enqueue(self,item): #Agregar elemento a la lista
-        #Metodo nuevo preimplementado en python
-        #insert(indice,elemento): agrega un elemento
-        #a la lista en el indice que se le especifica
-        #en este caso siempre debe de ir 'al final' de la fila
         self.items.insert(0,item)
     def dequeue(self): #Sacar elemento de una fila
-    #Uso del mismo metodo pop() pre implementado en Python
         return self.items.pop()
     def size(self):
         return len(self.items)
@@ -48,57 +36,73 @@ class Queue:
 # Definicion de un diccionario con llaves y una lista de atributos
 # { "nombre" : (valor,tipoDeCte)}
 var_globales = {}
-
-     
+var_boleanas = ("verdadero","falso")
+#Funcion para crear 'tabla' de variables
 def agregar_variable(nombre,valor,tipo):
+    #Revisa que no este repetida la variable
     if existe_variable(nombre):
         print("Error: Nombre de variable repetido")
         return False
     else:
+        #Revisa que la asignacion que se le hace sea
+        #correspondiente al tipo de variable que es
         if asignacion_compatible(tipo,valor):
             global var_globales
             var_globales[nombre]=(valor,tipo)
-            print(var_globales)
             return True
         else:
             print("Asignacion no compatible")
             return False
 def asignacion_compatible(tipo, valor):
+    #Revisa para los tres tipos de ctes. los valores posibles
     if tipo == "numero" : 
-        if not(c.isalpha() for c in valor):#TODO algo para identificar solo numeros
+        if valor.isdigit():
             return True
         else:
-            print("Error: Esta tipo "+tipo+" no puede tener este tipo de valor "+valor)
+            print("Error: Esta variable tipo '"+tipo+"' no puede tener este valor "+valor)
             return False
     elif tipo == "escrita":
         if isinstance(valor,basestring) and not(valor == "falso" or valor == "verdadero"):
             print(valor)
             return True
         else:
-            print("Error: Esta variable "+tipo+" no puede tener este valor "+valor)
+            print("Error: Esta variable tipo '"+tipo+"' no puede tener este valor "+valor)
             return False
     elif tipo == "decision":
-        if (valor == "verdadero" or valor == "falso"):
-            
+        if (valor in var_boleanas):
             return True
         else:
-            print("Error: Esta variable "+tipo+" no puede tener este valor "+valor)
+            print("Error: Esta variable tipo '"+tipo+"' no puede tener este valor "+valor)
             return False
     else:
         return False    
-def operacion_compatible(operacion, variableuno,variabledos):
-    #TODO
-    print ("Error: Esta variable no puede tener este tipo de valor")
-    return true
-def es_compatible(variableuno,variabledos):
-    global var_globales
-    tipoUno = var_globales[variableuno][1]
-    tipoDos = var_globales[variabledos][1]
-    if tipoUno == tipoDos:
-        return True
+def operacion_compatible(operacion, tipouno,tipodos):
+    #Obtiene la informacion del parser
+    if tipouno == tipodos:
+        if operador_compatible(operacion,tipouno):
+            return True
+        else:
+            print("Error: Tipo de operacion no compatible ")
+            return False
     else:
         print("Error: Tipos "+tipoUno+" y "+tipoDos+" no son compatibles ")
         return False
+    
+def comparacion_compatible(operandoizq):
+    #Obtiene la informacion del parser
+        if operandoizq in var_boleanas:
+            return True
+        elif existe_variable(operandoizq):
+            global var_globales
+            
+            if var_globales[operandoizq][1] == "decision":
+                return True
+            else:
+                return False
+        else:
+            print("Error: Variable  '"+operandoizq+"' en comparacion no declarada")
+            return False
+
 def existe_variable(nombre):
     global var_globales
     if nombre in var_globales:

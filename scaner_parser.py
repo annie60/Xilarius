@@ -6,10 +6,11 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica_variables import agregar_variable
+from semantica_variables import agregar_variable,comparacion_compatible
 from semantica_variables import Stack
 from semantica_variables import Queue
 sys.path.insert(0,"../..")
+#Inicializacion de objetos auxiliares
 ids = Stack()
 types = Queue()
 values = Queue()
@@ -122,6 +123,7 @@ def p_instruccion2(p):
         '''instruccion2 : CTEESCRITA
                         | IDENTIFICADOR'''
         pass
+    #TODO Agregar identificacion semantica aqui
 def p_mover(p):
         '''mover : ATRAS
 		| ADELANTE
@@ -144,15 +146,7 @@ def p_vars_error2(p):
 def p_vars1(p):
     '''vars1 : COMA vars2
         	| ENDLINE'''
-    pass
-    #TODO especificar en mejor en caso de error de semantica
-    if ids.size() >= 1:
-        valor = values.dequeue()
-        tipo = types.dequeue()
-        identificador =ids.pop()
-        print(valor+tipo+identificador)
-        agregar_variable(identificador,valor,tipo)
-            
+    pass  
 #Specific error handling
 def p_vars2_error(p):
 	'''vars1 : COMA error ENDLINE'''
@@ -167,21 +161,27 @@ def p_vars2(p):
             identificador =ids.pop()
             agregar_variable(identificador,valor,tipo)
 def p_laberinto(p):
-	'''laberinto : laberinto1 laberinto2 varcte'''
-	pass
+    '''laberinto : laberinto1 laberinto2 varcte'''
+    pass
+    if values.size() >= 1:
+       valor = values.dequeue()
+       comparacion_compatible(valor)
 def p_laberinto1(p):
-	'''laberinto1 : PARED
-			| LIBRE
-			| META'''
-	pass
+    '''laberinto1 : PARED
+		| LIBRE
+		| META'''
+    pass
+
 def p_laberinto2(p):
 	'''laberinto2 : DIFERENTEA
 			| IGUALA'''
 	pass
 def p_expresion(p):
-	'''expresion : termino exp
-                        | termino'''
-	pass
+    '''expresion : termino exp
+                  | termino'''
+    pass
+#TODO Agregar o revisar como incluir para funciones de movimiento 
+    values.dequeue()
 #Specific error generation
 def p_expresion_error(p):
         '''expresion : error exp
