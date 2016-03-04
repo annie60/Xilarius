@@ -7,8 +7,12 @@
 
 import sys
 from semantica_variables import agregar_variable
+from semantica_variables import Stack
+from semantica_variables import Queue
 sys.path.insert(0,"../..")
-
+ids = Stack()
+types = Queue()
+values = Queue()
 if sys.version_info[0] >= 3:
     raw_input = input
 #Token ids
@@ -138,20 +142,30 @@ def p_vars_error2(p):
 	print("More than one character declare" )
         
 def p_vars1(p):
-	'''vars1 : COMA vars2
-		| ENDLINE'''
-	pass
+    '''vars1 : COMA vars2
+        	| ENDLINE'''
+    pass
+    #TODO especificar en mejor en caso de error de semantica
+    if ids.size() >= 1:
+        valor = values.dequeue()
+        tipo = types.dequeue()
+        identificador =ids.pop()
+        print(valor+tipo+identificador)
+        agregar_variable(identificador,valor,tipo)
+            
 #Specific error handling
 def p_vars2_error(p):
 	'''vars1 : COMA error ENDLINE'''
 	print("Extra ',' " )
 def p_vars2(p):
-        '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1
-                | VAR IDENTIFICADOR tipo EQUALS CTEESCRITA vars1'''
-        #Posible manera de incrustar la tabla de variables
-        #TODO especificar en caso de error de semantica
-        agregar_variable(p[2],p[5],p[3])
+        '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1'''
         pass
+        ids.push(p[2])
+        if ids.size() >= 1:
+            valor = values.dequeue()
+            tipo = types.dequeue()
+            identificador =ids.pop()
+            agregar_variable(identificador,valor,tipo)
 def p_laberinto(p):
 	'''laberinto : laberinto1 laberinto2 varcte'''
 	pass
@@ -187,22 +201,30 @@ def p_termino(p):
                     | MULTIPLICACION varcte
                     | varcte'''
 	pass
+    
 #Specific error generation
 def p_termino_error(p):
-        '''termino : error varcte'''
-        print("not a valid operator" )
+    '''termino : error varcte'''
+    print("not a valid operator"+p[1])
+        
 def p_tipo(p):
-	'''tipo : TIPONUMERO
-			| TIPOESCRITA
-			| TIPODECISION'''
-	pass
+    '''tipo : TIPONUMERO
+		| TIPOESCRITA
+		| TIPODECISION'''
+    pass
+    
+    types.enqueue(p[1])
+    
 def p_varcte(p):
-	'''varcte : IDENTIFICADOR
-				| CTEENTERA
-                                | CTEDECISION1
-				| CTEDECISION2'''
-	pass
-	
+    '''varcte : IDENTIFICADOR
+        	| CTEENTERA
+                | CTEDECISION1
+		| CTEDECISION2
+                | CTEESCRITA'''
+    pass
+    values.enqueue(p[1])
+     
+        
 #Error handling
 def p_error(p):
     if p:
