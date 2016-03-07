@@ -86,8 +86,15 @@ lex.lex()
 # Parsing rules
 
 def p_programa(p):
-        '''program : MIPROGRAMA IDENTIFICADOR ENDLINE OPENEXP personaje modulo CLOSEEXP'''
-        pass
+    '''program : MIPROGRAMA IDENTIFICADOR ENDLINE OPENEXP personaje modulo CLOSEEXP'''
+    pass
+    ids.push(p[2])
+    types.enqueue(p[1])
+    if ids.size() >= 1:
+        valor = "void"
+        tipo = types.dequeue()
+        identificador =ids.pop()
+        agregar_variable(identificador,valor,tipo)
 #Specific error handling
 def p_programa_error(p):
         '''program : MIPROGRAMA error ENDLINE OPENEXP personaje modulo CLOSEEXP'''

@@ -53,6 +53,7 @@ def agregar_variable(nombre,valor,tipo):
         else:
             print("Asignacion no compatible")
             return False
+#TODO: Crear cubo de operaciones semanticas para remplazar operacion y asignacion
 def asignacion_compatible(tipo, valor):
     #Revisa para los tres tipos de ctes. los valores posibles
     if tipo == "numero" : 
