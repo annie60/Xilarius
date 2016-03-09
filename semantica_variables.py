@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Analisis semantico de variables: Xilarius
+# Analisis semantico de variables y funciones: Xilarius
 # Proyecto
 # Ana Arellano   		A01089996
 # Ana Karen Reyna		A01280310
@@ -35,8 +35,40 @@ class Queue:
 # Uso de variables globales solamente
 # Definicion de un diccionario con llaves y una lista de atributos
 # { "nombre" : (valor,tipoDeCte)}
-var_globales = {}
+var_dicc_funciones = {}
+
 var_boleanas = ("verdadero","falso")
+var_tipos = ("numero","escrita","decision")
+var_operaciones = ("=","+","-","*","/","<>","==")
+#Formato de matriz para cubo
+#                       =       +       -       *       /       <>      ==
+#numero     numero      1       1       1       1       1       -1      -1
+#numero     escrita     -1      -1      -1      -1      -1      -1      -1
+#numero     decision    -1      -1      -1      -1      -1      -1      -1
+#escrita    numero      -1      -1      -1      -1      -1      -1      -1
+#escrita    escrita      1      -1      -1      -1      -1      -1      -1
+#escrita    decision    -1      -1      -1      -1      -1      -1      -1
+#decision   numero      -1      -1      -1      -1      -1      -1      -1
+#decision   escrita     -1      -1      -1      -1      -1      -1      -1
+#decision   decision     1      -1      -1      -1      -1       1       1
+
+cubo_semantico = (
+    ((1,1,1,1,1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1)
+    ),
+    ((-1,-1,-1,-1,-1,-1,-1),
+    (1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1)
+    ),
+    ((-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1),
+    (1,-1,-1,-1,-1,1,1)
+    )
+    ) 
+def crear_modulo(nombre,ambiente):
+    global var_dicc_funciones
+    var_dicc_funciones[ambiente] = (nombre,{})
 #Funcion para crear 'tabla' de variables
 def agregar_variable(nombre,valor,tipo):
     #Revisa que no este repetida la variable
@@ -46,69 +78,47 @@ def agregar_variable(nombre,valor,tipo):
     else:
         #Revisa que la asignacion que se le hace sea
         #correspondiente al tipo de variable que es
-        if asignacion_compatible(tipo,valor):
-            global var_globales
-            var_globales[nombre]=(valor,tipo)
+        if operacion_compatible("=",tipo,valor):
+            global var_dicc_funciones
+            var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipo)
             return True
         else:
             print("Asignacion no compatible")
             return False
-#TODO: Crear cubo de operaciones semanticas para remplazar operacion y asignacion
-def asignacion_compatible(tipo, valor):
-    #Revisa para los tres tipos de ctes. los valores posibles
-    if tipo == "numero" : 
+
+def convertir_valor(valor):
+    #Convierte valores a tipo numericos
         if valor.isdigit():
-            return True
+            return 0
+        elif isinstance(valor,str) and not(valor in var_boleanas) and ('"' in valor):
+            return 1
+        elif (valor in var_boleanas):
+            return 2
+        elif (valor in var_dicc_funciones["miPrograma"][1]):
+            atributos =var_dicc_funciones["miPrograma"][1][valor]
+            return var_tipos.index(atributos[1])
         else:
-            print("Error: Esta variable tipo '"+tipo+"' no puede tener este valor "+valor)
-            return False
-    elif tipo == "escrita":
-        if isinstance(valor,basestring) and not(valor == "falso" or valor == "verdadero"):
-            print(valor)
-            return True
-        else:
-            print("Error: Esta variable tipo '"+tipo+"' no puede tener este valor "+valor)
-            return False
-    elif tipo == "decision":
-        if (valor in var_boleanas):
-            return True
-        else:
-            print("Error: Esta variable tipo '"+tipo+"' no puede tener este valor "+valor)
-            return False
-    else:
-        return False    
+            print ("Variable '"+valor+"' no declarada")
+            return -1
+          
 def operacion_compatible(operacion, tipouno,tipodos):
     #Obtiene la informacion del parser
-    if tipouno == tipodos:
-        if operador_compatible(operacion,tipouno):
+    tipo=var_tipos.index(tipouno)
+    indiceValor = convertir_valor(tipodos)
+    operador =var_operaciones.index(operacion)
+    if indiceValor >= 0:
+        if (cubo_semantico[tipo][indiceValor][operador] == 1):
             return True
         else:
-            print("Error: Tipo de operacion no compatible ")
+            print("Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion)
             return False
     else:
-        print("Error: Tipos "+tipoUno+" y "+tipoDos+" no son compatibles ")
         return False
-    
-def comparacion_compatible(operandoizq):
-    #Obtiene la informacion del parser
-        if operandoizq in var_boleanas:
-            return True
-        elif existe_variable(operandoizq):
-            global var_globales
-            
-            if var_globales[operandoizq][1] == "decision":
-                return True
-            else:
-                return False
-        else:
-            print("Error: Variable  '"+operandoizq+"' en comparacion no declarada")
-            return False
 
 def existe_variable(nombre):
-    global var_globales
-    if nombre in var_globales:
+    global var_dicc_funciones
+    if nombre in var_dicc_funciones["miPrograma"][1] :
         return True
     else:
         return False
-
 

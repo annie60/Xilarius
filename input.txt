@@ -1,7 +1,7 @@
 miPrograma Primerprograma;
 {
 crearPersonaje Ana;
-var Mivar decision = verdadero, var Miotravar numero = 3 ;
+var Mivar decision = verdadero, var Miotravar numero = 3,var Otravar escrita = "hola" ;
 siEs(pared == verdadero){
 Ana.parar;
 }
@@ -12,7 +12,7 @@ siEs(pared <> Mivar){
 Ana.derecha(Miotravar);
 }
 }
-Ana.responder("Hola");
+Ana.responder(Otravarmas);
 Ana.responder("Como estas?");
 Ana.parar;
 }

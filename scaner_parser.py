@@ -6,14 +6,15 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica_variables import agregar_variable,comparacion_compatible
+from semantica_variables import agregar_variable,crear_modulo,operacion_compatible, existe_variable
 from semantica_variables import Stack
 from semantica_variables import Queue
 sys.path.insert(0,"../..")
 #Inicializacion de objetos auxiliares
-ids = Stack()
-types = Queue()
-values = Queue()
+ids = Queue()
+types = Stack()
+operations = Queue()
+values = Stack()
 if sys.version_info[0] >= 3:
     raw_input = input
 #Token ids
@@ -86,23 +87,31 @@ lex.lex()
 # Parsing rules
 
 def p_programa(p):
-    '''program : MIPROGRAMA IDENTIFICADOR ENDLINE OPENEXP personaje modulo CLOSEEXP'''
+    '''program : declarar ENDLINE OPENEXP personaje modulo CLOSEEXP'''
     pass
-    ids.push(p[2])
-    types.enqueue(p[1])
+    
+def p_declarar(p):
+    '''declarar : MIPROGRAMA IDENTIFICADOR'''
+    ids.enqueue(p[2])
+    types.push(p[1])
     if ids.size() >= 1:
-        valor = "void"
-        tipo = types.dequeue()
-        identificador =ids.pop()
-        agregar_variable(identificador,valor,tipo)
+        tipo = types.pop()
+        identificador =ids.dequeue()
+        crear_modulo(identificador,tipo)
 #Specific error handling
 def p_programa_error(p):
         '''program : MIPROGRAMA error ENDLINE OPENEXP personaje modulo CLOSEEXP'''
         print("Incorrect identifier " )
    
 def p_personaje(p):
-        '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
-        pass
+    '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
+    pass
+    ids.enqueue(p[2])
+    types.push(p[1])
+    if ids.size() >= 1:
+        tipo = types.pop()
+        identificador =ids.dequeue()
+        crear_modulo(identificador,tipo)
 def p_modulo(p):
 	'''modulo : moduloaux1 OPENCOND laberinto CLOSECOND OPENEXP instruccionaux CLOSEEXP instruccionaux
 				| instruccion'''
@@ -121,22 +130,27 @@ def p_instruccionaux(p):
 	pass
 
 def p_instruccion1(p):
-	'''instruccion1 : PARAR
+    '''instruccion1 : PARAR
 			| mover OPENCOND expresion CLOSECOND
 			| RESPONDER OPENCOND instruccion2 CLOSECOND'''
-	pass
-    
+    pass
+    #if values.size() >= 1:
+     #   valor = values.pop()
+      #  operacion = operations.dequeue()
+       # operacion_compatible(operacion,tipo,valor)
 def p_instruccion2(p):
-        '''instruccion2 : CTEESCRITA
+    '''instruccion2 : CTEESCRITA
                         | IDENTIFICADOR'''
-        pass
-    #TODO Agregar identificacion semantica aqui
+    pass
+    #values.push(p[1])
+#TODO Agregar identificacion semantica aqui
 def p_mover(p):
-        '''mover : ATRAS
+    '''mover : ATRAS
 		| ADELANTE
 		| DERECHA
 		| IZQUIERDA'''
-        pass
+    pass
+
 def p_vars(p):
         '''vars : 
                 | vars2'''
@@ -161,54 +175,54 @@ def p_vars2_error(p):
 def p_vars2(p):
         '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1'''
         pass
-        ids.push(p[2])
+        ids.enqueue(p[2])
         if ids.size() >= 1:
-            valor = values.dequeue()
-            tipo = types.dequeue()
-            identificador =ids.pop()
+            valor = values.pop()
+            tipo = types.pop()
+            identificador =ids.dequeue()
             agregar_variable(identificador,valor,tipo)
 def p_laberinto(p):
     '''laberinto : laberinto1 laberinto2 varcte'''
     pass
     if values.size() >= 1:
-       valor = values.dequeue()
-       comparacion_compatible(valor)
+        valor = values.pop()
+        tipo = types.pop()
+        operacion = operations.dequeue()
+        operacion_compatible(operacion,tipo,valor)
 def p_laberinto1(p):
     '''laberinto1 : PARED
 		| LIBRE
 		| META'''
     pass
-
+    types.push("decision")
 def p_laberinto2(p):
-	'''laberinto2 : DIFERENTEA
-			| IGUALA'''
-	pass
+    '''laberinto2 : DIFERENTEA
+	| IGUALA'''
+    pass
+    operations.enqueue(p[1])
 def p_expresion(p):
     '''expresion : termino exp
                   | termino'''
-    pass
-#TODO Agregar o revisar como incluir para funciones de movimiento 
-    values.dequeue()
+    pass 
 #Specific error generation
 def p_expresion_error(p):
         '''expresion : error exp
                         | termino error'''
         print("not a valid expresion" )  
 def p_exp(p):
-	'''exp : RESTA expresion
+    '''exp : RESTA expresion
 		| SUMA expresion'''
-	pass
+    pass  
 #Specific error generation
 def p_exp_error(p):
         '''exp : error expresion'''
         print("not a valid operator" )  
         
 def p_termino(p):
-	'''termino : DIVISION varcte
+    '''termino : DIVISION varcte
                     | MULTIPLICACION varcte
                     | varcte'''
-	pass
-    
+    pass
 #Specific error generation
 def p_termino_error(p):
     '''termino : error varcte'''
@@ -218,9 +232,8 @@ def p_tipo(p):
     '''tipo : TIPONUMERO
 		| TIPOESCRITA
 		| TIPODECISION'''
-    pass
-    
-    types.enqueue(p[1])
+    pass  
+    types.push(p[1])
     
 def p_varcte(p):
     '''varcte : IDENTIFICADOR
@@ -229,8 +242,7 @@ def p_varcte(p):
 		| CTEDECISION2
                 | CTEESCRITA'''
     pass
-    values.enqueue(p[1])
-     
+    values.push(p[1])
         
 #Error handling
 def p_error(p):
