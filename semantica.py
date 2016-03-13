@@ -125,6 +125,10 @@ def existe_variable(nombre):
 
 def cuadruplo(operador,operandoizq,operandoder):
     indice = var_operaciones.index(operador)
+    if operandoizq in var_dicc_funciones["miPrograma"][1]:
+        operandoizq=var_dicc_funciones["miPrograma"][1][operandoizq][0]
+    if operandoder in var_dicc_funciones["miPrograma"][1]:
+        operandoder=var_dicc_funciones["miPrograma"][1][operandoder][0]
     if indice == 1:
         return int(operandoizq) + int(operandoder)
     elif indice == 2:

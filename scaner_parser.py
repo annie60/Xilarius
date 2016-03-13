@@ -136,6 +136,7 @@ def p_instruccion1(p):
 			| mover OPENCOND expresion CLOSECOND
 			| instruccion3'''
     pass
+    print(str(pOper.pop()))
     if operations.size() >= 1:
         valor = values.pop()
         operacion = operations.dequeue()
@@ -224,8 +225,8 @@ def p_expresion_error(p):
         print("not a valid expresion" )  
 def p_exp(p):
     '''exp : termino
-            | RESTA varcte termino
-            | SUMA varcte termino'''
+            | RESTA expresion
+            | SUMA expresion'''
     pass
     pilaO.push(p[1])
     if pilaO.top() == "+" or pilaO.top() == "-":
