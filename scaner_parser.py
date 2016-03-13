@@ -6,15 +6,17 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica_variables import agregar_variable,crear_modulo,operacion_compatible, existe_variable
-from semantica_variables import Stack
-from semantica_variables import Queue
+from semantica import agregar_variable,crear_modulo,operacion_compatible,cuadruplo
+from semantica import Stack
+from semantica import Queue
 sys.path.insert(0,"../..")
 #Inicializacion de objetos auxiliares
 ids = Queue()
 types = Stack()
 operations = Queue()
 values = Stack()
+pOper = Stack()
+pilaO =Stack()
 if sys.version_info[0] >= 3:
     raw_input = input
 #Token ids
@@ -113,14 +115,14 @@ def p_personaje(p):
         identificador =ids.dequeue()
         crear_modulo(identificador,tipo)
 def p_modulo(p):
-	'''modulo : moduloaux1 OPENCOND laberinto CLOSECOND OPENEXP instruccionaux CLOSEEXP instruccionaux
+    '''modulo : moduloaux1 OPENCOND laberinto CLOSECOND OPENEXP instruccionaux CLOSEEXP instruccionaux
 				| instruccion'''
-	pass
+    pass
 def p_moduloaux1(p):
 	'''moduloaux1 : SIES
 			| REPETIRHASTA'''
 	pass
-
+        
 def p_instruccion(p):
 	'''instruccion : IDENTIFICADOR PUNTO instruccion1 ENDLINE instruccionaux'''
 	pass
@@ -132,17 +134,28 @@ def p_instruccionaux(p):
 def p_instruccion1(p):
     '''instruccion1 : PARAR
 			| mover OPENCOND expresion CLOSECOND
-			| RESPONDER OPENCOND instruccion2 CLOSECOND'''
+			| instruccion3'''
     pass
-    #if values.size() >= 1:
-     #   valor = values.pop()
-      #  operacion = operations.dequeue()
-       # operacion_compatible(operacion,tipo,valor)
+    if operations.size() >= 1:
+        valor = values.pop()
+        operacion = operations.dequeue()
+        tipo = types.pop()
+        operacion_compatible(operacion,tipo,valor)
+def p_instruccion3(p):
+    '''instruccion3 : RESPONDER OPENCOND instruccion2 CLOSECOND'''
+    pass
+    types.push("escrita")
+    operations.enqueue("=")
+    if values.size() >= 1:
+        valor = values.pop()
+        operacion = operations.dequeue()
+        tipo = types.pop()
+        operacion_compatible(operacion,tipo,valor)
 def p_instruccion2(p):
     '''instruccion2 : CTEESCRITA
                         | IDENTIFICADOR'''
     pass
-    #values.push(p[1])
+    values.push(p[1])
 #TODO Agregar identificacion semantica aqui
 def p_mover(p):
     '''mover : ATRAS
@@ -150,7 +163,8 @@ def p_mover(p):
 		| DERECHA
 		| IZQUIERDA'''
     pass
-
+    types.push("numero")
+    operations.enqueue("=")
 def p_vars(p):
         '''vars : 
                 | vars2'''
@@ -201,8 +215,7 @@ def p_laberinto2(p):
     pass
     operations.enqueue(p[1])
 def p_expresion(p):
-    '''expresion : termino exp
-                  | termino'''
+    '''expresion : varcte exp'''
     pass 
 #Specific error generation
 def p_expresion_error(p):
@@ -210,24 +223,36 @@ def p_expresion_error(p):
                         | termino error'''
         print("not a valid expresion" )  
 def p_exp(p):
-    '''exp : RESTA expresion
-		| SUMA expresion'''
-    pass  
+    '''exp : termino
+            | RESTA varcte termino
+            | SUMA varcte termino'''
+    pass
+    pilaO.push(p[1])
+    if pilaO.top() == "+" or pilaO.top() == "-":
+        operador = pilaO.pop()
+        operDer = pOper.pop()
+        operIzq = pOper.pop()
+        temporal = cuadruplo(operador,operIzq,operDer)
+        pOper.push(temporal)
 #Specific error generation
 def p_exp_error(p):
         '''exp : error expresion'''
-        print("not a valid operator" )  
-        
+        print("not a valid operator" )   
 def p_termino(p):
-    '''termino : DIVISION varcte
-                    | MULTIPLICACION varcte
-                    | varcte'''
+    '''termino :
+                | termino1'''
     pass
-#Specific error generation
-def p_termino_error(p):
-    '''termino : error varcte'''
-    print("not a valid operator"+p[1])
-        
+def p_termino1(p):
+    '''termino1 : DIVISION varcte exp
+                | MULTIPLICACION varcte exp'''
+    pass
+    pilaO.push(p[1])
+    if pilaO.top() == "*" or pilaO.top() == "/":
+        operador = pilaO.pop()
+        operDer = pOper.pop()
+        operIzq = pOper.pop()
+        temporal = cuadruplo(operador,operIzq,operDer)
+        pOper.push(temporal)
 def p_tipo(p):
     '''tipo : TIPONUMERO
 		| TIPOESCRITA
@@ -243,7 +268,7 @@ def p_varcte(p):
                 | CTEESCRITA'''
     pass
     values.push(p[1])
-        
+    pOper.push(p[1])
 #Error handling
 def p_error(p):
     if p:

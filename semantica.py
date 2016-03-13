@@ -11,7 +11,8 @@ class Stack:
 
      def isEmpty(self):
          return self.items == [] #esta vacia la lista T|F
-
+     def top(self):
+         return self.items[len(self.items)-1]
      def push(self, item):
          self.items.append(item) 
      def pop(self):
@@ -122,3 +123,14 @@ def existe_variable(nombre):
     else:
         return False
 
+def cuadruplo(operador,operandoizq,operandoder):
+    indice = var_operaciones.index(operador)
+    if indice == 1:
+        return int(operandoizq) + int(operandoder)
+    elif indice == 2:
+        return int(operandoizq) - int(operandoder)
+    elif indice == 3:
+        return int(operandoizq) * int(operandoder)
+    elif indice == 4:
+        return int(int(operandoizq) / int(operandoder))
+        
