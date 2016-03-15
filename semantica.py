@@ -26,6 +26,8 @@ class Queue:
         self.items =[]
     def isEmpty(self):
         return self.items ==[]
+    def top(self):
+         return self.items[len(self.items)-1]
     def enqueue(self,item): #Agregar elemento a la lista
         self.items.insert(0,item)
     def dequeue(self): #Sacar elemento de una fila
@@ -99,7 +101,7 @@ def agregar_variable(nombre,valor,tipo):
             var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipo)
             return True
         else:
-            print("Asignacion no compatible")
+            print("Error: Asignacion no compatible")
             return False
 
 def convertir_valor(valor):
@@ -116,7 +118,7 @@ def convertir_valor(valor):
         elif valor == "personaje":
             return 3
         else:
-            print ("Variable '"+valor+"' no declarada")
+            print ("Error:Variable '"+valor+"' no declarada")
             return -1
           
 def operacion_compatible(operacion, tipouno,tipodos):

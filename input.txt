@@ -6,8 +6,8 @@ siEs(pared == verdadero){
 Ana.parar;
 }
 repetirHasta(libre == Mivar){
-Ana.atras(3*5*4/Miotravar);
-Ana.derecha(4+2*3+Miotravar);
+Ana.atras(3*5*4/Miotravar-1);
+Ana.derecha(4+21-1+Miotravar);
 siEs(pared <> Mivar){
 Ana.derecha(Miotravar);
 }
@@ -15,4 +15,4 @@ Ana.derecha(Miotravar);
 Ana.responder(Otravar);
 Ana.responder("Como estas?");
 Ana.parar;
-}
+}	

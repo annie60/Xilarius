@@ -129,12 +129,15 @@ def p_instruccion(p):
     '''instruccion : IDENTIFICADOR PUNTO instruccion1 ENDLINE instruccionaux'''
     pass
     types.push(p[1])
+    pOper.push(p[1])
     if values.size() >= 1:
         valor = values.pop()
         operation = operations.pop()
         tipo = types.pop()
+        operder =pOper.pop()
+        operizq = pOper.pop()
+        operador = pilaO.pop()
         operacion(operation,valor,tipo)
-        print(operation+" a "+tipo+" "+valor)
 def p_instruccionaux(p):
 	'''instruccionaux : 
                             | modulo'''
@@ -145,22 +148,24 @@ def p_instruccion1(p):
 			| mover OPENCOND expresion CLOSECOND
 			| instruccion3'''
     pass
-    print(str(pOper.pop()))
+    print(str(pOper.top()))
 def p_instruccion4(p):
     '''instruccion4 : PARAR'''
     pass
     operations.push(p[1])
     values.push("personaje")
+    pilaO.push(p[1])
 def p_instruccion3(p):
     '''instruccion3 : RESPONDER OPENCOND instruccion2 CLOSECOND'''
     pass 
     operations.push(p[1])
-    
+    pilaO.push(p[1])
 def p_instruccion2(p):
     '''instruccion2 : CTEESCRITA
                         | IDENTIFICADOR'''
     pass
     values.push(p[1])
+    pOper.push(p[1])
 def p_mover(p):
     '''mover : ATRAS
 		| ADELANTE
@@ -168,14 +173,16 @@ def p_mover(p):
 		| IZQUIERDA'''
     pass
     operations.push(p[1])
+    pilaO.push(p[1])
 def p_vars(p):
         '''vars : 
                 | vars2'''
         pass
 #Specific error handling
 def p_vars_error(p):
-	'''vars : error IDENTIFICADOR tipo EQUALS varcte vars1'''
-	print("Incorrect declaration " )
+    '''vars : error IDENTIFICADOR tipo EQUALS varcte vars1'''
+    line = p.lineno(1)
+    print("Incorrect declaration near line "+line )
 #Specific error handling
 def p_vars_error2(p):
 	'''vars : CREARPERSONAJE error'''
@@ -197,6 +204,7 @@ def p_vars2(p):
             valor = values.pop()
             tipo = types.pop()
             identificador =ids.dequeue()
+            pOper.pop()
             agregar_variable(identificador,valor,tipo)
 def p_laberinto(p):
     '''laberinto : laberinto1 laberinto2 varcte'''
@@ -236,6 +244,7 @@ def p_exp(p):
         operDer = pOper.pop()
         operIzq = pOper.pop()
         temporal = cuadruplo(operador,operIzq,operDer)
+        print(str(operIzq)+operador+str(operDer)+"="+str(temporal)+" +/-")
         pOper.push(temporal)
 #Specific error generation
 def p_exp_error(p):
