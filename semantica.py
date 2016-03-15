@@ -70,6 +70,13 @@ cubo_semantico = (
 def crear_modulo(nombre,ambiente):
     global var_dicc_funciones
     var_dicc_funciones[ambiente] = (nombre,{})
+def existe_modulo(nombre):
+    global var_dicc_funciones
+    if nombre in var_dicc_funciones["crearPersonaje"]:
+        return True
+    else:
+        print("Error: Accion no permitida para este identificador o no encontrado")
+        return False
 #Funcion para crear 'tabla' de variables
 def agregar_variable(nombre,valor,tipo):
     #Revisa que no este repetida la variable

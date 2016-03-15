@@ -6,7 +6,7 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica import agregar_variable,crear_modulo,operacion_compatible,cuadruplo
+from semantica import agregar_variable,crear_modulo,operacion_compatible,cuadruplo,existe_modulo
 from semantica import Stack
 from semantica import Queue
 sys.path.insert(0,"../..")
@@ -124,8 +124,9 @@ def p_moduloaux1(p):
 	pass
         
 def p_instruccion(p):
-	'''instruccion : IDENTIFICADOR PUNTO instruccion1 ENDLINE instruccionaux'''
-	pass
+    '''instruccion : IDENTIFICADOR PUNTO instruccion1 ENDLINE instruccionaux'''
+    pass
+    existe_modulo(p[1])
 def p_instruccionaux(p):
 	'''instruccionaux : 
                             | modulo'''
@@ -157,7 +158,6 @@ def p_instruccion2(p):
                         | IDENTIFICADOR'''
     pass
     values.push(p[1])
-#TODO Agregar identificacion semantica aqui
 def p_mover(p):
     '''mover : ATRAS
 		| ADELANTE
