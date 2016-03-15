@@ -6,14 +6,14 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica import agregar_variable,crear_modulo,operacion_compatible,cuadruplo,existe_modulo
+from semantica import agregar_variable,operacion_compatible,cuadruplo,crear_modulo,operacion
 from semantica import Stack
 from semantica import Queue
 sys.path.insert(0,"../..")
 #Inicializacion de objetos auxiliares
 ids = Queue()
 types = Stack()
-operations = Queue()
+operations = Stack()
 values = Stack()
 pOper = Stack()
 pilaO =Stack()
@@ -109,11 +109,13 @@ def p_personaje(p):
     '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
     pass
     ids.enqueue(p[2])
-    types.push(p[1])
+    types.push("personaje")
+    values.push("personaje")
     if ids.size() >= 1:
         tipo = types.pop()
+        valor = values.pop()
         identificador =ids.dequeue()
-        crear_modulo(identificador,tipo)
+        agregar_variable(identificador,valor,tipo)
 def p_modulo(p):
     '''modulo : moduloaux1 OPENCOND laberinto CLOSECOND OPENEXP instruccionaux CLOSEEXP instruccionaux
 				| instruccion'''
@@ -126,33 +128,34 @@ def p_moduloaux1(p):
 def p_instruccion(p):
     '''instruccion : IDENTIFICADOR PUNTO instruccion1 ENDLINE instruccionaux'''
     pass
-    existe_modulo(p[1])
+    types.push(p[1])
+    if values.size() >= 1:
+        valor = values.pop()
+        operation = operations.pop()
+        tipo = types.pop()
+        operacion(operation,valor,tipo)
+        print(operation+" a "+tipo+" "+valor)
 def p_instruccionaux(p):
 	'''instruccionaux : 
                             | modulo'''
 	pass
 
 def p_instruccion1(p):
-    '''instruccion1 : PARAR
+    '''instruccion1 : instruccion4
 			| mover OPENCOND expresion CLOSECOND
 			| instruccion3'''
     pass
     print(str(pOper.pop()))
-    if operations.size() >= 1:
-        valor = values.pop()
-        operacion = operations.dequeue()
-        tipo = types.pop()
-        operacion_compatible(operacion,tipo,valor)
+def p_instruccion4(p):
+    '''instruccion4 : PARAR'''
+    pass
+    operations.push(p[1])
+    values.push("personaje")
 def p_instruccion3(p):
     '''instruccion3 : RESPONDER OPENCOND instruccion2 CLOSECOND'''
-    pass
-    types.push("escrita")
-    operations.enqueue("=")
-    if values.size() >= 1:
-        valor = values.pop()
-        operacion = operations.dequeue()
-        tipo = types.pop()
-        operacion_compatible(operacion,tipo,valor)
+    pass 
+    operations.push(p[1])
+    
 def p_instruccion2(p):
     '''instruccion2 : CTEESCRITA
                         | IDENTIFICADOR'''
@@ -164,8 +167,7 @@ def p_mover(p):
 		| DERECHA
 		| IZQUIERDA'''
     pass
-    types.push("numero")
-    operations.enqueue("=")
+    operations.push(p[1])
 def p_vars(p):
         '''vars : 
                 | vars2'''
@@ -202,7 +204,7 @@ def p_laberinto(p):
     if values.size() >= 1:
         valor = values.pop()
         tipo = types.pop()
-        operacion = operations.dequeue()
+        operacion = operations.pop()
         operacion_compatible(operacion,tipo,valor)
 def p_laberinto1(p):
     '''laberinto1 : PARED
@@ -214,7 +216,7 @@ def p_laberinto2(p):
     '''laberinto2 : DIFERENTEA
 	| IGUALA'''
     pass
-    operations.enqueue(p[1])
+    operations.push(p[1])
 def p_expresion(p):
     '''expresion : varcte exp'''
     pass 

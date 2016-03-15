@@ -39,44 +39,52 @@ class Queue:
 var_dicc_funciones = {}
 
 var_boleanas = ("verdadero","falso")
-var_tipos = ("numero","escrita","decision")
-var_operaciones = ("=","+","-","*","/","<>","==")
+var_tipos = ("numero","escrita","decision","personaje")
+var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","atras","adelante","derecha","izquierda")
 #Formato de matriz para cubo
-#                       =       +       -       *       /       <>      ==
-#numero     numero      1       1       1       1       1       -1      -1
-#numero     escrita     -1      -1      -1      -1      -1      -1      -1
-#numero     decision    -1      -1      -1      -1      -1      -1      -1
-#escrita    numero      -1      -1      -1      -1      -1      -1      -1
-#escrita    escrita      1      -1      -1      -1      -1      -1      -1
-#escrita    decision    -1      -1      -1      -1      -1      -1      -1
-#decision   numero      -1      -1      -1      -1      -1      -1      -1
-#decision   escrita     -1      -1      -1      -1      -1      -1      -1
-#decision   decision     1      -1      -1      -1      -1       1       1
+#                       =       +       -       *       /       <>      ==      p   r   at  ad   d   i
+#numero     numero      1       1       1       1       1       -1      -1     -1  -1  -1   -1  -1  -1
+#numero     escrita     -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   
+#numero     decision    -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1
+#numero     personaje   -1      -1      -1      -1      -1      -1      -1     -1  -1   1    1   1   1
+#escrita    numero      -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   
+#escrita    escrita      1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   
+#escrita    decision    -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1
+#escita     personaje   -1      -1      -1      -1      -1      -1      -1     -1   1  -1   -1  -1  -1
+#decision   numero      -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1  
+#decision   escrita     -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   
+#decision   decision     1      -1      -1      -1      -1       1       1     -1  -1  -1   -1  -1  -1
+#decision   personaje   -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1
+#personaje  numero      -1      -1      -1      -1      -1      -1      -1     -1  -1   1    1   1   1
+#personaje  escrita     -1      -1      -1      -1      -1      -1      -1     -1   1  -1   -1  -1  -1
+#personaje  decision    -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1
+#personaje  personaje    1      -1      -1      -1      -1      -1      -1      1  -1  -1   -1  -1  -1
 
 cubo_semantico = (
-    ((1,1,1,1,1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1)
+    ((1,1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,1,1,1,1)
     ),
-    ((-1,-1,-1,-1,-1,-1,-1),
-    (1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1)
+    ((-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1)
     ),
-    ((-1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1),
-    (1,-1,-1,-1,-1,1,1)
+    ((-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (1,-1,-1,-1,-1,1,1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
+    ),
+    ((-1,-1,-1,-1,-1,-1,-1,-1,-1,1,1,1,1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1)
     )
     ) 
 def crear_modulo(nombre,ambiente):
     global var_dicc_funciones
     var_dicc_funciones[ambiente] = (nombre,{})
-def existe_modulo(nombre):
-    global var_dicc_funciones
-    if nombre in var_dicc_funciones["crearPersonaje"]:
-        return True
-    else:
-        print("Error: Accion no permitida para este identificador o no encontrado")
-        return False
 #Funcion para crear 'tabla' de variables
 def agregar_variable(nombre,valor,tipo):
     #Revisa que no este repetida la variable
@@ -105,6 +113,8 @@ def convertir_valor(valor):
         elif (valor in var_dicc_funciones["miPrograma"][1]):
             atributos =var_dicc_funciones["miPrograma"][1][valor]
             return var_tipos.index(atributos[1])
+        elif valor == "personaje":
+            return 3
         else:
             print ("Variable '"+valor+"' no declarada")
             return -1
@@ -112,6 +122,19 @@ def convertir_valor(valor):
 def operacion_compatible(operacion, tipouno,tipodos):
     #Obtiene la informacion del parser
     tipo=var_tipos.index(tipouno)
+    indiceValor = convertir_valor(tipodos)
+    operador =var_operaciones.index(operacion)
+    if indiceValor >= 0:
+        if (cubo_semantico[tipo][indiceValor][operador] == 1):
+            return True
+        else:
+            print("Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion)
+            return False
+    else:
+        return False
+def operacion(operacion, tipouno,tipodos):
+    #Obtiene la informacion del parser
+    tipo=convertir_valor(tipouno)
     indiceValor = convertir_valor(tipodos)
     operador =var_operaciones.index(operacion)
     if indiceValor >= 0:
