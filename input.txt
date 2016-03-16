@@ -1,15 +1,20 @@
 miPrograma Primerprograma;
 {
 crearPersonaje Ana;
-var Mivar decision = verdadero, var Miotravar numero = 3,var Otravar escrita = "hola" ;
+var Mivar decision = verdadero, 
+var Miotravar numero = 3,
+var Otravar escrita = "hola" ;
 siEs(pared == verdadero){
 Ana.parar;
 }
 repetirHasta(libre == Mivar){
 Ana.atras(3*5*4/Miotravar-1);
-Ana.derecha(4+21-1+Miotravar);
+Ana.derecha(4+21+1-Miotravar);
 siEs(pared <> Mivar){
 Ana.derecha(Miotravar);
+repetirHasta(pared == falso){
+Ana.izquierda(2*4-1);
+}
 }
 }
 Ana.responder(Otravar);

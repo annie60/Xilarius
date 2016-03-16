@@ -126,8 +126,11 @@ def p_moduloaux1(p):
 	pass
         
 def p_instruccion(p):
-    '''instruccion : IDENTIFICADOR PUNTO instruccion1 ENDLINE instruccionaux'''
+    '''instruccion : instruccion5 instruccionaux'''
     pass
+    
+def p_instruccion5(p):
+    '''instruccion5 : IDENTIFICADOR PUNTO instruccion1 ENDLINE'''
     types.push(p[1])
     pOper.push(p[1])
     if values.size() >= 1:
@@ -138,6 +141,7 @@ def p_instruccion(p):
         operizq = pOper.pop()
         operador = pilaO.pop()
         operacion(operation,valor,tipo)
+        print("Instruccion "+operador+" "+str(operder)+" "+str(operizq))
 def p_instruccionaux(p):
 	'''instruccionaux : 
                             | modulo'''
@@ -148,13 +152,14 @@ def p_instruccion1(p):
 			| mover OPENCOND expresion CLOSECOND
 			| instruccion3'''
     pass
-    print(str(pOper.top()))
+
 def p_instruccion4(p):
     '''instruccion4 : PARAR'''
     pass
     operations.push(p[1])
     values.push("personaje")
     pilaO.push(p[1])
+    pOper.push(p[1])
 def p_instruccion3(p):
     '''instruccion3 : RESPONDER OPENCOND instruccion2 CLOSECOND'''
     pass 
@@ -213,6 +218,8 @@ def p_laberinto(p):
         valor = values.pop()
         tipo = types.pop()
         operacion = operations.pop()
+        ##TODO: Specify use of thi evalution
+        pOper.pop()
         operacion_compatible(operacion,tipo,valor)
 def p_laberinto1(p):
     '''laberinto1 : PARED
@@ -226,7 +233,7 @@ def p_laberinto2(p):
     pass
     operations.push(p[1])
 def p_expresion(p):
-    '''expresion : varcte exp'''
+    '''expresion : termino exp'''
     pass 
 #Specific error generation
 def p_expresion_error(p):
@@ -234,9 +241,13 @@ def p_expresion_error(p):
                         | termino error'''
         print("not a valid expresion" )  
 def p_exp(p):
-    '''exp : termino
-            | RESTA expresion
-            | SUMA expresion'''
+    '''exp :
+            | exp2 exp'''
+    pass
+
+def p_exp2(p):
+    '''exp2 : RESTA termino 
+            | SUMA termino'''
     pass
     pilaO.push(p[1])
     if pilaO.top() == "+" or pilaO.top() == "-":
@@ -248,15 +259,19 @@ def p_exp(p):
         pOper.push(temporal)
 #Specific error generation
 def p_exp_error(p):
-        '''exp : error expresion'''
+        '''exp2 : error termino '''
         print("not a valid operator" )   
 def p_termino(p):
-    '''termino :
-                | termino1'''
+    '''termino : varcte termino2'''
     pass
-def p_termino1(p):
-    '''termino1 : DIVISION varcte exp
-                | MULTIPLICACION varcte exp'''
+def p_termino2(p):
+    '''termino2 : 
+                | termino3 termino2'''
+    pass
+    
+def p_termino3(p):
+    '''termino3 : DIVISION varcte
+                | MULTIPLICACION varcte'''
     pass
     pilaO.push(p[1])
     if pilaO.top() == "*" or pilaO.top() == "/":
@@ -264,6 +279,7 @@ def p_termino1(p):
         operDer = pOper.pop()
         operIzq = pOper.pop()
         temporal = cuadruplo(operador,operIzq,operDer)
+        print(str(operIzq)+operador+str(operDer)+"="+str(temporal)+" * /")
         pOper.push(temporal)
 def p_tipo(p):
     '''tipo : TIPONUMERO
