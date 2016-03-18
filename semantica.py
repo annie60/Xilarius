@@ -154,13 +154,21 @@ def existe_variable(nombre):
         return True
     else:
         return False
-
+def checa_operando(operando):
+    if operando in var_dicc_funciones["miPrograma"][1]:
+        return var_dicc_funciones["miPrograma"][1][operando][0]
+    elif not isinstance(operando,int):
+        if not operando.isdigit():
+            print("Error: Variable '"+str(operando)+"' no declarada")
+            return 1 
+        else:
+            return operando
+    else:
+        return operando    
 def cuadruplo(operador,operandoizq,operandoder):
     indice = var_operaciones.index(operador)
-    if operandoizq in var_dicc_funciones["miPrograma"][1]:
-        operandoizq=var_dicc_funciones["miPrograma"][1][operandoizq][0]
-    if operandoder in var_dicc_funciones["miPrograma"][1]:
-        operandoder=var_dicc_funciones["miPrograma"][1][operandoder][0]
+    operandoizq=checa_operando(operandoizq) 
+    operandoder=checa_operando(operandoder)
     if indice == 1:
         return int(operandoizq) + int(operandoder)
     elif indice == 2:

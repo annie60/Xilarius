@@ -17,6 +17,7 @@ operations = Stack()
 values = Stack()
 pOper = Stack()
 pilaO =Stack()
+errors = ""
 if sys.version_info[0] >= 3:
     raw_input = input
 #Token ids
@@ -77,7 +78,7 @@ def t_newline(t):
     t.lexer.lineno += t.value.count("\n")
     
 def t_error(t):
-    print("Illegal character '%s'" % t.value[0])
+    print("Caracter ilegal: '%s'" % t.value[0])
     t.lexer.skip(1)
     
 # Build the lexer
@@ -102,9 +103,8 @@ def p_declarar(p):
         crear_modulo(identificador,tipo)
 #Specific error handling
 def p_programa_error(p):
-        '''program : MIPROGRAMA error ENDLINE OPENEXP personaje modulo CLOSEEXP'''
-        print("Incorrect identifier " )
-   
+    '''program : MIPROGRAMA error ENDLINE OPENEXP personaje modulo CLOSEEXP'''
+    print("Identificador incorrecto")
 def p_personaje(p):
     '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
     pass
@@ -141,7 +141,21 @@ def p_instruccion5(p):
         operizq = pOper.pop()
         operador = pilaO.pop()
         operacion(operation,valor,tipo)
-        print("Instruccion "+operador+" "+str(operder)+" "+str(operizq))
+        
+def p_instruccion5_error(p):
+    '''instruccion5 : IDENTIFICADOR PUNTO instruccion1 error'''
+    print("Error:Falta ';'")
+    types.push(p[1])
+    pOper.push(p[1])
+    if values.size() >= 1:
+        valor = values.pop()
+        operation = operations.pop()
+        tipo = types.pop()
+        operder =pOper.pop()
+        operizq = pOper.pop()
+        operador = pilaO.pop()
+        operacion(operation,valor,tipo)
+        
 def p_instruccionaux(p):
 	'''instruccionaux : 
                             | modulo'''
@@ -186,21 +200,19 @@ def p_vars(p):
 #Specific error handling
 def p_vars_error(p):
     '''vars : error IDENTIFICADOR tipo EQUALS varcte vars1'''
-    line = p.lineno(1)
-    print("Incorrect declaration near line "+line )
+    print("Declaracion incorrecta  ")
 #Specific error handling
 def p_vars_error2(p):
-	'''vars : CREARPERSONAJE error'''
-	print("More than one character declare" )
-        
+    '''vars : CREARPERSONAJE error'''
+    print("Mas de un personaje declarado")
 def p_vars1(p):
     '''vars1 : COMA vars2
         	| ENDLINE'''
     pass  
 #Specific error handling
 def p_vars2_error(p):
-	'''vars1 : COMA error ENDLINE'''
-	print("Extra ',' " )
+    '''vars1 : COMA error ENDLINE'''
+    print("Extra ',' "	) 
 def p_vars2(p):
         '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1'''
         pass
@@ -218,7 +230,7 @@ def p_laberinto(p):
         valor = values.pop()
         tipo = types.pop()
         operacion = operations.pop()
-        ##TODO: Specify use of thi evalution
+        ##TODO: Specify use of this evaluation
         pOper.pop()
         operacion_compatible(operacion,tipo,valor)
 def p_laberinto1(p):
@@ -237,9 +249,9 @@ def p_expresion(p):
     pass 
 #Specific error generation
 def p_expresion_error(p):
-        '''expresion : error exp
-                        | termino error'''
-        print("not a valid expresion" )  
+    '''expresion : error exp
+                | termino error'''
+    print("Expresion no valida")
 def p_exp(p):
     '''exp :
             | exp2 exp'''
@@ -255,12 +267,12 @@ def p_exp2(p):
         operDer = pOper.pop()
         operIzq = pOper.pop()
         temporal = cuadruplo(operador,operIzq,operDer)
-        print(str(operIzq)+operador+str(operDer)+"="+str(temporal)+" +/-")
+        #print(str(operIzq)+operador+str(operDer)+"="+str(temporal)+" +/-")
         pOper.push(temporal)
 #Specific error generation
 def p_exp_error(p):
-        '''exp2 : error termino '''
-        print("not a valid operator" )   
+    '''exp2 : error termino '''
+    print("Operacion no valida")
 def p_termino(p):
     '''termino : varcte termino2'''
     pass
@@ -279,7 +291,7 @@ def p_termino3(p):
         operDer = pOper.pop()
         operIzq = pOper.pop()
         temporal = cuadruplo(operador,operIzq,operDer)
-        print(str(operIzq)+operador+str(operDer)+"="+str(temporal)+" * /")
+        #print(str(operIzq)+operador+str(operDer)+"="+str(temporal)+" * /")
         pOper.push(temporal)
 def p_tipo(p):
     '''tipo : TIPONUMERO
@@ -300,11 +312,11 @@ def p_varcte(p):
 #Error handling
 def p_error(p):
     if p:
-        print("Syntax error near '%s'" % p.value)
-        print("On line ",p.lineno)
-        
+        print("Error de sintaxis cerca de '%s'" % p.value)
+        print("En linea",p.lineno)
+                
     else:
-        print("Syntax error at EOF")
+        print("Error de sintaxis en el fin del archivo")
 
 import ply.yacc as yacc
 yacc.yacc()
