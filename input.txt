@@ -5,7 +5,7 @@ var Mivar decision = verdadero,
 var Miotravar numero = 3,
 var Otravar escrita = "hola" ;
 siEs(pared == verdadero){
-Ana.parar
+Ana.parar;
 }
 repetirHasta(libre == Mivar){
 Ana.atras(3*5*4/Miotravar-1);
@@ -13,7 +13,7 @@ Ana.derecha(4+21+1-Miotravar);
 siEs(pared <> Mivar){
 Ana.derecha(Miotravar);
 repetirHasta(pared == falso){
-Ana.izquierda(2*4-1);
+Anaizquierda(2*4-1);
 }
 }
 }

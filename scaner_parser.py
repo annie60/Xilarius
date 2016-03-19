@@ -17,7 +17,7 @@ operations = Stack()
 values = Stack()
 pOper = Stack()
 pilaO =Stack()
-errors = ""
+braces = Stack()
 if sys.version_info[0] >= 3:
     raw_input = input
 #Token ids
@@ -75,8 +75,7 @@ t_ignore = " \t"
 # Error handling
 def t_newline(t):
     r'\n+'
-    t.lexer.lineno += t.value.count("\n")
-    
+    t.lexer.lineno += t.value.count("\n")                 
 def t_error(t):
     print("Caracter ilegal: '%s'" % t.value[0])
     t.lexer.skip(1)
@@ -90,9 +89,18 @@ lex.lex()
 # Parsing rules
 
 def p_programa(p):
-    '''program : declarar ENDLINE OPENEXP personaje modulo CLOSEEXP'''
+    '''program : declarar ENDLINE program2 personaje modulo CLOSEEXP'''
     pass
-    
+    if not braces.isEmpty():
+        braces.pop()
+
+def p_program2(p):
+    '''program2 : OPENEXP'''
+    braces.push(p[1])
+def p_program2_error(p):
+    '''program2 : error'''
+    pass
+    print("Error: Falta '{'")
 def p_declarar(p):
     '''declarar : MIPROGRAMA IDENTIFICADOR'''
     ids.enqueue(p[2])
@@ -101,10 +109,6 @@ def p_declarar(p):
         tipo = types.pop()
         identificador =ids.dequeue()
         crear_modulo(identificador,tipo)
-#Specific error handling
-def p_programa_error(p):
-    '''program : MIPROGRAMA error ENDLINE OPENEXP personaje modulo CLOSEEXP'''
-    print("Identificador incorrecto")
 def p_personaje(p):
     '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
     pass
@@ -117,9 +121,18 @@ def p_personaje(p):
         identificador =ids.dequeue()
         agregar_variable(identificador,valor,tipo)
 def p_modulo(p):
-    '''modulo : moduloaux1 OPENCOND laberinto CLOSECOND OPENEXP instruccionaux CLOSEEXP instruccionaux
+    '''modulo : moduloaux1 OPENCOND laberinto CLOSECOND modulo2 instruccionaux CLOSEEXP instruccionaux
 				| instruccion'''
     pass
+    if not braces.isEmpty():
+        braces.pop()
+def p_modulo2(p):
+    '''modulo2 : OPENEXP'''
+    pass
+    braces.push(p[1])
+def p_modulo2_error(p):
+    '''modulo2 : error'''
+    print("Error: Falta '{'")
 def p_moduloaux1(p):
 	'''moduloaux1 : SIES
 			| REPETIRHASTA'''
@@ -128,7 +141,7 @@ def p_moduloaux1(p):
 def p_instruccion(p):
     '''instruccion : instruccion5 instruccionaux'''
     pass
-    
+    braces.push('{')
 def p_instruccion5(p):
     '''instruccion5 : IDENTIFICADOR PUNTO instruccion1 ENDLINE'''
     types.push(p[1])
@@ -155,7 +168,20 @@ def p_instruccion5_error(p):
         operizq = pOper.pop()
         operador = pilaO.pop()
         operacion(operation,valor,tipo)
-        
+
+def p_instruccion5_error2(p):
+    '''instruccion5 : IDENTIFICADOR error instruccion1 ENDLINE'''
+    print("Error: Falta '.' ")
+    types.push(p[1])
+    pOper.push(p[1])
+    if values.size() >= 1:
+        valor = values.pop()
+        operation = operations.pop()
+        tipo = types.pop()
+        operder =pOper.pop()
+        operizq = pOper.pop()
+        operador = pilaO.pop()
+        operacion(operation,valor,tipo)   
 def p_instruccionaux(p):
 	'''instruccionaux : 
                             | modulo'''
@@ -316,6 +342,8 @@ def p_error(p):
         print("En linea",p.lineno)
                 
     else:
+        if not braces.isEmpty():
+            print("Error: Falta '}'")
         print("Error de sintaxis en el fin del archivo")
 
 import ply.yacc as yacc
