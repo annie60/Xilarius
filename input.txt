@@ -13,7 +13,7 @@ Ana.derecha(4+21+1-Miotravar);
 siEs(pared <> Mivar){
 Ana.derecha(Miotravar);
 repetirHasta(pared == falso){
-Anaizquierda(2*4-1);
+Ana.izquierda(2*4-1);
 }
 }
 }

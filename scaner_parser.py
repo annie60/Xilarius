@@ -18,6 +18,9 @@ values = Stack()
 pOper = Stack()
 pilaO =Stack()
 braces = Stack()
+pSaltos = Stack()
+counter = 0
+cuadruplos = {}
 if sys.version_info[0] >= 3:
     raw_input = input
 #Token ids
@@ -93,7 +96,8 @@ def p_programa(p):
     pass
     if not braces.isEmpty():
         braces.pop()
-
+    print(cuadruplos)
+    print("\n")
 def p_program2(p):
     '''program2 : OPENEXP'''
     braces.push(p[1])
@@ -109,9 +113,12 @@ def p_declarar(p):
         tipo = types.pop()
         identificador =ids.dequeue()
         crear_modulo(identificador,tipo)
+##Declaracion de personaje
+##-----------------------------------
 def p_personaje(p):
     '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
     pass
+##Declaracion de variables
     ids.enqueue(p[2])
     types.push("personaje")
     values.push("personaje")
@@ -120,12 +127,42 @@ def p_personaje(p):
         valor = values.pop()
         identificador =ids.dequeue()
         agregar_variable(identificador,valor,tipo)
+##Inician modulos de control de flujo
+##-----------------------------------
 def p_modulo(p):
-    '''modulo : moduloaux1 OPENCOND laberinto CLOSECOND modulo2 instruccionaux CLOSEEXP instruccionaux
-				| instruccion'''
+    '''modulo : moduloaux1 
+		| moduloaux2
+                | instruccion'''
     pass
+    ##Control de pariedad de parentesis
     if not braces.isEmpty():
         braces.pop()
+def p_moduloaux1(p):
+    '''moduloaux1 : SIES OPENCOND laberinto CLOSECOND modulo2 instruccionaux modulo3 instruccionaux'''
+    pass
+##Control de ciclos y decisiones
+def p_modulo3(p):
+    '''modulo3 : CLOSEEXP'''
+    pass
+    if not pSaltos.isEmpty():
+        global counter
+        cuadruplos[pSaltos.pop()][3]=counter
+def p_modulo4(p):
+    '''modulo4 : CLOSEEXP'''
+    pass
+    if not pSaltos.isEmpty():
+        global counter
+        cuadruplos[pSaltos.pop()][3]=counter+1
+        if not pSaltos.isEmpty():
+            cuadruplos[counter]=["goto","","",pSaltos.pop()]
+            counter+=1
+def p_moduloaux2(p):
+    '''moduloaux2 : moduloaux3 OPENCOND laberinto CLOSECOND modulo2 instruccionaux modulo4 instruccionaux'''
+    pass
+def p_moduloaux3(p):
+    '''moduloaux3 : REPETIRHASTA'''
+    pass
+    pSaltos.push(counter)
 def p_modulo2(p):
     '''modulo2 : OPENEXP'''
     pass
@@ -133,20 +170,19 @@ def p_modulo2(p):
 def p_modulo2_error(p):
     '''modulo2 : error'''
     print("Error: Falta '{'")
-def p_moduloaux1(p):
-	'''moduloaux1 : SIES
-			| REPETIRHASTA'''
-	pass
-        
+##Inician instrucciones a personaje
+## -------------------------
 def p_instruccion(p):
     '''instruccion : instruccion5 instruccionaux'''
     pass
+#Control de pariedad de corchetes
     braces.push('{')
 def p_instruccion5(p):
     '''instruccion5 : IDENTIFICADOR PUNTO instruccion1 ENDLINE'''
     types.push(p[1])
     pOper.push(p[1])
     if values.size() >= 1:
+        global counter
         valor = values.pop()
         operation = operations.pop()
         tipo = types.pop()
@@ -154,6 +190,12 @@ def p_instruccion5(p):
         operizq = pOper.pop()
         operador = pilaO.pop()
         operacion(operation,valor,tipo)
+        ##TODO
+        ##Add interface connection
+        ##Remove and rename
+        pOper.push("temp")
+        cuadruplos[counter] = (operador,operizq,operder,"")
+        counter+=1
         
 def p_instruccion5_error(p):
     '''instruccion5 : IDENTIFICADOR PUNTO instruccion1 error'''
@@ -164,9 +206,9 @@ def p_instruccion5_error(p):
         valor = values.pop()
         operation = operations.pop()
         tipo = types.pop()
-        operder =pOper.pop()
-        operizq = pOper.pop()
-        operador = pilaO.pop()
+        pOper.pop()
+        pOper.pop()
+        pilaO.pop()
         operacion(operation,valor,tipo)
 
 def p_instruccion5_error2(p):
@@ -178,9 +220,9 @@ def p_instruccion5_error2(p):
         valor = values.pop()
         operation = operations.pop()
         tipo = types.pop()
-        operder =pOper.pop()
-        operizq = pOper.pop()
-        operador = pilaO.pop()
+        pOper.pop()
+        pOper.pop()
+        pilaO.pop()
         operacion(operation,valor,tipo)   
 def p_instruccionaux(p):
 	'''instruccionaux : 
@@ -199,7 +241,7 @@ def p_instruccion4(p):
     operations.push(p[1])
     values.push("personaje")
     pilaO.push(p[1])
-    pOper.push(p[1])
+    pOper.push("")
 def p_instruccion3(p):
     '''instruccion3 : RESPONDER OPENCOND instruccion2 CLOSECOND'''
     pass 
@@ -219,6 +261,8 @@ def p_mover(p):
     pass
     operations.push(p[1])
     pilaO.push(p[1])
+##Inicia definicion de declaracion de variables
+##-------------------------------------------
 def p_vars(p):
         '''vars : 
                 | vars2'''
@@ -249,27 +293,43 @@ def p_vars2(p):
             identificador =ids.dequeue()
             pOper.pop()
             agregar_variable(identificador,valor,tipo)
+##Inician expresiones de control
+##-----------------------------------------------
 def p_laberinto(p):
     '''laberinto : laberinto1 laberinto2 varcte'''
     pass
     if values.size() >= 1:
+        global counter
         valor = values.pop()
         tipo = types.pop()
         operacion = operations.pop()
         ##TODO: Specify use of this evaluation
-        pOper.pop()
+        ##according to interface
+        operadorizq=pOper.pop()
+        operador=pOper.pop()
         operacion_compatible(operacion,tipo,valor)
+        cuadruplos[counter]=[operacion,operadorizq,operador,""]
+        counter+=1
+        ##Remove and rename
+        pOper.push("temp")
+        pSaltos.push(counter)
+        cuadruplos[counter]=["gotof",pOper.pop(),"",""]
+        counter+=1
+        
 def p_laberinto1(p):
     '''laberinto1 : PARED
 		| LIBRE
 		| META'''
     pass
     types.push("decision")
+    pOper.push(p[1])
 def p_laberinto2(p):
     '''laberinto2 : DIFERENTEA
 	| IGUALA'''
     pass
     operations.push(p[1])
+##Inician expresiones regulares
+##----------------------------------
 def p_expresion(p):
     '''expresion : termino exp'''
     pass 
@@ -289,12 +349,14 @@ def p_exp2(p):
     pass
     pilaO.push(p[1])
     if pilaO.top() == "+" or pilaO.top() == "-":
+        global counter
         operador = pilaO.pop()
         operDer = pOper.pop()
         operIzq = pOper.pop()
         temporal = cuadruplo(operador,operIzq,operDer)
-        #print(str(operIzq)+operador+str(operDer)+"="+str(temporal)+" +/-")
+        cuadruplos[counter] = [operador,operIzq,operDer,temporal]
         pOper.push(temporal)
+        counter+=1
 #Specific error generation
 def p_exp_error(p):
     '''exp2 : error termino '''
@@ -313,12 +375,14 @@ def p_termino3(p):
     pass
     pilaO.push(p[1])
     if pilaO.top() == "*" or pilaO.top() == "/":
+        global counter
         operador = pilaO.pop()
         operDer = pOper.pop()
         operIzq = pOper.pop()
         temporal = cuadruplo(operador,operIzq,operDer)
-        #print(str(operIzq)+operador+str(operDer)+"="+str(temporal)+" * /")
+        cuadruplos[counter] = (operador,operIzq,operDer,temporal)
         pOper.push(temporal)
+        counter+=1
 def p_tipo(p):
     '''tipo : TIPONUMERO
 		| TIPOESCRITA
