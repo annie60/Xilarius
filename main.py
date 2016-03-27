@@ -7,14 +7,13 @@
 
 
 #-----------------------Libs import-----------------------#
-#from pygame import init, display, Color, key, quit, time, event
 import pygame, sys
 from pygame.locals import *
 from Function import *
 from Class import *
-#from sys import exit
+from tygame.main import StaticFrame, Button, Label, render_widgets, handle_widgets #But you can put in ..\Python\Lib\site-packages
 
-#Replace this
+#TODO Remplazar funciones de botones
 #---------------------Buttons functions--------------------#
     
 def But_X_Y(size):
@@ -45,13 +44,10 @@ pygame.init()
 #Window creation
 WW, WH = 640, 480
 Window = pygame.display.set_mode((WW, WH))
-
-#icone = image.load("Bipo.png")
-#icone.set_colorkey(const.pink)
-#display.set_icon(icone)
 pygame.display.set_caption("Xilarius")
 # FIN
-
+Frame = StaticFrame(Window, colour = const.Pblue, header = False, bordercolor = const.Pgreen, borderwidth = 5, width = 229, height = 470)
+Frame.place((401, 0))
 
 
 #---------------------Some variables--------------------#
@@ -79,7 +75,7 @@ while True:
             pygame.quit()
             sys.exit()
             pygame.display.update()
-    ##Todo: Poner aqui logica para traducir programa
+    ##TODO: Poner aqui logica para traducir programa
     if keys:
         if keys[K_UP]:
             if not character.yellow_road:
@@ -93,8 +89,10 @@ while True:
         if keys[K_RIGHT]:
             if not character.yellow_road:
                 character.move(const.right)
+        if keys[K_h]:
+            But_path()
                 
-
+    ##Sets miliseconds between a display loop            
     if pygame.time.get_ticks() - character_time >= const.time_character_poll:
         character_time = pygame.time.get_ticks()
         character.poll()
@@ -102,7 +100,7 @@ while True:
 
     character.show(Window)
     pygame.display.flip()
-    
+    render_widgets()
     if character.x == character.maze.w - 1 and character.y == character.maze.h - 1:
         pygame.time.delay(300)       
         
@@ -113,7 +111,7 @@ while True:
     
         mymaze = maze(25, 30)
         mymaze.generate_maze()
-        character = character(mymaze)
+        character = Character(mymaze)
         
         while True:
             Window.fill(const.Porange)
@@ -131,6 +129,6 @@ while True:
             for Xil in list_x2:
                 Xil.show(Window)
             
-            display.flip()
+            pygame.display.flip()
             
-        list_x2 = Function.fill_list_x2(list_x1)
+        list_x2 = fill_list_x2(list_x1)

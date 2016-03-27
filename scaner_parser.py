@@ -96,8 +96,9 @@ def p_programa(p):
     pass
     if not braces.isEmpty():
         braces.pop()
-    print(cuadruplos)
-    print("\n")
+    ##TODO: Quitar impresion
+    #print(cuadruplos)
+    #print("\n")
 def p_program2(p):
     '''program2 : OPENEXP'''
     braces.push(p[1])
@@ -113,12 +114,12 @@ def p_declarar(p):
         tipo = types.pop()
         identificador =ids.dequeue()
         crear_modulo(identificador,tipo)
-##Declaracion de personaje
+##Character declaration
 ##-----------------------------------
 def p_personaje(p):
     '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
     pass
-##Declaracion de variables
+##Glob. var. declaration
     ids.enqueue(p[2])
     types.push("personaje")
     values.push("personaje")
@@ -127,20 +128,23 @@ def p_personaje(p):
         valor = values.pop()
         identificador =ids.dequeue()
         agregar_variable(identificador,valor,tipo)
-##Inician modulos de control de flujo
+def p_personaje_error(p):
+    '''personaje : CREARPERSONAJE error ENDLINE vars'''
+    print("Error: No se encontro nombre de personaje")
+##Start of the modules for flow control
 ##-----------------------------------
 def p_modulo(p):
     '''modulo : moduloaux1 
 		| moduloaux2
                 | instruccion'''
     pass
-    ##Control de pariedad de parentesis
+    ##Braces equality check
     if not braces.isEmpty():
         braces.pop()
 def p_moduloaux1(p):
     '''moduloaux1 : SIES OPENCOND laberinto CLOSECOND modulo2 instruccionaux modulo3 instruccionaux'''
     pass
-##Control de ciclos y decisiones
+##Loops and decitions control
 def p_modulo3(p):
     '''modulo3 : CLOSEEXP'''
     pass
@@ -162,20 +166,22 @@ def p_moduloaux2(p):
 def p_moduloaux3(p):
     '''moduloaux3 : REPETIRHASTA'''
     pass
+    #For loops control
     pSaltos.push(counter)
 def p_modulo2(p):
     '''modulo2 : OPENEXP'''
     pass
+    #Part of parenthesis equality control
     braces.push(p[1])
 def p_modulo2_error(p):
     '''modulo2 : error'''
     print("Error: Falta '{'")
-##Inician instrucciones a personaje
+##Character instructions start
 ## -------------------------
 def p_instruccion(p):
     '''instruccion : instruccion5 instruccionaux'''
     pass
-#Control de pariedad de corchetes
+#Equality control for braces
     braces.push('{')
 def p_instruccion5(p):
     '''instruccion5 : IDENTIFICADOR PUNTO instruccion1 ENDLINE'''
@@ -194,9 +200,9 @@ def p_instruccion5(p):
         ##Add interface connection
         ##Remove and rename
         pOper.push("temp")
-        cuadruplos[counter] = (operador,operizq,operder,"")
+        cuadruplos[counter] = [operador,operizq,operder,""]
         counter+=1
-        
+##Error control for sintaxis        
 def p_instruccion5_error(p):
     '''instruccion5 : IDENTIFICADOR PUNTO instruccion1 error'''
     print("Error:Falta ';'")
@@ -223,7 +229,8 @@ def p_instruccion5_error2(p):
         pOper.pop()
         pOper.pop()
         pilaO.pop()
-        operacion(operation,valor,tipo)   
+        operacion(operation,valor,tipo)
+##Auxiliar instruction rules
 def p_instruccionaux(p):
 	'''instruccionaux : 
                             | modulo'''
@@ -261,7 +268,7 @@ def p_mover(p):
     pass
     operations.push(p[1])
     pilaO.push(p[1])
-##Inicia definicion de declaracion de variables
+##Global vars. definition rules
 ##-------------------------------------------
 def p_vars(p):
         '''vars : 
@@ -286,6 +293,7 @@ def p_vars2_error(p):
 def p_vars2(p):
         '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1'''
         pass
+        #Table of variables declaration
         ids.enqueue(p[2])
         if ids.size() >= 1:
             valor = values.pop()
@@ -293,7 +301,7 @@ def p_vars2(p):
             identificador =ids.dequeue()
             pOper.pop()
             agregar_variable(identificador,valor,tipo)
-##Inician expresiones de control
+##Start of control/decision expresions
 ##-----------------------------------------------
 def p_laberinto(p):
     '''laberinto : laberinto1 laberinto2 varcte'''
@@ -328,7 +336,7 @@ def p_laberinto2(p):
 	| IGUALA'''
     pass
     operations.push(p[1])
-##Inician expresiones regulares
+##Regular expresions start
 ##----------------------------------
 def p_expresion(p):
     '''expresion : termino exp'''
@@ -380,7 +388,7 @@ def p_termino3(p):
         operDer = pOper.pop()
         operIzq = pOper.pop()
         temporal = cuadruplo(operador,operIzq,operDer)
-        cuadruplos[counter] = (operador,operIzq,operDer,temporal)
+        cuadruplos[counter] = [operador,operIzq,operDer,temporal]
         pOper.push(temporal)
         counter+=1
 def p_tipo(p):
@@ -407,7 +415,7 @@ def p_error(p):
                 
     else:
         if not braces.isEmpty():
-            print("Error: Falta '}'")
+            print("Error: Falta '}' o ')'")
         print("Error de sintaxis en el fin del archivo")
 
 import ply.yacc as yacc

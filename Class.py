@@ -59,14 +59,17 @@ const.down = 3
 
 #Sizes
 
-const.wc = 16 # ancho de un carril del maze
-const.hc = 16 # alto de un carril del maze
+const.wc = 16 # width of a square on the maze
+const.hc = 16 # height of the square on the maze
 
 const.time_character_poll = 75
 
   
     
 class Point(object):
+    """
+    Coordinate or cardinal point
+    """
     def __init__(self, xy):
         self.x = xy[0]
         self.y = xy[1]      
@@ -74,7 +77,7 @@ class Point(object):
 	
 class Case(object):
     """
-    Case es un cuadro de maze.
+    Case is a square on the maze
     """
 
     def __init__(self):
@@ -84,7 +87,7 @@ class Case(object):
 		
 class CaseColor(object):
     """
-    Para la coloracion de cuadros
+    For the squares coloring
     """
     def __init__(self, Pos, color):
         self.pos = Pos
@@ -95,7 +98,7 @@ class CaseColor(object):
 		
 class Character(object):
     """
-    Personaje
+    Instance of a character
     """
     def __init__(self, maze):
         self.x = 0
@@ -106,7 +109,7 @@ class Character(object):
         self.reverse = 0
         
         self.maze = maze
-        
+        #Set avatar image
         self.img = image.load("Bipo.png").convert()
         self.img.set_colorkey(const.pink)
         self.rect_img = self.img.get_rect()

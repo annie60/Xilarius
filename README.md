@@ -19,6 +19,11 @@ __Prof. Elda Quiroga__
 
 __Dr. José Icaza__
 
+##Requisitos
+- Python V.3.5.x
+- Libreria [Pygame](http://www.pygame.org/) V.3.X
+- Libreria [Tygame](http://www.pygame.org/project-Tygame+-+GUI+Project-2081-.html)
+
 ## Como usar
 - Usar archivo __input.txt__ para diseñar un programa 'dummy'
 - En la consola ejecutar

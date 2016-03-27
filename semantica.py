@@ -91,7 +91,7 @@ def crear_modulo(nombre,ambiente):
 def agregar_variable(nombre,valor,tipo):
     #Revisa que no este repetida la variable
     if existe_variable(nombre):
-        print("Error: Nombre de variable repetido")
+        print("Error: Nombre de variable '"+nombre+"' repetido")
         return False
     else:
         #Revisa que la asignacion que se le hace sea
