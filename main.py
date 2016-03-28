@@ -34,7 +34,7 @@ def But_path():
     character.go_to(chemain)
 def Execute_instruction():
     global entryForInput
-    #TODO Logica para procesar semantica
+    #TODO Logica para procesar semantica de un programa
     print("Ejecuta")
 def Change_avatar():
     global avatar_index,character
@@ -46,6 +46,7 @@ def Change_avatar():
         character.change_avatar(avatars[avatar_index])
 def Character_talk():
     global character,Window
+    #TODO Manejar logica de acuerdo al programa escrito
     character.talk(Window,"hello")
 def Home():
     global on_game,on_initial,change_button,Label_gen,Frame,execute_button,entryForInput,back_button
@@ -185,6 +186,7 @@ while True:
         if character.x == character.maze.w - 1 and character.y == character.maze.h - 1:
             Restart()
     elif(on_initial):
+        ## Main page
         Window.fill(const.black) 
         start_button= Button(Window, text = "Iniciar! ", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 18, target = Start_game)
         start_button.place((545, 6))
@@ -196,6 +198,7 @@ while True:
         img.set_colorkey(RLEACCEL)
         rect = Rect((100,50), (101, 171))
         Window.blit(img, rect)
+        # TODO Dibujar el resto de la pantalla
         render_widgets()
         pygame.display.flip()
     else:

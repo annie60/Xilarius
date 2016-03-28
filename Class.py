@@ -186,7 +186,13 @@ class Character(object):
                 self.y += 1
                 
             self.rect_img[0], self.rect_img[1] = (self.x * const.wc), (self.y * const.hc)
-            
+    
+    def isWall(self,dir):
+        if not self.maze.get_cell(self.x, self.y).gate[dir]:
+            return False
+        else:
+            return True
+        
     def astar(self, dest):
         desti = Point(dest)
         openL = []

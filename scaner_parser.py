@@ -10,7 +10,7 @@ from semantica import agregar_variable,operacion_compatible,cuadruplo,crear_modu
 from semantica import Stack
 from semantica import Queue
 sys.path.insert(0,"../..")
-#Inicializacion de objetos auxiliares
+#Helpers initialization
 ids = Queue()
 types = Stack()
 operations = Stack()
@@ -21,6 +21,9 @@ braces = Stack()
 pSaltos = Stack()
 counter = 0
 cuadruplos = {}
+temporary = []
+temp_counter =0
+
 if sys.version_info[0] >= 3:
     raw_input = input
 #Token ids
@@ -97,7 +100,7 @@ def p_programa(p):
     if not braces.isEmpty():
         braces.pop()
     ##TODO: Quitar impresion
-    #print(cuadruplos)
+    print(cuadruplos)
     #print("\n")
 def p_program2(p):
     '''program2 : OPENEXP'''
@@ -293,6 +296,7 @@ def p_vars2_error(p):
 def p_vars2(p):
         '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1'''
         pass
+        #TODO Agregar declaracion de constantes
         #Table of variables declaration
         ids.enqueue(p[2])
         if ids.size() >= 1:
@@ -318,7 +322,7 @@ def p_laberinto(p):
         operacion_compatible(operacion,tipo,valor)
         cuadruplos[counter]=[operacion,operadorizq,operador,""]
         counter+=1
-        ##Remove and rename
+        ##TODO Remove and rename
         pOper.push("temp")
         pSaltos.push(counter)
         cuadruplos[counter]=["gotof",pOper.pop(),"",""]
@@ -361,7 +365,9 @@ def p_exp2(p):
         operador = pilaO.pop()
         operDer = pOper.pop()
         operIzq = pOper.pop()
-        temporal = cuadruplo(operador,operIzq,operDer)
+        #temporal = cuadruplo(operador,operIzq,operDer)
+        #TODO Crear espacios para temporal
+        temporal = ""
         cuadruplos[counter] = [operador,operIzq,operDer,temporal]
         pOper.push(temporal)
         counter+=1
@@ -387,7 +393,9 @@ def p_termino3(p):
         operador = pilaO.pop()
         operDer = pOper.pop()
         operIzq = pOper.pop()
-        temporal = cuadruplo(operador,operIzq,operDer)
+        #temporal = cuadruplo(operador,operIzq,operDer)
+        #TODO Crear espacios de memoria para temporal
+        temporal =""
         cuadruplos[counter] = [operador,operIzq,operDer,temporal]
         pOper.push(temporal)
         counter+=1

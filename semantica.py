@@ -39,7 +39,17 @@ class Queue:
 # Definicion de un diccionario con llaves y una lista de atributos
 # { "nombre" : (valor,tipoDeCte)}
 var_dicc_funciones = {}
-
+#Mapeo de memoria
+#1000 - 19999 <- Globales
+#20000- 24999 <- Temporales
+#25000- 25999 <- Constantes
+global_mem_counter = 1000;
+temp_mem_counter = 20000;
+const_mem_counter = 25000;
+vm_memory = {0:{}, #Globales {numeroenmemoria : (nombrereal, valor)}
+             1:{}, #Temporales {numeroenmemoria : (nombrereal, valor)}
+             2:{}  #Constantes {numeroenmemoria :  valor}
+            }
 var_boleanas = ("verdadero","falso")
 var_tipos = ("numero","escrita","decision","personaje")
 var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","atras","adelante","derecha","izquierda")
@@ -164,7 +174,8 @@ def checa_operando(operando):
         else:
             return operando
     else:
-        return operando    
+        return operando 
+## TODO Cambiar por espacios de memoria
 def cuadruplo(operador,operandoizq,operandoder):
     indice = var_operaciones.index(operador)
     operandoizq=checa_operando(operandoizq) 

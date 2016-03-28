@@ -629,6 +629,15 @@ class Entry:
                 self.text +="("
             elif button == "0":
                 self.text +=")"
+            elif button == "'":
+                self.text +="\""
+            elif button == "-":
+                self.text +="_"
+            elif button == "=":
+                self.text +="+"
+            elif button == "8":
+                self.text +="*"
+            
         if button == "backspace":
             self.text = self.text[:-1]
         elif button == "space":
