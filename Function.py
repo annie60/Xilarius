@@ -10,9 +10,9 @@ def list_xil(WW, WH):
     Xi = 0
     Yi = 0
     
-    while Yi < int(WH/16):
-        while Xi < int(WW/16):
-            list_x.append(Xilarius((Xi * 16, Yi * 16)))
+    while Yi < int(WH/26):
+        while Xi < int(WW/26):
+            list_x.append(Xilarius((Xi * 26, Yi * 26)))
             Xi += 1
             
         Xi = 0

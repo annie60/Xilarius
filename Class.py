@@ -9,7 +9,7 @@ from pygame import image, Rect, draw, Surface
 from pygame.locals import *
 from random import randint, choice
 from math import sqrt
-
+imagespath ="images/"
 
 """
 Funcion:
@@ -51,6 +51,8 @@ const.Pgreen = (192, 234, 68)
 const.Porange = (255, 201, 14)
 const.Pblue = (18, 204, 214)
 
+const.beginning="door_open"
+const.ending ="door_closed"
 #directions 
 const.right = 0
 const.left = 1
@@ -59,8 +61,8 @@ const.down = 3
 
 #Sizes
 
-const.wc = 16 # width of a square on the maze
-const.hc = 16 # height of the square on the maze
+const.wc = 26 # width of a square on the maze
+const.hc = 26 # height of the square on the maze
 
 const.time_character_poll = 75
 
@@ -94,7 +96,20 @@ class CaseColor(object):
         
         self.surf = Surface((const.wc, const.hc))
         self.surf.fill(color)
-        
+class CaseImage(object):
+    """
+    For the squares coloring
+    """
+    def __init__(self, Pos, imagenam):
+        self.pos = Pos
+        global imagespath
+        imagename=imagespath+imagenam+".png"
+        self.img = image.load(imagename).convert_alpha()
+        self.img.set_colorkey(RLEACCEL)
+        self.rect_img = self.img.get_rect()
+        self.surf = Surface((const.wc, const.hc))
+        self.surf.fill(const.Porange)
+        self.surf.blit(self.img,self.rect_img)        
 		
 class Character(object):
     """
@@ -107,17 +122,24 @@ class Character(object):
         self.mainroad = None
         self.yellow_road = []
         self.reverse = 0
-        
+
+        global imagespath
         self.maze = maze
         #Set avatar image
-        self.img = image.load("Bipo.png").convert()
-        self.img.set_colorkey(const.pink)
+        self.img = image.load(imagespath+"Character_boy.png").convert_alpha()
+        self.img.set_colorkey(RLEACCEL)
         self.rect_img = self.img.get_rect()
         self.rect_img[0], self.rect_img[1] = (self.x * const.wc), (self.y * const.hc)
         ##Sets begin and end
-        self.dep = CaseColor((0, 0), const.green)
-        self.fin = CaseColor(((self.maze.w * const.wc - const.wc), (self.maze.h * const.hc - const.hc)), const.red)
-
+        self.dep = CaseImage((0, 0), const.beginning)
+        self.fin = CaseImage(((self.maze.w * const.wc - const.wc), (self.maze.h * const.hc - const.hc)), const.ending)
+    def change_avatar(self,imagenam):
+        global imagespath
+        imagename=imagespath+imagenam+".png"
+        self.img = image.load(imagename).convert_alpha()
+        self.img.set_colorkey(RLEACCEL)
+        self.rect_img = self.img.get_rect()
+        self.rect_img[0], self.rect_img[1] = (self.x * const.wc), (self.y * const.hc)
         
     def show(self, screen):
 
@@ -145,7 +167,12 @@ class Character(object):
         
         
         self.maze.show(screen)
-        
+    def talk(self,screen,string):
+        self.img_speech = image.load(imagespath+"bubble.png").convert_alpha()
+        self.img_speech.set_colorkey(RLEACCEL)
+        self.rect_img_speech = self.img_speech.get_rect()
+        self.rect_img_speech[0], self.rect_img_speech[1] = (self.x+3 * const.wc), (self.y+5 * const.hc)
+        screen.blit(self.img_speech, self.rect_img_speech) 
     def move(self, dir):
         if not self.maze.get_cell(self.x, self.y).gate[dir]:
             
@@ -371,10 +398,10 @@ class maze(object):
 
 class Xilarius(object):
     def __init__(self, Pos):
-        
-        self.img = image.load("Bipo.png").convert()
-        self.img.set_colorkey(const.pink)
-        self.rect = Rect(Pos, (16, 16))
+        global imagespath
+        self.img = image.load(imagespath+"Character_boy.png").convert_alpha()
+        self.img.set_colorkey(RLEACCEL)
+        self.rect = Rect(Pos, (26, 26))
         
     def show(self, screen):
         screen.blit(self.img, self.rect)
