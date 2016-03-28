@@ -258,42 +258,42 @@ class Character(object):
         source = self.maze.get_cell(csource[0], csource[1])
         desti = self.maze.get_cell(cdesti[0], cdesti[1])
         
-        actuel = desti
+        actual = desti
         mainroad = []
         
-        while actuel and (actuel.x != source.x or actuel.y != source.y):
-            if actuel.x == actuel.parent.x - 1:
-                self.yellow_road.append(actuel)
+        while actual and (actual.x != source.x or actual.y != source.y):
+            if actual.x == actual.parent.x - 1:
+                self.yellow_road.append(actual)
                 mainroad.append(const.right)
-            if actuel.x == actuel.parent.x + 1:
-                self.yellow_road.append(actuel)
+            if actual.x == actual.parent.x + 1:
+                self.yellow_road.append(actual)
                 mainroad.append(const.left)
-            if actuel.y == actuel.parent.y - 1:
-                self.yellow_road.append(actuel)
+            if actual.y == actual.parent.y - 1:
+                self.yellow_road.append(actual)
                 mainroad.append(const.down)
-            if actuel.y == actuel.parent.y + 1:
-                self.yellow_road.append(actuel)
+            if actual.y == actual.parent.y + 1:
+                self.yellow_road.append(actual)
                 mainroad.append(const.up)
                 
-            actuel = actuel.parent
+            actual = actual.parent
             
-        che_retour = []        
+        return_road = []        
         id = len(mainroad) - 1
         
         while id >= 0:
-            che_retour.append(self.maze.notdir(mainroad[id]))
+            return_road.append(self.maze.notdir(mainroad[id]))
             id -= 1
             
         
-        return che_retour
+        return return_road
         
     def poll(self):
         if self.mainroad:
             self.move(self.mainroad.pop(0))
             self.yellow_road.pop(0)
             
-    def go_to(self, che):
-        self.mainroad = che
+    def go_to(self, road):
+        self.mainroad = road
         
         
 class maze(object):
