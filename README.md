@@ -24,16 +24,16 @@ __Dr. José Icaza__
 - Libreria [Pygame](http://www.pygame.org/) V.3.X
 - Libreria [Tygame](http://www.pygame.org/project-Tygame+-+GUI+Project-2081-.html)
 
-### Notas
-Hubo cambios a la libreria tygame por lo qeu se tiene que tomar del directorio local
+#### Notas
+Hubo cambios a la libreria tygame por lo que se tiene que tomar del directorio local
 
-## Como usar
-### Funcion de escaner y analizador
+## Como usar?
+#### Funcion de escaner y analizador
 - Usar archivo __input.txt__ para diseñar un programa 'dummy'
 - En la consola ejecutar
 ` python scaner_parser.py input.txt `
 
-### Interfaz Grafica
+#### Interfaz Grafica
 - En la consola ejecutar
 ` python main.py `
 
