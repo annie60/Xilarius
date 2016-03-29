@@ -17,6 +17,7 @@ musicpath ="music/"
 avatars = ["Character_boy","Character_Cat_girl",
             "Character_Horn_Girl","Character_Pink_Girl"]
 avatar_index=0
+main_background = "Main_Background"
 on_game = False
 on_initial = True
 #TODO Remplazar funciones de botones
@@ -190,13 +191,20 @@ while True:
         Window.fill(const.black) 
         start_button= Button(Window, text = "Iniciar! ", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 18, target = Start_game)
         start_button.place((545, 6))
+		## Background image
+        img = image.load(imagespath+"Main_Background.png").convert_alpha()
+        img.set_colorkey(RLEACCEL)
+        rect = Rect((0,0), (0, 0))
+        Window.blit(img, rect)
+		## Character
         img = image.load(imagespath+"Character_boy_Large.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
-        rect = Rect((20,100), (101, 171))
+        rect = Rect((-10,70), (101, 171))
         Window.blit(img, rect)
+        ## Bubble message
         img = image.load(imagespath+"bubble.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
-        rect = Rect((100,50), (101, 171))
+        rect = Rect((80,20), (101, 171))
         Window.blit(img, rect)
         # TODO Dibujar el resto de la pantalla
         render_widgets()
