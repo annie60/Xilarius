@@ -46,6 +46,7 @@ const.black  = (0 , 0 , 0)
 const.yellow = (255 , 255 , 0)
 const.red = (255 , 0 , 0)
 const.green = (0, 255, 0)
+const.gray = (128,128,128)
 
 const.Pgreen = (192, 234, 68)
 const.Porange = (255, 201, 14)
@@ -53,6 +54,8 @@ const.Pblue = (18, 204, 214)
 
 const.beginning="door_open"
 const.ending ="door_closed"
+const.brownPatch = "brown_cell"
+const.greenPatch = "green_cell"
 #directions 
 const.right = 0
 const.left = 1
@@ -83,9 +86,11 @@ class Case(object):
     """
 
     def __init__(self):
+        self.x=0;
+        self.y=0;
         self.state = False
         self.gate = [True, True, True, True] # D, G, H, B
-        
+        #self.background = CaseImage((0, 0), const.greenPatch)
 		
 class CaseColor(object):
     """
@@ -313,11 +318,22 @@ class maze(object):
         
         self.sx = sx
         self.sy = sy
-        
+        localX = 0.1
         for v in range(self.w * self.h):
             a = Case()
             a.x = v % self.w
             a.y = int(v / self.w)
+            
+                localX += 1
+            else:
+                localX = 0.1
+                localY = loop
+                loop += 1
+            
+            if randint(0, 50) < 10:
+                    a.background = CaseImage((localX* self.wc,localY * self.hc), const.brownPatch)
+            else:
+                    a.background = CaseImage((localX * self.wc,localY* self.hc), const.greenPatch)
             self.cases.append(a)
         
     def get_cell(self, x, y):
@@ -339,7 +355,7 @@ class maze(object):
             y = randint(0, self.h - 1)
             
         cell_act = self.get_cell(x, y)
-        
+                
         if not cell_act.state:
             cell_act.state = True
             
@@ -372,15 +388,14 @@ class maze(object):
     def show(self, screen):
         W, H = self.wc, self.hc
         sx , sy = self.sx, self.sy
-        
         for y in range(self.h - 1):
             for x in range(self.w - 1):
                 c = self.get_cell(x, y)
                 
                 if c.gate[const.right]:
-                    draw.line(screen, const.black, (sx + ((x + 1) * W), (sy + (y * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 2)
+                    draw.line(screen, const.black, (sx + ((x + 1) * W), (sy + (y * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                 if c.gate[const.down]:
-                    draw.line(screen, const.black, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 2)
+                    draw.line(screen, const.black, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                                      
         x = self.w - 1
         
@@ -388,7 +403,7 @@ class maze(object):
             c = self.get_cell(x, y)
             
             if c.gate[const.down]:
-                draw.line(screen, const.black, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 2)
+                draw.line(screen, const.black, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                 
         y = self.h - 1
         
@@ -396,11 +411,10 @@ class maze(object):
             c = self.get_cell(x, y)
             
             if c.gate[const.right]:
-                draw.line(screen, const.black, (sx + ((x + 1) * W), (sy + (y * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 2)
                 
                 
-
-        draw.rect(screen, const.black, (sx, sy, W * self.w, H * self.h), 2)
+        
+        draw.rect(screen, const.black, (sx, sy, W * self.w, H * self.h), 3)
 
 class Xilarius(object):
     def __init__(self, Pos):
