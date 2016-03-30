@@ -77,7 +77,7 @@ def Restart():
             character = Character(mymaze)
             entryForInput.set("")
             while True:
-                Window.fill(const.Porange)
+                Window.fill(const.green)
                 character.show(Window)
                 render_widgets()
             
@@ -156,7 +156,7 @@ while True:
                 quit()
                 exit()
     if on_game:
-        Window.fill(const.Porange)    
+        Window.fill(const.green)    
         keys = pygame.key.get_pressed()
         ##TODO: Poner aqui logica para traducir programa
         if keys:

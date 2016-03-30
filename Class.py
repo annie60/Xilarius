@@ -45,8 +45,8 @@ const.pink   = (255 , 0 , 255)
 const.black  = (0 , 0 , 0)
 const.yellow = (255 , 255 , 0)
 const.red = (255 , 0 , 0)
-const.green = (0, 255, 0)
-const.gray = (128,128,128)
+const.green = (106, 198, 81)
+const.gray = (64,64,64)
 
 const.Pgreen = (192, 234, 68)
 const.Porange = (255, 201, 14)
@@ -56,6 +56,8 @@ const.beginning="door_open"
 const.ending ="door_closed"
 const.brownPatch = "brown_cell"
 const.greenPatch = "green_cell"
+const.grayPatch = "stone_block"
+const.dirtPatch = "dirt_block"
 #directions 
 const.right = 0
 const.left = 1
@@ -86,8 +88,7 @@ class Case(object):
     """
 
     def __init__(self):
-        self.x=0;
-        self.y=0;
+        
         self.state = False
         self.gate = [True, True, True, True] # D, G, H, B
         #self.background = CaseImage((0, 0), const.greenPatch)
@@ -113,7 +114,7 @@ class CaseImage(object):
         self.img.set_colorkey(RLEACCEL)
         self.rect_img = self.img.get_rect()
         self.surf = Surface((const.wc, const.hc))
-        self.surf.fill(const.Porange)
+        self.surf.fill(const.green)
         self.surf.blit(self.img,self.rect_img)        
 		
 class Character(object):
@@ -161,17 +162,17 @@ class Character(object):
                     caseL.append(CaseColor(((c.x * const.wc), (c.y * const.hc)), const.yellow))
                     
                     
-                
+        
         caseL.reverse()
         for c in caseL:
             screen.blit(c.surf, c.pos)
-            
+        self.maze.show(screen)    
         screen.blit(self.dep.surf, self.dep.pos)
         screen.blit(self.fin.surf, self.fin.pos)            
         screen.blit(self.img, self.rect_img)
         
         
-        self.maze.show(screen)
+        
     def talk(self,screen,string):
         self.img_speech = image.load(imagespath+"bubble.png").convert_alpha()
         self.img_speech.set_colorkey(RLEACCEL)
@@ -318,12 +319,16 @@ class maze(object):
         
         self.sx = sx
         self.sy = sy
+        localY = 0.1
         localX = 0.1
+        loop = 1
         for v in range(self.w * self.h):
             a = Case()
             a.x = v % self.w
             a.y = int(v / self.w)
             
+            
+            if v < (self.w * loop):
                 localX += 1
             else:
                 localX = 0.1
@@ -332,8 +337,11 @@ class maze(object):
             
             if randint(0, 50) < 10:
                     a.background = CaseImage((localX* self.wc,localY * self.hc), const.brownPatch)
+            elif randint(0,50) < 5:
+                 a.background = CaseImage((localX* self.wc,localY * self.hc), const.dirtPatch)
             else:
-                    a.background = CaseImage((localX * self.wc,localY* self.hc), const.greenPatch)
+                a.background = CaseImage((localX * self.wc,localY* self.hc), const.greenPatch)
+            
             self.cases.append(a)
         
     def get_cell(self, x, y):
@@ -388,14 +396,16 @@ class maze(object):
     def show(self, screen):
         W, H = self.wc, self.hc
         sx , sy = self.sx, self.sy
+        for cell in self.cases:
+            screen.blit(cell.background.surf, cell.background.pos)
         for y in range(self.h - 1):
             for x in range(self.w - 1):
                 c = self.get_cell(x, y)
                 
                 if c.gate[const.right]:
-                    draw.line(screen, const.black, (sx + ((x + 1) * W), (sy + (y * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
+                    draw.line(screen, const.gray, (sx + ((x + 1) * W), (sy + (y * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                 if c.gate[const.down]:
-                    draw.line(screen, const.black, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
+                    draw.line(screen, const.gray, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                                      
         x = self.w - 1
         
@@ -403,7 +413,7 @@ class maze(object):
             c = self.get_cell(x, y)
             
             if c.gate[const.down]:
-                draw.line(screen, const.black, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
+                draw.line(screen, const.gray, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                 
         y = self.h - 1
         
@@ -411,10 +421,10 @@ class maze(object):
             c = self.get_cell(x, y)
             
             if c.gate[const.right]:
-                
+                draw.line(screen, const.gray, (sx + ((x + 1) * W), (sy + (y * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                 
         
-        draw.rect(screen, const.black, (sx, sy, W * self.w, H * self.h), 3)
+        draw.rect(screen, const.gray, (sx, sy, W * self.w, H * self.h), 3)
 
 class Xilarius(object):
     def __init__(self, Pos):

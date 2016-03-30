@@ -643,7 +643,7 @@ class Entry:
         elif button == "space":
             button = " "
         elif button == "return":
-            self.text += "\n"
+            self.text += "\n\n"
         if self.numonly:
             if button.isalpha():
                 button = ""
