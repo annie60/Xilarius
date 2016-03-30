@@ -9,7 +9,6 @@ from pygame import image, Rect, draw, Surface
 from pygame.locals import *
 from random import randint, choice
 from math import sqrt
-imagespath ="images/"
 
 """
 Funcion:
@@ -20,7 +19,7 @@ def distance(p1, p2):
 
 
 """
-Para uso de la clase
+For constant definitions
 """
 class def_const(object):
     def __getattr__(self, attr):
@@ -38,7 +37,9 @@ class def_const(object):
 
 const = def_const ()
 """Contant definitions """
-
+#paths
+const.imagespath = "images/"
+const.musicpath = "music/"
 # Colors
 const.white  = (255 , 255 , 255)
 const.pink   = (255 , 0 , 255)
@@ -51,7 +52,7 @@ const.gray = (64,64,64)
 const.Pgreen = (192, 234, 68)
 const.Porange = (255, 201, 14)
 const.Pblue = (18, 204, 214)
-
+#images
 const.beginning="door_open"
 const.ending ="door_closed"
 const.brownPatch = "brown_cell"
@@ -81,7 +82,8 @@ class Point(object):
         self.x = xy[0]
         self.y = xy[1]      
     
-	
+#Starts cell object
+#-------------------------------
 class Case(object):
     """
     Case is a square on the maze
@@ -108,15 +110,15 @@ class CaseImage(object):
     """
     def __init__(self, Pos, imagenam):
         self.pos = Pos
-        global imagespath
-        imagename=imagespath+imagenam+".png"
+        imagename=const.imagespath+imagenam+".png"
         self.img = image.load(imagename).convert_alpha()
         self.img.set_colorkey(RLEACCEL)
         self.rect_img = self.img.get_rect()
         self.surf = Surface((const.wc, const.hc))
         self.surf.fill(const.green)
         self.surf.blit(self.img,self.rect_img)        
-		
+#Starts character object
+#-------------------------------------------
 class Character(object):
     """
     Instance of a character
@@ -129,10 +131,9 @@ class Character(object):
         self.yellow_road = []
         self.reverse = 0
 
-        global imagespath
         self.maze = maze
         #Set avatar image
-        self.img = image.load(imagespath+"Character_boy.png").convert_alpha()
+        self.img = image.load(const.imagespath+"Character_boy.png").convert_alpha()
         self.img.set_colorkey(RLEACCEL)
         self.rect_img = self.img.get_rect()
         self.rect_img[0], self.rect_img[1] = (self.x * const.wc), (self.y * const.hc)
@@ -140,8 +141,7 @@ class Character(object):
         self.dep = CaseImage((0, 0), const.beginning)
         self.fin = CaseImage(((self.maze.w * const.wc - const.wc), (self.maze.h * const.hc - const.hc)), const.ending)
     def change_avatar(self,imagenam):
-        global imagespath
-        imagename=imagespath+imagenam+".png"
+        imagename=const.imagespath+imagenam+".png"
         self.img = image.load(imagename).convert_alpha()
         self.img.set_colorkey(RLEACCEL)
         self.rect_img = self.img.get_rect()
@@ -174,7 +174,8 @@ class Character(object):
         
         
     def talk(self,screen,string):
-        self.img_speech = image.load(imagespath+"bubble.png").convert_alpha()
+        #Create bubble of speech
+        self.img_speech = image.load(const.imagespath+"bubble.png").convert_alpha()
         self.img_speech.set_colorkey(RLEACCEL)
         self.rect_img_speech = self.img_speech.get_rect()
         self.rect_img_speech[0], self.rect_img_speech[1] = (self.x+3 * const.wc), (self.y+5 * const.hc)
@@ -194,6 +195,7 @@ class Character(object):
             self.rect_img[0], self.rect_img[1] = (self.x * const.wc), (self.y * const.hc)
     
     def isWall(self,dir):
+        #Checks if next step has a wall
         if not self.maze.get_cell(self.x, self.y).gate[dir]:
             return False
         else:
@@ -307,7 +309,8 @@ class Character(object):
     def go_to(self, road):
         self.mainroad = road
         
-        
+#Starts object maze
+#---------------------------------
 class maze(object):
     def __init__(self, w = 25, h = 30, sx = 0, sy = 0):
         self.w = w
@@ -327,14 +330,14 @@ class maze(object):
             a.x = v % self.w
             a.y = int(v / self.w)
             
-            
+            #For coordinate of backgrounf
             if v < (self.w * loop):
                 localX += 1
             else:
                 localX = 0.1
                 localY = loop
                 loop += 1
-            
+            #Random patches generation
             if randint(0, 50) < 10:
                     a.background = CaseImage((localX* self.wc,localY * self.hc), const.brownPatch)
             elif randint(0,50) < 5:
@@ -396,8 +399,10 @@ class maze(object):
     def show(self, screen):
         W, H = self.wc, self.hc
         sx , sy = self.sx, self.sy
+        #Print background cells
         for cell in self.cases:
             screen.blit(cell.background.surf, cell.background.pos)
+        #Generates lines of walls
         for y in range(self.h - 1):
             for x in range(self.w - 1):
                 c = self.get_cell(x, y)
@@ -423,13 +428,12 @@ class maze(object):
             if c.gate[const.right]:
                 draw.line(screen, const.gray, (sx + ((x + 1) * W), (sy + (y * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                 
-        
+        #Draws outline
         draw.rect(screen, const.gray, (sx, sy, W * self.w, H * self.h), 3)
-
+#Instantce of character
 class Xilarius(object):
     def __init__(self, Pos):
-        global imagespath
-        self.img = image.load(imagespath+"Character_boy.png").convert_alpha()
+        self.img = image.load(const.imagespath+"Character_boy.png").convert_alpha()
         self.img.set_colorkey(RLEACCEL)
         self.rect = Rect(Pos, (26, 26))
         

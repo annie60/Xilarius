@@ -12,8 +12,6 @@ from pygame.locals import *
 from Function import *
 from Class import *
 from tygame.main import StaticFrame,Entry, Button, Label, render_widgets, handle_widgets #But you can put in ..\Python\Lib\site-packages
-imagespath ="images/"
-musicpath ="music/"
 avatars = ["Character_boy","Character_Cat_girl",
             "Character_Horn_Girl","Character_Pink_Girl"]
 avatar_index=0
@@ -52,7 +50,7 @@ def Character_talk():
 def Home():
     global on_game,on_initial,change_button,Label_gen,Frame,execute_button,entryForInput,back_button
     pygame.mixer.music.stop()
-    pygame.mixer.music.load(musicpath+"Ultralounge.wav")
+    pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
     #TODO: Activar
     #pygame.mixer.music.play(-1,0.0)
     on_game = False
@@ -96,7 +94,7 @@ def Restart():
 def Start_game():
     global on_game,on_initial,Label_gen,Frame,change_button,back_button,execute_button,character_time,entryForInput,character,list_x1,list_x2
     pygame.mixer.music.stop()
-    pygame.mixer.music.load(musicpath+"Bet_On_It.wav")
+    pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
     #TODO Activar
     #pygame.mixer.music.play(-1,0.0)
     on_game = True
@@ -138,11 +136,11 @@ pygame.init()
 #Window creation
 WW, WH = 670, 500
 Window = pygame.display.set_mode((WW, WH))
-icone = image.load(imagespath+avatars[0]+".png")
+icone = image.load(const.imagespath+avatars[0]+".png")
 icone.set_colorkey(const.pink)
 pygame.display.set_icon(icone)
 pygame.display.set_caption("Xilarius")
-pygame.mixer.music.load(musicpath+"Ultralounge.wav")
+pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
 #TODO Activar
 #pygame.mixer.music.play(-1,0.0)
 # FIN
@@ -192,17 +190,17 @@ while True:
         start_button= Button(Window, text = "Iniciar! ", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 18, target = Start_game)
         start_button.place((545, 6))
 		## Background image
-        img = image.load(imagespath+"Main_Background.png").convert_alpha()
+        img = image.load(const.imagespath+"Main_Background.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
         rect = Rect((0,0), (0, 0))
         Window.blit(img, rect)
 		## Character
-        img = image.load(imagespath+"Character_boy_Large.png").convert_alpha()
+        img = image.load(const.imagespath+"Character_boy_Large.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
         rect = Rect((-10,70), (101, 171))
         Window.blit(img, rect)
         ## Bubble message
-        img = image.load(imagespath+"bubble.png").convert_alpha()
+        img = image.load(const.imagespath+"bubble.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
         rect = Rect((80,20), (101, 171))
         Window.blit(img, rect)

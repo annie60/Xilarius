@@ -50,6 +50,7 @@ vm_memory = {0:{}, #Globales {numeroenmemoria : (nombrereal, valor)}
              1:{}, #Temporales {numeroenmemoria : (nombrereal, valor)}
              2:{}  #Constantes {numeroenmemoria :  valor}
             }
+#Definicion de operadores,tipos y palabras reservadas
 var_boleanas = ("verdadero","falso")
 var_tipos = ("numero","escrita","decision","personaje")
 var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","atras","adelante","derecha","izquierda")
@@ -94,6 +95,7 @@ cubo_semantico = (
     (1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1)
     )
     ) 
+#Definicion de tabla de funciones
 def crear_modulo(nombre,ambiente):
     global var_dicc_funciones
     var_dicc_funciones[ambiente] = (nombre,{})
@@ -144,6 +146,7 @@ def operacion_compatible(operacion, tipouno,tipodos):
             return False
     else:
         return False
+#Para funciones propias como: parar, responder, adelante....
 def operacion(operacion, tipouno,tipodos):
     #Obtiene la informacion del parser
     tipo=convertir_valor(tipouno)
