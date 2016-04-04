@@ -655,35 +655,45 @@ class Entry:
         if len(button) == 3 and not(mods & KMOD_SHIFT):
             if button[0] == "[" and button[2] == "]":
                 self.text += button[1]
-        def format_text(string,width):
-            requested_lines = string.splitlines()
-            # Create a series of lines that will fit on the provided
-            # rectangle.
-            fonts = font.Font(None, 12)
-            for requested_line in requested_lines:
-                if fonts.size(requested_line)[0] > width:
-                    words = requested_line.split(' ')
-                    # Start a new line
-                    accumulated_line = ""
-                    # if any of our words are too long to fit, return.
-                    '''for word in words:
-                        if fonts.size(word)[0] >= (width):
-                            print()'''
-                    for word in words:
-                        test_line = accumulated_line + word + " "
-                        # Build the line while the words fit.    
-                        if fonts.size(test_line)[0] < width:
-                            accumulated_line = test_line 
-                        else: 
-                            final_lines.append(accumulated_line) 
-                            accumulated_line = word + " " 
-                    final_lines.append(accumulated_line)
-                else: 
-                    final_lines.append(requested_line) 
-            return final_lines
         tmpText = self._font.render(self.text,self.antialias,self.textcolor)
         self._x = self.width - tmpText.get_width()
-        final_lines = format_text(self.text,self.width)
+        
+        requested_lines = self.text.splitlines()
+            # Create a series of lines that will fit on the provided
+            # rectangle.
+        index = 0
+        returnIndex = 0
+        fonts = font.Font(None, 12)
+        for requested_line in requested_lines:
+            if fonts.size(requested_line)[0] > self.width:
+                words = requested_line.split(' ')
+                # Start a new line
+                accumulated_line = ""
+                # if any of our words are too long to fit, return.
+                for word in words:
+                    if fonts.size(word)[0] >= int(self.width/8):
+                        returnIndex = index + int(self.width/10)
+                        accumulated_line = word[:int(self.width/10)] 
+                        final_lines.append(accumulated_line)
+                        print(final_lines)
+                        test_line = word[int(self.width/10):]
+                        print("line"+test_line)
+                        self.text = self.text[:returnIndex]+" \n\n"+self.text[returnIndex:]
+                    else:
+                        test_line = accumulated_line + word + " "
+                    print ('test '+test_line)
+                    # Build the line while the words fit    
+                    if fonts.size(test_line)[0] < self.width:
+                        accumulated_line = test_line 
+                    else: 
+                        final_lines.append(accumulated_line) 
+                        accumulated_line = word + " " 
+                    
+                    index += len(word)
+                final_lines.append(accumulated_line)
+            else: 
+                final_lines.append(requested_line) 
+
         if self._x > 0: self._x = 0
         self._buffer.fill(self.bg)
         justification =0

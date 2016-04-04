@@ -18,6 +18,7 @@ avatar_index=0
 main_background = "Main_Background"
 on_game = False
 on_initial = True
+blinker_on=True
 #TODO Remplazar funciones de botones
 #---------------------Buttons functions--------------------#
     
@@ -101,7 +102,7 @@ def Start_game():
     on_initial = False
     Frame = StaticFrame(Window, colour = const.Pblue, header = False, bordercolor = const.Pgreen, borderwidth = 5, width = 229, height = 480)
     Frame.place((421, 0))
-
+    #For maze initialization
     mymaze = maze(16, 19)
     mymaze.generate_maze()
     character = Character(mymaze) 
@@ -110,10 +111,10 @@ def Start_game():
 
     list_x1 = list_xil(WW, WH)
     list_x2 = fill_list_x2(list_x1)
-
+    #Pygame directive
     pygame.display.flip()
     pygame.key.set_repeat(50, 55)
-
+    #Side toolbar
     change_button= Button(Window, text = "Cambiar avatar ", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Change_avatar)
     change_button.place((545, 6))
 
@@ -174,7 +175,17 @@ while True:
                 But_path()
             if keys[K_t]:#TODO es instantaneo hay que cambiar
                 Character_talk()
-                
+            
+        ##Blinker for input 
+        '''
+        currentInput = entryForInput.get()
+        if (blinker_on):
+          entryForInput.set(currentInput+"|")
+          blinker_on =False             
+        else:
+          entryForInput.set(currentInput.replace('|',''))
+          blinker_on = True'''
+          
         ##Sets miliseconds between a display loop            
         if pygame.time.get_ticks() - character_time >= const.time_character_poll:
             character_time = pygame.time.get_ticks()
