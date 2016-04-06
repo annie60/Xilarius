@@ -6,7 +6,7 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica import agregar_variable,operacion_compatible,cuadruplo,crear_modulo,operacion
+from semantica import obtener_direccion,agregar_variable,operacion_compatible,cuadruplo,crear_modulo,operacion
 from semantica import Stack
 from semantica import Queue
 sys.path.insert(0,"../..")
@@ -21,8 +21,8 @@ braces = Stack()
 pSaltos = Stack()
 counter = 0
 cuadruplos = {}
-temporary = []
-temp_counter =0
+#Helper counters
+temp_counter = 0
 
 if sys.version_info[0] >= 3:
     raw_input = input
@@ -131,6 +131,7 @@ def p_personaje(p):
         valor = values.pop()
         identificador =ids.dequeue()
         agregar_variable(identificador,valor,tipo)
+
 def p_personaje_error(p):
     '''personaje : CREARPERSONAJE error ENDLINE vars'''
     print("Error: No se encontro nombre de personaje")
@@ -191,19 +192,22 @@ def p_instruccion5(p):
     types.push(p[1])
     pOper.push(p[1])
     if values.size() >= 1:
-        global counter
+        global counter,temp_counter
         valor = values.pop()
         operation = operations.pop()
         tipo = types.pop()
         operder =pOper.pop()
         operizq = pOper.pop()
         operador = pilaO.pop()
-        operacion(operation,valor,tipo)
+        if operacion(operation,valor,tipo):
+            dir_der=obtener_direccion(operder)
+            dir_izq=obtener_direccion(operizq)
         ##TODO
         ##Add interface connection
         ##Remove and rename
-        pOper.push("temp")
-        cuadruplos[counter] = [operador,operizq,operder,""]
+        obtener_direccion("temp"+str(temp_counter))
+        pOper.push("temp"+str(temp_counter))
+        cuadruplos[counter] = [operador,dir_izq,dir_der,""]
         counter+=1
 ##Error control for sintaxis        
 def p_instruccion5_error(p):
@@ -305,13 +309,14 @@ def p_vars2(p):
             identificador =ids.dequeue()
             pOper.pop()
             agregar_variable(identificador,valor,tipo)
+
 ##Start of control/decision expresions
 ##-----------------------------------------------
 def p_laberinto(p):
     '''laberinto : laberinto1 laberinto2 varcte'''
     pass
     if values.size() >= 1:
-        global counter
+        global counter,temp_counter
         valor = values.pop()
         tipo = types.pop()
         operacion = operations.pop()
@@ -319,13 +324,18 @@ def p_laberinto(p):
         ##according to interface
         operadorizq=pOper.pop()
         operador=pOper.pop()
-        operacion_compatible(operacion,tipo,valor)
-        cuadruplos[counter]=[operacion,operadorizq,operador,""]
+        if operacion_compatible(operacion,tipo,valor):
+            dir_izq = obtener_direccion(operadorizq)
+            dir_der = obtener_direccion(operador)
+            dir_temp = obtener_direccion("temp"+str(temp_counter))
+        pOper.push("temp"+str(temp_counter))
+        temp_counter+=1
+        cuadruplos[counter]=[operacion,dir_izq,dir_der,dir_temp]
         counter+=1
         ##TODO Remove and rename
-        pOper.push("temp")
         pSaltos.push(counter)
-        cuadruplos[counter]=["gotof",pOper.pop(),"",""]
+        pOper.pop()
+        cuadruplos[counter]=["gotof",dir_temp,"",""]
         counter+=1
         
 def p_laberinto1(p):
@@ -361,15 +371,17 @@ def p_exp2(p):
     pass
     pilaO.push(p[1])
     if pilaO.top() == "+" or pilaO.top() == "-":
-        global counter
+        global counter,temp_counter
         operador = pilaO.pop()
         operDer = pOper.pop()
         operIzq = pOper.pop()
         #temporal = cuadruplo(operador,operIzq,operDer)
-        #TODO Crear espacios para temporal
-        temporal = ""
-        cuadruplos[counter] = [operador,operIzq,operDer,temporal]
-        pOper.push(temporal)
+        dir_der = obtener_direccion(operDer)
+        dir_izq = obtener_direccion(operIzq)
+        dir_temp = obtener_direccion("temp"+str(temp_counter))
+        pOper.push("temp"+str(temp_counter))
+        temp_counter+=1
+        cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
         counter+=1
 #Specific error generation
 def p_exp_error(p):
@@ -389,15 +401,16 @@ def p_termino3(p):
     pass
     pilaO.push(p[1])
     if pilaO.top() == "*" or pilaO.top() == "/":
-        global counter
+        global counter,temp_counter
         operador = pilaO.pop()
         operDer = pOper.pop()
         operIzq = pOper.pop()
-        #temporal = cuadruplo(operador,operIzq,operDer)
-        #TODO Crear espacios de memoria para temporal
-        temporal =""
-        cuadruplos[counter] = [operador,operIzq,operDer,temporal]
-        pOper.push(temporal)
+        dir_der = obtener_direccion(operDer)
+        dir_izq = obtener_direccion(operIzq)
+        dir_temp = obtener_direccion("temp"+str(temp_counter))
+        pOper.push("temp"+str(temp_counter))
+        temp_counter+=1
+        cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
         counter+=1
 def p_tipo(p):
     '''tipo : TIPONUMERO

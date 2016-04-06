@@ -5,6 +5,7 @@
 # Ana Karen Reyna		A01280310
 # -----------------------------------------------------------------------------
 #Clase pila para apoyo en la construccion de tablas
+
 class Stack:
      def __init__(self):
          self.items = [] #inicializa una lista vacia
@@ -37,23 +38,20 @@ class Queue:
 #Diccionario
 # Uso de variables globales solamente
 # Definicion de un diccionario con llaves y una lista de atributos
-# { "nombre" : (valor,tipoDeCte)}
+# { "nombre" : (valor,tipoDeCte,direccion)}
 var_dicc_funciones = {}
-#Mapeo de memoria
-#1000 - 19999 <- Globales
-#20000- 24999 <- Temporales
-#25000- 25999 <- Constantes
-global_mem_counter = 1000;
-temp_mem_counter = 20000;
-const_mem_counter = 25000;
-vm_memory = {0:{}, #Globales {numeroenmemoria : (nombrereal, valor)}
-             1:{}, #Temporales {numeroenmemoria : (nombrereal, valor)}
-             2:{}  #Constantes {numeroenmemoria :  valor}
-            }
+#Helper structures
+#Constantes {numeroenmemoria :  valor}
+const_mem={}
+temp_mem = {}
+global_mem_counter = 1000
+temp_mem_counter = 20000
+const_mem_counter = 25000
 #Definicion de operadores,tipos y palabras reservadas
 var_boleanas = ("verdadero","falso")
 var_tipos = ("numero","escrita","decision","personaje")
 var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","atras","adelante","derecha","izquierda")
+var_constantes = ("verdadero","falso","pared","libre","meta")
 #Formato de matriz para cubo
 #                       =       +       -       *       /       <>      ==      p   r   at  ad   d   i
 #numero     numero      1       1       1       1       1       -1      -1     -1  -1  -1   -1  -1  -1
@@ -109,8 +107,9 @@ def agregar_variable(nombre,valor,tipo):
         #Revisa que la asignacion que se le hace sea
         #correspondiente al tipo de variable que es
         if operacion_compatible("=",tipo,valor):
-            global var_dicc_funciones
-            var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipo)
+            global var_dicc_funciones,global_mem_counter
+            var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipo,global_mem_counter)
+            global_mem_counter+=1
             return True
         else:
             print("Error: Asignacion no compatible")
@@ -146,6 +145,24 @@ def operacion_compatible(operacion, tipouno,tipodos):
             return False
     else:
         return False
+def obtener_direccion(variable):
+    global temp_mem,global_mem_counter,temp_mem_counter,const_mem_counter
+    if (variable in var_dicc_funciones["miPrograma"][1]): 
+        return var_dicc_funciones["miPrograma"][1][variable][2]
+    elif isinstance(variable,int) or variable.isdigit() or (variable in var_constantes):
+        if (variable in const_mem):
+            return const_mem[variable]
+        else:
+            crear_constante(variable)
+            return (const_mem_counter - 1)
+        
+    else:
+        if not (variable in temp_mem):
+            crear_temporal(variable)
+            return (temp_mem_counter - 1)
+        else:
+            return temp_mem[variable]
+        
 #Para funciones propias como: parar, responder, adelante....
 def operacion(operacion, tipouno,tipodos):
     #Obtiene la informacion del parser
@@ -178,6 +195,14 @@ def checa_operando(operando):
             return operando
     else:
         return operando 
+def crear_constante(valor):
+    global const_mem,const_mem_counter
+    const_mem[valor]=const_mem_counter
+    const_mem_counter+=1
+def crear_temporal(valor):
+    global temp_mem,temp_mem_counter
+    temp_mem[valor]=temp_mem_counter
+    temp_mem_counter+=1
 ## TODO Cambiar por espacios de memoria
 def cuadruplo(operador,operandoizq,operandoder):
     indice = var_operaciones.index(operador)

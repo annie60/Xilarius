@@ -11,29 +11,32 @@ from semantica import Stack
 from io import StringIO
 import sys
 
+#Mapeo de memoria
+#1000 - 19999 <- Globales
+#20000- 24999 <- Temporales
+#25000- 25999 <- Constantes
+global_mem_range = [1000,19999]
+temp_mem_range = [20001,24999]
+const_mem_range = [25000,25999]
 class Machine:
-    def __init__(self, code):
-        self.data_stack = Stack()
-        self.return_stack = Stack()
+    def __init__(self, globals,constants,temporary,cuadruplos):
+        
+        self.memory={
+             0:globals, #Globales {numeroenmemoria : (nombrereal, valor)}
+             1:{}, #Temporales {numeroenmemoria : (nombrereal, valor)}
+             2:{} #Constantes {numeroenmemoria :  valor}
+            }
+        self.constant =constants
+        self.temporary = temporary
         self.instruction_pointer = 0
-        self.code = code
-#TODO Quitar esto por un acceso al objeto para la memoria virtual
-    def pop(self):
-        return self.data_stack.pop()
-
-    def push(self, value):
-        self.data_stack.push(value)
-
-    def top(self):
-        return self.data_stack.top()
+        self.code = cuadruplos
  #TODO Cambiar a usar estructura de cuadruplos
  #bajando el output del escaner  a un archivo
  #no input directo de codigo
     def run(self):
         while self.instruction_pointer < len(self.code):
-            opcode = self.code[self.instruction_pointer]
-            self.instruction_pointer += 1
-            self.dispatch(opcode)
+            line = self.code[self.instruction_pointer]
+            self.dispatch(line)
 
     def dispatch(self, op):
         dispatch_map = {
@@ -53,20 +56,16 @@ class Machine:
             "responder":    self.respond,
         }
 
-        if op in dispatch_map:
+        if op[0] in dispatch_map:
             dispatch_map[op]()
-        elif isinstance(op, int):
-            self.push(op) # push numbers on stack
-        elif isinstance(op, str) and op[0]==op[-1]=='"':
-            self.push(op[1:-1]) # push quoted strings on stack
         else:
             raise RuntimeError("Unknown opcode: '%s'" % op)
 
     # OPERATIONS FOLLOW:
 #TODO: Cambiar pila a valores de retorno para
 #memoria virtual
-    def plus(self):
-        self.push(self.pop() + self.pop())
+    def plus(self,line):
+        print(line)
 
     def exit(self):
         sys.exit(0)
@@ -131,11 +130,13 @@ class Machine:
         for v in reversed(self.data_stack):
             print(" - type %s, value '%s'" % (type(v), v))
 
-def test(code = [2, 3, "+", 5, "*", "println"]):
+def test():
 
-
-    print("Stack after running original program:")
-    a = Machine(code)
+    temps = { 'temp4': 20005, 'temp9': 20010, 'temp8': 20009, 'temp6': 20007, 'temp2': 20003, 'temp3': 20004, 'temp5': 20006, 'temp1': 20002, 'temp0': 20000, 'temp7': 20008}
+    glob = {'miPrograma': ('Primerprograma', {'Ana': ('personaje', 'personaje', 1003), 'Otravar': ('"hola"', 'escrita', 1000), 'Miotravar': ('3', 'numero', 1001), 'Mivar': ('verdadero', 'decision', 1002)})}
+    const ={'pared': 25001, 'verdadero': 25000, '21': 25007, '1': 25006, '3': 25004, 'libre': 25002, '5': 25003, '4': 25005}
+    code = {0: ['*', 25004, 25003, 20003], 1: ['*', 20003, 25005, 20004], 2: ['/', 20004, 1001, 20005], 3: ['-', 20005, 25006, 20006]}
+    a = Machine(glob,const,temps,code)
     a.run()
     a.dump_stack()
 
