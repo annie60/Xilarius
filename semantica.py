@@ -43,7 +43,10 @@ var_dicc_funciones = {}
 #Helper structures
 #Constantes {numeroenmemoria :  valor}
 const_mem={}
+const_mem_output={}
 temp_mem = {}
+temp_mem_output= {}
+global_mem_output= {}
 global_mem_counter = 1000
 temp_mem_counter = 20000
 const_mem_counter = 25000
@@ -109,6 +112,7 @@ def agregar_variable(nombre,valor,tipo):
         if operacion_compatible("=",tipo,valor):
             global var_dicc_funciones,global_mem_counter
             var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipo,global_mem_counter)
+            global_mem_output[global_mem_counter] = valor
             global_mem_counter+=1
             return True
         else:
@@ -198,10 +202,12 @@ def checa_operando(operando):
 def crear_constante(valor):
     global const_mem,const_mem_counter
     const_mem[valor]=const_mem_counter
+    const_mem_output[const_mem_counter] =valor
     const_mem_counter+=1
 def crear_temporal(valor):
     global temp_mem,temp_mem_counter
     temp_mem[valor]=temp_mem_counter
+    const_mem_output[temp_mem_counter]=valor
     temp_mem_counter+=1
 ## TODO Cambiar por espacios de memoria
 def cuadruplo(operador,operandoizq,operandoder):

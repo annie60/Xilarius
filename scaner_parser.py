@@ -204,7 +204,6 @@ def p_instruccion5(p):
             dir_izq=obtener_direccion(operizq)
         ##TODO
         ##Add interface connection
-        ##Remove and rename
         obtener_direccion("temp"+str(temp_counter))
         pOper.push("temp"+str(temp_counter))
         cuadruplos[counter] = [operador,dir_izq,dir_der,""]
