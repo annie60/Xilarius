@@ -6,8 +6,8 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica import obtener_direccion,agregar_variable,operacion_compatible,cuadruplo,crear_modulo,operacion
-from semantica import Stack
+from semantica import obtener_direccion,agregar_variable,operacion_compatible,crear_modulo,operacion
+from semantica import Stack,crear_archivo_salida
 from semantica import Queue
 sys.path.insert(0,"../..")
 #Helpers initialization
@@ -101,6 +101,7 @@ def p_programa(p):
         braces.pop()
     ##TODO: Quitar impresion
     print(cuadruplos)
+    crear_archivo_salida(cuadruplos)
     #print("\n")
 def p_program2(p):
     '''program2 : OPENEXP'''
@@ -202,8 +203,6 @@ def p_instruccion5(p):
         if operacion(operation,valor,tipo):
             dir_der=obtener_direccion(operder)
             dir_izq=obtener_direccion(operizq)
-        ##TODO
-        ##Add interface connection
         obtener_direccion("temp"+str(temp_counter))
         pOper.push("temp"+str(temp_counter))
         cuadruplos[counter] = [operador,dir_izq,dir_der,""]
@@ -299,8 +298,6 @@ def p_vars2_error(p):
 def p_vars2(p):
         '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1'''
         pass
-        #TODO Agregar declaracion de constantes
-        #Table of variables declaration
         ids.enqueue(p[2])
         if ids.size() >= 1:
             valor = values.pop()
@@ -319,8 +316,6 @@ def p_laberinto(p):
         valor = values.pop()
         tipo = types.pop()
         operacion = operations.pop()
-        ##TODO: Specify use of this evaluation
-        ##according to interface
         operadorizq=pOper.pop()
         operador=pOper.pop()
         if operacion_compatible(operacion,tipo,valor):
@@ -331,7 +326,6 @@ def p_laberinto(p):
         temp_counter+=1
         cuadruplos[counter]=[operacion,dir_izq,dir_der,dir_temp]
         counter+=1
-        ##TODO Remove and rename
         pSaltos.push(counter)
         pOper.pop()
         cuadruplos[counter]=["gotof",dir_temp,"",""]

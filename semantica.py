@@ -110,7 +110,7 @@ def agregar_variable(nombre,valor,tipo):
         #Revisa que la asignacion que se le hace sea
         #correspondiente al tipo de variable que es
         if operacion_compatible("=",tipo,valor):
-            global var_dicc_funciones,global_mem_counter
+            global global_mem_output,var_dicc_funciones,global_mem_counter
             var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipo,global_mem_counter)
             global_mem_output[global_mem_counter] = valor
             global_mem_counter+=1
@@ -205,21 +205,17 @@ def crear_constante(valor):
     const_mem_output[const_mem_counter] =valor
     const_mem_counter+=1
 def crear_temporal(valor):
-    global temp_mem,temp_mem_counter
+    global temp_mem,const_mem_output,temp_mem_counter
     temp_mem[valor]=temp_mem_counter
-    const_mem_output[temp_mem_counter]=valor
+    temp_mem_output[temp_mem_counter]=valor
     temp_mem_counter+=1
-## TODO Cambiar por espacios de memoria
-def cuadruplo(operador,operandoizq,operandoder):
-    indice = var_operaciones.index(operador)
-    operandoizq=checa_operando(operandoizq) 
-    operandoder=checa_operando(operandoder)
-    if indice == 1:
-        return int(operandoizq) + int(operandoder)
-    elif indice == 2:
-        return int(operandoizq) - int(operandoder)
-    elif indice == 3:
-        return int(operandoizq) * int(operandoder)
-    elif indice == 4:
-        return int(int(operandoizq) / int(operandoder))
-        
+def crear_archivo_salida(cuadruplos):
+    global const_mem_output,temp_mem_output,global_mem_output
+    file = open('result.txt','w')
+    file.write(str(global_mem_output))
+    file.write('$')
+    file.write(str(const_mem_output))
+    file.write('$')
+    file.write(str(temp_mem_output))
+    file.write('$')
+    file.write(str(cuadruplos))
