@@ -31,9 +31,11 @@ __Dr. José Icaza__
 - En la consola ejecutar
 ` python scaner_parser.py input.txt `
 
-#### Interfaz Grafica
+#### Interfaz Grafica y maquina virtual
 - En la consola ejecutar
 ` python main.py `
+- Ir a iniciar
+- Presionar 'Correr programa'
 
 ## Notas
 * Este proyecto esta probado correctamente para sistema operativo windows, cualquier otro sistemas podria tener fallas.

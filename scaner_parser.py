@@ -31,8 +31,8 @@ tokens = (
     'MIPROGRAMA','IDENTIFICADOR','ENDLINE',
 	'OPENEXP','CLOSEEXP','CREARPERSONAJE','SIES',
 	'OPENCOND','CLOSECOND','REPETIRHASTA',
-    'PUNTO','PARAR','RESPONDER','CTEDECISION1','CTEDECISION2','CTEESCRITA','ATRAS',
-    'ADELANTE','DERECHA','IZQUIERDA','VAR','EQUALS','COMA',
+    'PUNTO','PARAR','RESPONDER','CTEDECISION1','CTEDECISION2','CTEESCRITA','ARRIBA',
+    'ABAJO','DERECHA','IZQUIERDA','VAR','EQUALS','COMA',
     'PARED','LIBRE','META','IGUALA','DIFERENTEA',
     'SUMA','RESTA','DIVISION','MULTIPLICACION',
 	'CTEENTERA','TIPONUMERO','TIPOESCRITA','TIPODECISION'
@@ -55,8 +55,8 @@ t_RESPONDER = r'responder'
 t_CTEDECISION1 = r'verdadero'
 t_CTEDECISION2 = r'falso'
 t_CTEESCRITA = r'\"[a-zA-Z0-9 \?\']*\"'
-t_ATRAS = r'atras'
-t_ADELANTE = r'adelante'
+t_ARRIBA = r'arriba'
+t_ABAJO = r'abajo'
 t_DERECHA = r'derecha'
 t_IZQUIERDA = r'izquierda'
 t_VAR = r'var'
@@ -266,8 +266,8 @@ def p_instruccion2(p):
     values.push(p[1])
     pOper.push(p[1])
 def p_mover(p):
-    '''mover : ATRAS
-		| ADELANTE
+    '''mover : ARRIBA
+		| ABAJO
 		| DERECHA
 		| IZQUIERDA'''
     pass

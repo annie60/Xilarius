@@ -53,7 +53,7 @@ const_mem_counter = 25000
 #Definicion de operadores,tipos y palabras reservadas
 var_boleanas = ("verdadero","falso")
 var_tipos = ("numero","escrita","decision","personaje")
-var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","atras","adelante","derecha","izquierda")
+var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","arriba","abajo","derecha","izquierda")
 var_constantes = ("verdadero","falso","pared","libre","meta")
 #Formato de matriz para cubo
 #                       =       +       -       *       /       <>      ==      p   r   at  ad   d   i

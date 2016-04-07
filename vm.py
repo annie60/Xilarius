@@ -9,6 +9,7 @@ from __future__ import print_function
 from collections import deque
 from semantica import Stack
 from io import StringIO
+from Class import *
 import ast
 import sys
 
@@ -19,6 +20,7 @@ import sys
 global_mem_range = [1000,19999]
 temp_mem_range = [20001,24999]
 const_mem_range = [25000,25999]
+xilarius = ''
 class Machine:
     def __init__(self, globals,constants,temporary,cuadruplos):
         
@@ -36,10 +38,11 @@ class Machine:
             operators = line[1:]
             for value in operators:
                 if value != '':
-                    if (value > temp_mem_range[0] and value < temp_mem_range[1]) and not (value in self.memory):
+                    if (value >= temp_mem_range[0] and value <= temp_mem_range[1]) and not (value in self.memory):
                         self.memory[value]=self.temporary[value]  
-                    elif (value > const_mem_range[0] and value < const_mem_range[1]) and not (value in self.memory):
+                    elif (value >= const_mem_range[0] and value <= const_mem_range[1]) and not (value in self.memory):
                         self.memory[value]=self.constant[value]
+            print(self.memory)
             self.dispatch(line)
             self.instruction_pointer+=1
     def dispatch(self, op):
@@ -50,8 +53,8 @@ class Machine:
             "/":            self.div,
             "==":           self.eq,
             "<>":           self.noteq,
-            "atras":        self.bwd,
-            "adelante":     self.fwd,
+            "arriba":       self.bwd,
+            "abajo":        self.fwd,
             "derecha":      self.right,
             "izquierda":    self.left,
             "gotof":        self.gotof,
@@ -109,16 +112,31 @@ class Machine:
         return 0
     def bwd(self,line):
         #TODO Conexion a interfaz para mover personaje
-        return 0
+        global xilarius
+        total = int(self.memory[line[1]])
+        while(total > 0):
+            xilarius.move(const.up)
+        
     def fwd(self,line):
         #TODO Conexion a interfaz para mover personaje
-        return 0
+        global xilarius
+        total = int(self.memory[line[1]])
+        while(total > 0):
+            xilarius.move(const.down)
+        
     def right(self,line):
         #TODO Conecion a interfaz para mover personaje
-        return 0
+        global xilarius
+        total = int(self.memory[line[1]])
+        while(total > 0):
+            xilarius.move(const.right)
+        
     def left(self,line):
         #TODO Conecion a interfaz para mover personaje
-        return 0
+        global xilarius
+        total = int(self.memory[line[1]])
+        while(total > 0):
+            xilarius.move(const.left)
     def respond(self,line):
         #TODO Conecion a interfaz para mover personaje
         return 0
@@ -128,8 +146,8 @@ class Machine:
         for v in reversed(self.data_stack):
             print(" - type %s, value '%s'" % (type(v), v))
 
-def test():
-#TODO: Cambiar a que lea de archivo
+def runProgram():
+    xilarius = character
     file = open('result.txt','r')
     content = file.read()
     firstPart =content.index('$')
@@ -150,7 +168,7 @@ if __name__ == "__main__":
         if len(sys.argv) > 1:
             cmd = sys.argv[1]
             if cmd == "test":
-                test()
+                runProgram()
             else:
                 print("Commands: repl, test")
         

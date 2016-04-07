@@ -200,7 +200,12 @@ class Character(object):
             return False
         else:
             return True
-        
+    def isFinishLine(self):
+        if self.maze.get_cell((self.maze.w - 1), (self.maze.h - 1)) != self.maze.get_cell(self.x,self.y):
+            return False
+        else:
+            return True
+    
     def astar(self, dest):
         desti = Point(dest)
         openL = []
