@@ -10,6 +10,7 @@
 from __future__ import print_function
 import pygame, sys, ast
 from pygame.locals import *
+from time import sleep
 from Function import *
 from Class import *
 from tygame.main import StaticFrame,Entry, Button, Label, render_widgets, handle_widgets #But you can put in ..\Python\Lib\site-packages
@@ -29,7 +30,7 @@ blinker_on=True
 global_mem_range = [1000,19999]
 temp_mem_range = [20001,24999]
 const_mem_range = [25000,25999]
-
+#Starts all virtual machine functions
 class Machine:
     def __init__(self, globals,constants,temporary,cuadruplos):
         
@@ -40,6 +41,7 @@ class Machine:
         self.code = cuadruplos
     def run(self):
         global character_time,character
+        
         while self.instruction_pointer < len(self.code):
             line = self.code[self.instruction_pointer]
             operators = line[1:]
@@ -50,7 +52,14 @@ class Machine:
                     elif (value >= const_mem_range[0] and value <= const_mem_range[1]) and not (value in self.memory):
                         self.memory[value]=self.constant[value]
             self.dispatch(line)
-            
+            ##Sets miliseconds between a display loop            
+            if pygame.time.get_ticks() - character_time >= const.time_character_poll:
+                character_time = pygame.time.get_ticks()
+                character.poll()
+            character.show(Window)
+            pygame.display.flip()
+            sleep(0.3)
+        self.dump_vm()
     def dispatch(self, op):
         dispatch_map = {
             "*":            self.mul,
@@ -77,28 +86,53 @@ class Machine:
     # OPERATIONS FOLLOW:
     def plus(self,line):
         self.memory[line[3]] = int(self.memory[line[1]]) + int(self.memory[line[2]])
-        print(self.memory[line[3]])
         self.instruction_pointer+=1
     def exit(self):
         sys.exit(0)
 
     def minus(self,line):
         self.memory[line[3]] = int(self.memory[line[1]]) - int(self.memory[line[2]])
-        print(self.memory[line[3]])
         self.instruction_pointer+=1
     def mul(self,line):
         self.memory[line[3]] = int(self.memory[line[1]]) * int(self.memory[line[2]])
-        print(self.memory[line[3]])
         self.instruction_pointer+=1
     def div(self,line):
         self.memory[line[3]] = int( int(self.memory[line[1]]) / int(self.memory[line[2]]))
-        print(self.memory[line[3]])
         self.instruction_pointer+=1
     def stop(self,line):
         self.instruction_pointer+=1
-        print("parar")
 
     def eq(self,line):
+        value = self.memory[line[1]]
+        #Transalte reserved word to instruction
+        if value == "verdadero": value = True
+        elif value == "falso": value = False
+        objeto = self.memory[line[2]]
+        #Flag to check for wall or free cell
+        checkforwall = 0
+        if objeto[:5] == "pared": checkforwall = 1
+        elif objeto[:4] == "meta": checkforwall = 2
+        #Gets information of the world
+        if checkforwall < 3:
+            if objeto[5:] == "Derecha": objeto = character.isWall(const.right)
+            elif objeto[5:] == "Izquierda": objeto = character.isWall(const.left)
+            elif objeto[5:] == "Arriba": objeto = character.isWall(const.up)
+            elif objeto[5:] == "Abajo": objeto = character.isWall(const.down)
+            #If its not a wall then is checking for 
+            #free cell, so negate actual result
+            if checkforwall == 0: objeto = not objeto
+        else:
+            objeto = character.isFinishLine()
+        print(objeto)
+        print(value)
+        #Makes comparison
+        if objeto == value: result = True
+        else: result = False
+        
+        print(result)
+        self.memory[line[3]] = result
+        self.instruction_pointer+=1
+    def noteq(self,line):
         value = self.memory[line[1]]
         if value == "verdadero": value = True
         elif value == "falso": value = False
@@ -118,15 +152,12 @@ class Machine:
             objeto = character.isFinishLine()
         print(objeto)
         print(value)
-        if objeto == value: result = True
+        if objeto != value: result = True
         else: result = False
         
         print(result)
         self.memory[line[3]] = result
         self.instruction_pointer+=1
-    def noteq(self,line):
-        #TODO Agregar conexion a interfaz
-        return 0
 
     def gotof(self,line):
         addr=line[3]
@@ -167,15 +198,11 @@ class Machine:
             total -=1
         self.instruction_pointer+=1
     def respond(self,line):
-        #TODO Conecion a interfaz para mover personaje
+        #TODO Conecion a interfaz para crear burbuja de dialogo
         return 0
-    def dump_stack(self):
-        print("Data stack (top first):")
-
-        for v in reversed(self.data_stack):
-            print(" - type %s, value '%s'" % (type(v), v))
-
-
+    def dump_vm(self):
+        self.memory = {}
+# FIN
 #---------------------Buttons functions--------------------#
     
 ##To find solution
@@ -189,22 +216,25 @@ def But_path():
     chemain = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
     character.go_to(chemain)
 def Execute_instruction():
-    global entryForInput
-    #TODO Logica para procesar semantica de un programa
+    #Divides file of compiled code
     file = open('result.txt','r')
     content = file.read()
+    #Global variables
     firstPart =content.index('$')
     glob = ast.literal_eval(content[:firstPart])
     content = content[firstPart+1:]
+    #Constants table
     secondPart =content.index('$')
     const =ast.literal_eval(content[:secondPart])
     content = content[secondPart+1:]
+    #Temporals table
     thirdPart =content.index('$')
     temps =ast.literal_eval(content[:thirdPart])
     content = content[thirdPart+1:]
     code =ast.literal_eval(content)
     a = Machine(glob,const,temps,code)
     a.run()
+    #TODO Quitar para produccion
     print(a.memory)
 def Change_avatar():
     global avatar_index,character
@@ -240,10 +270,13 @@ def Restart():
         
             for Xil in list_x2:
                 Xil.show(Window)
-                pygame.display.flip()                     
+                pygame.display.flip()
+            #Re generates maze
             mymaze = maze(16, 19)
             mymaze.generate_maze()
             character = Character(mymaze)
+            #Restars input
+            #TODO Cambiar para el nuevo widget de input
             entryForInput.set("")
             while True:
                 Window.fill(const.green)
