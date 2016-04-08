@@ -35,7 +35,23 @@ __Dr. José Icaza__
 - En la consola ejecutar
 ` python main.py `
 - Ir a iniciar
-- Presionar 'Correr programa'
+- Presionar __'Correr programa'__
+
+##### Ejemplo de programa
+```
+miPrograma Primerprograma;
+{
+    crearPersonaje Minombre;
+    var Mivar decision = verdadero;
+    repetirMientras(libreDerecha == verdadero){
+        Ana.derecha(1);
+    }
+    Minombre.abajo(1);
+    siEs(paredAbajo <> Mivar){
+        Minombre.abajo(1);
+    }
+}
+```
 
 ## Notas
 * Este proyecto esta probado correctamente para sistema operativo windows, cualquier otro sistemas podria tener fallas.
