@@ -30,10 +30,10 @@ if sys.version_info[0] >= 3:
 tokens = (
     'MIPROGRAMA','IDENTIFICADOR','ENDLINE',
 	'OPENEXP','CLOSEEXP','CREARPERSONAJE','SIES',
-	'OPENCOND','CLOSECOND','REPETIRHASTA',
+	'OPENCOND','CLOSECOND','REPETIRMIENTRAS',
     'PUNTO','PARAR','RESPONDER','CTEDECISION1','CTEDECISION2','CTEESCRITA','ARRIBA',
     'ABAJO','DERECHA','IZQUIERDA','VAR','EQUALS','COMA',
-    'PARED','LIBRE','META','IGUALA','DIFERENTEA',
+    'PAREDDERECHA','PAREDIZQUIERDA','PAREDARRIBA','PAREDABAJO','LIBREDERECHA','LIBREIZQUIERDA','LIBREARRIBA','LIBREABAJO','METADERECHA','METAIZQUIERDA','METAARRIBA','METAABAJO','IGUALA','DIFERENTEA',
     'SUMA','RESTA','DIVISION','MULTIPLICACION',
 	'CTEENTERA','TIPONUMERO','TIPOESCRITA','TIPODECISION'
     )
@@ -48,7 +48,7 @@ t_CREARPERSONAJE = r'crearPersonaje'
 t_SIES = r'siEs'
 t_OPENCOND = r'\('
 t_CLOSECOND = r'\)'
-t_REPETIRHASTA = r'repetirHasta'
+t_REPETIRMIENTRAS = r'repetirMientras'
 t_PUNTO = r'\.'
 t_PARAR = r'parar'
 t_RESPONDER = r'responder'
@@ -62,9 +62,18 @@ t_IZQUIERDA = r'izquierda'
 t_VAR = r'var'
 t_EQUALS = r'='
 t_COMA = r'\,'
-t_PARED = r'pared'
-t_LIBRE = r'libre'
-t_META = r'meta'
+t_PAREDDERECHA = r'paredDerecha'
+t_PAREDIZQUIERDA = r'paredIzquierda'
+t_PAREDARRIBA = r'paredArriba'
+t_PAREDABAJO = r'paredAbajo'
+t_LIBREDERECHA = r'libreDerecha'
+t_LIBREIZQUIERDA = r'libreIzquierda'
+t_LIBREARRIBA = r'libreArriba'
+t_LIBREABAJO = r'libreAbajo'
+t_METADERECHA = r'metaDerecha'
+t_METAIZQUIERDA = r'metaIzquierda'
+t_METAARRIBA = r'metaArriba'
+t_METAABAJO = r'metaAbajo'
 t_IGUALA = r'=='
 t_DIFERENTEA = r'<>'
 t_SUMA = r'\+'
@@ -169,7 +178,7 @@ def p_moduloaux2(p):
     '''moduloaux2 : moduloaux3 OPENCOND laberinto CLOSECOND modulo2 instruccionaux modulo4 instruccionaux'''
     pass
 def p_moduloaux3(p):
-    '''moduloaux3 : REPETIRHASTA'''
+    '''moduloaux3 : REPETIRMIENTRAS'''
     pass
     #For loops control
     pSaltos.push(counter)
@@ -332,9 +341,18 @@ def p_laberinto(p):
         counter+=1
         
 def p_laberinto1(p):
-    '''laberinto1 : PARED
-		| LIBRE
-		| META'''
+    '''laberinto1 : PAREDDERECHA
+                | PAREDIZQUIERDA
+                | PAREDARRIBA
+                | PAREDABAJO
+		| LIBREDERECHA
+                | LIBREIZQUIERDA
+                | LIBREABAJO
+                | LIBREARRIBA
+		| METADERECHA
+                | METAIZQUIERDA
+                | METAARRIBA
+                | METAABAJO'''
     pass
     types.push("decision")
     pOper.push(p[1])
@@ -376,6 +394,8 @@ def p_exp2(p):
         temp_counter+=1
         cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
         counter+=1
+#TODO Todos los errores se tienen que mandar
+#a la interfaz grafica
 #Specific error generation
 def p_exp_error(p):
     '''exp2 : error termino '''

@@ -39,6 +39,7 @@ class Machine:
         self.instruction_pointer = 0
         self.code = cuadruplos
     def run(self):
+        global character_time,character
         while self.instruction_pointer < len(self.code):
             line = self.code[self.instruction_pointer]
             operators = line[1:]
@@ -49,7 +50,7 @@ class Machine:
                     elif (value >= const_mem_range[0] and value <= const_mem_range[1]) and not (value in self.memory):
                         self.memory[value]=self.constant[value]
             self.dispatch(line)
-            self.instruction_pointer+=1
+            
     def dispatch(self, op):
         dispatch_map = {
             "*":            self.mul,
@@ -77,71 +78,94 @@ class Machine:
     def plus(self,line):
         self.memory[line[3]] = int(self.memory[line[1]]) + int(self.memory[line[2]])
         print(self.memory[line[3]])
-
+        self.instruction_pointer+=1
     def exit(self):
         sys.exit(0)
 
     def minus(self,line):
         self.memory[line[3]] = int(self.memory[line[1]]) - int(self.memory[line[2]])
         print(self.memory[line[3]])
+        self.instruction_pointer+=1
     def mul(self,line):
         self.memory[line[3]] = int(self.memory[line[1]]) * int(self.memory[line[2]])
         print(self.memory[line[3]])
+        self.instruction_pointer+=1
     def div(self,line):
         self.memory[line[3]] = int( int(self.memory[line[1]]) / int(self.memory[line[2]]))
         print(self.memory[line[3]])
+        self.instruction_pointer+=1
     def stop(self,line):
+        self.instruction_pointer+=1
         print("parar")
 
     def eq(self,line):
-        #self.memory[line[3]] =  int(self.memory[line[1]]) == self.memory[line[2]]
-        return 0
+        value = self.memory[line[1]]
+        if value == "verdadero": value = True
+        elif value == "falso": value = False
+        objeto = self.memory[line[2]]
+        checkforwall = 0
+        if objeto[:5] == "pared": checkforwall = 1
+        elif objeto[:4] == "meta": checkforwall = 2
+        
+        if checkforwall < 3:
+            if objeto[5:] == "Derecha": objeto = character.isWall(const.right)
+            elif objeto[5:] == "Izquierda": objeto = character.isWall(const.left)
+            elif objeto[5:] == "Arriba": objeto = character.isWall(const.up)
+            elif objeto[5:] == "Abajo": objeto = character.isWall(const.down)
+            
+            if checkforwall == 0: objeto = not objeto
+        else:
+            objeto = character.isFinishLine()
+        print(objeto)
+        print(value)
+        if objeto == value: result = True
+        else: result = False
+        
+        print(result)
+        self.memory[line[3]] = result
+        self.instruction_pointer+=1
     def noteq(self,line):
         #TODO Agregar conexion a interfaz
         return 0
-#TODO Modificar a gotof
+
     def gotof(self,line):
-        '''false_clause = self.pop()
-        true_clause = self.pop()
-        test = self.pop()
-        self.push(true_clause if test else false_clause)
-        '''
-        return 0
-    def goto(self,line):
-        '''addr = self.pop()
-        if isinstance(addr, int) and 0 <= addr < len(self.code):
+        addr=line[3]
+        if not self.memory[line[1]]:
             self.instruction_pointer = addr
-        else:
-            raise RuntimeError("JMP address must be a valid integer.")
-        '''
-        return 0
+        else: self.instruction_pointer+=1
+        print(self.instruction_pointer)
+    def goto(self,line):
+        addr=line[3]
+        self.instruction_pointer = addr
+        
     def bwd(self,line):
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
             character.move(const.up)
             total -=1
-        
+        self.instruction_pointer+=1
     def fwd(self,line):
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
             character.move(const.down)
             total -=1
-        
+        self.instruction_pointer+=1
     def right(self,line):
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
             character.move(const.right)
             total -=1
-        
+        self.instruction_pointer+=1
     def left(self,line):
         global characteer
         total = int(self.memory[line[1]])
         while(total > 0):
             character.move(const.left)
             total -=1
+        self.instruction_pointer+=1
     def respond(self,line):
         #TODO Conecion a interfaz para mover personaje
         return 0
@@ -269,6 +293,8 @@ def Start_game():
 
     entryForInput = Entry(Frame,width=190,height=270)
     entryForInput.place((15,40))
+    #TODO Agregar boton para compilar 
+    #y no habilitar boton de ejecutar hasta despues
     execute_button= Button(Window, text = "Correr mi programa! ", width = 145, height = 50, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Execute_instruction)
     execute_button.place((460, 350))
     back_button= Button(Window, text = "Atras ", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Home)

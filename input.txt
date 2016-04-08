@@ -5,6 +5,15 @@ var Mivar decision = verdadero,
 var Miotravar numero = 3,
 var Otravar escrita = "hola" ;
 
-Ana.abajo(1);
+
+repetirMientras(paredDerecha == falso){
 Ana.derecha(1);
-}	
+}
+siEs(paredDerecha == verdadero){
+Ana.abajo(1);
+}
+siEs(paredDerecha == verdadero){
+Ana.izquierda(1);
+}
+
+}

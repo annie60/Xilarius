@@ -54,7 +54,7 @@ const_mem_counter = 25000
 var_boleanas = ("verdadero","falso")
 var_tipos = ("numero","escrita","decision","personaje")
 var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","arriba","abajo","derecha","izquierda")
-var_constantes = ("verdadero","falso","pared","libre","meta")
+var_constantes = ("verdadero","falso","paredDerecha","paredIzquierda","paredArriba","paredAbajo","libreDerecha","libreIzquierda","libreArriba","libreAbajo","metaDerechas","metaIzquierda","metaArriba","metaAbajo")
 #Formato de matriz para cubo
 #                       =       +       -       *       /       <>      ==      p   r   at  ad   d   i
 #numero     numero      1       1       1       1       1       -1      -1     -1  -1  -1   -1  -1  -1
