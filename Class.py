@@ -205,7 +205,7 @@ class Character(object):
         
     def talk(self,message):
         #Create bubble of speech
-        if ((self.x+1)*(const.wc)) > self.maze.w :
+        if ((self.x+1)*(const.wc)) > (self.maze.w *15):
             self.img_speech = CaseDoubleImage((((self.x-5) * const.wc), (self.y * const.hc)),"bubble_small_revert")
             self.speech = CaseText((((self.x-4.4) * const.wc), ((self.y+0.3) * const.hc)),message)
         else:
@@ -369,7 +369,7 @@ class maze(object):
             a.x = v % self.w
             a.y = int(v / self.w)
             
-            #For coordinate of backgrounf
+            #For coordinate of background
             if v < (self.w * loop):
                 localX += 1
             else:
