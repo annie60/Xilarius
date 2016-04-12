@@ -19,11 +19,11 @@ pOper = Stack()
 pilaO =Stack()
 braces = Stack()
 pSaltos = Stack()
-counter = 0
 cuadruplos = {}
+build_errors=[]
 #Helper counters
 temp_counter = 0
-
+counter = 0
 if sys.version_info[0] >= 3:
     raw_input = input
 #Token ids
@@ -92,7 +92,8 @@ def t_newline(t):
     r'\n+'
     t.lexer.lineno += t.value.count("\n")                 
 def t_error(t):
-    print("Caracter ilegal: '%s'" % t.value[0])
+    global build_errors
+    build_errors.append("Caracter ilegal: '%s'" % t.value[0])
     t.lexer.skip(1)
     
 # Build the lexer
@@ -118,7 +119,8 @@ def p_program2(p):
 def p_program2_error(p):
     '''program2 : error'''
     pass
-    print("Error: Falta '{'")
+    global build_errors
+    build_errors.append("Error: Falta '{'")
 def p_declarar(p):
     '''declarar : MIPROGRAMA IDENTIFICADOR'''
     ids.enqueue(p[2])
@@ -136,15 +138,19 @@ def p_personaje(p):
     ids.enqueue(p[2])
     types.push("personaje")
     values.push("personaje")
+    global build_errors
     if ids.size() >= 1:
         tipo = types.pop()
         valor = values.pop()
         identificador =ids.dequeue()
-        agregar_variable(identificador,valor,tipo)
+        respuesta_semantica =agregar_variable(identificador,valor,tipo)
+        if (respuesta_semantica != ""):
+            build_errors.append(respuesta_semantica)
 
 def p_personaje_error(p):
     '''personaje : CREARPERSONAJE error ENDLINE vars'''
-    print("Error: No se encontro nombre de personaje")
+    global build_errors,error_counter
+    build_errors.append("Error: No se encontro nombre de personaje")
 ##Start of the modules for flow control
 ##-----------------------------------
 def p_modulo(p):
@@ -171,6 +177,7 @@ def p_modulo4(p):
     if not pSaltos.isEmpty():
         global counter
         cuadruplos[pSaltos.pop()][3]=counter+1
+        #Loops operation creation for vm
         if not pSaltos.isEmpty():
             cuadruplos[counter]=["goto","","",pSaltos.pop()]
             counter+=1
@@ -189,7 +196,8 @@ def p_modulo2(p):
     braces.push(p[1])
 def p_modulo2_error(p):
     '''modulo2 : error'''
-    print("Error: Falta '{'")
+    global build_errors
+    build_errors.append("Error: Falta '{'")
 ##Character instructions start
 ## -------------------------
 def p_instruccion(p):
@@ -209,9 +217,15 @@ def p_instruccion5(p):
         operder =pOper.pop()
         operizq = pOper.pop()
         operador = pilaO.pop()
-        if operacion(operation,valor,tipo):
+        global build_errors
+        respuesta_semantica = operacion(operation,valor,tipo)
+        if respuesta_semantica == "":
             dir_der=obtener_direccion(operder)
             dir_izq=obtener_direccion(operizq)
+        else:
+            dir_der=obtener_direccion(operder)
+            dir_izq=obtener_direccion(operizq)
+            build_errors.append(respuesta_semantica)
         obtener_direccion("temp"+str(temp_counter))
         pOper.push("temp"+str(temp_counter))
         cuadruplos[counter] = [operador,dir_izq,dir_der,""]
@@ -219,7 +233,8 @@ def p_instruccion5(p):
 ##Error control for sintaxis        
 def p_instruccion5_error(p):
     '''instruccion5 : IDENTIFICADOR PUNTO instruccion1 error'''
-    print("Error:Falta ';'")
+    global build_errors
+    build_errors.append("Error: Falta ';'")
     types.push(p[1])
     pOper.push(p[1])
     if values.size() >= 1:
@@ -229,11 +244,14 @@ def p_instruccion5_error(p):
         pOper.pop()
         pOper.pop()
         pilaO.pop()
-        operacion(operation,valor,tipo)
+        respuesta_semantica =operacion(operation,valor,tipo)
+        if respuesta_semantica != "":
+            build_errors.append(respuesta_semantica)
 
 def p_instruccion5_error2(p):
     '''instruccion5 : IDENTIFICADOR error instruccion1 ENDLINE'''
-    print("Error: Falta '.' ")
+    global build_errors
+    build_errors.append("Error: Falta '.'")
     types.push(p[1])
     pOper.push(p[1])
     if values.size() >= 1:
@@ -243,7 +261,9 @@ def p_instruccion5_error2(p):
         pOper.pop()
         pOper.pop()
         pilaO.pop()
-        operacion(operation,valor,tipo)
+        respuesta_semantica =operacion(operation,valor,tipo)
+        if respuesta_semantica != "":
+            build_errors.append(respuesta_semantica)
 ##Auxiliar instruction rules
 def p_instruccionaux(p):
 	'''instruccionaux : 
@@ -291,11 +311,12 @@ def p_vars(p):
 #Specific error handling
 def p_vars_error(p):
     '''vars : error IDENTIFICADOR tipo EQUALS varcte vars1'''
-    print("Declaracion incorrecta  ")
+    global build_errors
+    build_errors.append("Error: Declaracion incorrecta")
 #Specific error handling
 def p_vars_error2(p):
     '''vars : CREARPERSONAJE error'''
-    print("Mas de un personaje declarado")
+    build_errors.append("Error: Mas de un personaje declarado")
 def p_vars1(p):
     '''vars1 : COMA vars2
         	| ENDLINE'''
@@ -303,17 +324,21 @@ def p_vars1(p):
 #Specific error handling
 def p_vars2_error(p):
     '''vars1 : COMA error ENDLINE'''
-    print("Extra ',' "	) 
+    global build_errors
+    build_errors.append("Error: Extra ','")
 def p_vars2(p):
         '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1'''
         pass
+        global build_errors
         ids.enqueue(p[2])
         if ids.size() >= 1:
             valor = values.pop()
             tipo = types.pop()
             identificador =ids.dequeue()
             pOper.pop()
-            agregar_variable(identificador,valor,tipo)
+            respuesta_semantica =agregar_variable(identificador,valor,tipo)
+            if (respuesta_semantica != ""):
+                build_errors.append(respuesta_semantica)
 
 ##Start of control/decision expresions
 ##-----------------------------------------------
@@ -324,19 +349,26 @@ def p_laberinto(p):
         global counter,temp_counter
         valor = values.pop()
         tipo = types.pop()
-        operacion = operations.pop()
+        operation = operations.pop()
         operadorizq=pOper.pop()
         operador=pOper.pop()
-        if operacion_compatible(operacion,tipo,valor):
+        global build_errors
+        ##Checks semantics
+        respuesta_semantica = operacion_compatible(operation,tipo,valor)
+        if respuesta_semantica == "":
             dir_izq = obtener_direccion(operadorizq)
             dir_der = obtener_direccion(operador)
             dir_temp = obtener_direccion("temp"+str(temp_counter))
+        else:
+            build_errors.append(respuesta_semantica)
+        #Creates structure of operators for vm
         pOper.push("temp"+str(temp_counter))
         temp_counter+=1
-        cuadruplos[counter]=[operacion,dir_izq,dir_der,dir_temp]
+        cuadruplos[counter]=[operation,dir_izq,dir_der,dir_temp]
         counter+=1
         pSaltos.push(counter)
         pOper.pop()
+        #Constructor of logic operator
         cuadruplos[counter]=["gotof",dir_temp,"",""]
         counter+=1
         
@@ -370,7 +402,8 @@ def p_expresion(p):
 def p_expresion_error(p):
     '''expresion : error exp
                 | termino error'''
-    print("Expresion no valida")
+    global build_errors
+    build_errors.append("Error: Operacion matematica no es correcta")
 def p_exp(p):
     '''exp :
             | exp2 exp'''
@@ -386,7 +419,7 @@ def p_exp2(p):
         operador = pilaO.pop()
         operDer = pOper.pop()
         operIzq = pOper.pop()
-        #temporal = cuadruplo(operador,operIzq,operDer)
+        #Construction of structure for operations on vm
         dir_der = obtener_direccion(operDer)
         dir_izq = obtener_direccion(operIzq)
         dir_temp = obtener_direccion("temp"+str(temp_counter))
@@ -394,12 +427,11 @@ def p_exp2(p):
         temp_counter+=1
         cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
         counter+=1
-#TODO Todos los errores se tienen que mandar
-#a la interfaz grafica
 #Specific error generation
 def p_exp_error(p):
     '''exp2 : error termino '''
-    print("Operacion no valida")
+    global build_errors,error_counter
+    build_errors.append("Error: Operacion matematica no es correcta")
 def p_termino(p):
     '''termino : varcte termino2'''
     pass
@@ -443,25 +475,30 @@ def p_varcte(p):
     pOper.push(p[1])
 #Error handling
 def p_error(p):
+    global build_errors,error_counter
     if p:
-        print("Error de sintaxis cerca de '%s'" % p.value)
-        print("En linea",p.lineno)
+        build_errors.append("Error de escritura cerca de '%s'" % p.value)
+        build_errors.append("En linea %i"%p.lineno)
                 
     else:
         if not braces.isEmpty():
-            print("Error: Falta '}' o ')'")
-        print("Error de sintaxis en el fin del archivo")
+            build_errors.append("Error: Falta '}' o ')'")
+        build_errors.append("Error de escritura al final del archivo")
 
 import ply.yacc as yacc
 yacc.yacc()
 
 
 import sys
-try:
-    f = open(sys.argv[1])
-    p = yacc.parse(f.read())
-    print(p)
-except EOFError:
-    print("Could not open file %s." % sys.argv[1])
+def scan():
+    global build_errors,error_counter
+    try:
+        #TODO Cambiar en caso de usar recuadro de input
+        f = open("input.txt")
+        p = yacc.parse(f.read())
+        return build_errors
+    except EOFError:
+        build_errors.append("No se pudo abrir archivo." )
 
     
+scan()

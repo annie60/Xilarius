@@ -6,14 +6,11 @@ var Miotravar numero = 3,
 var Otravar escrita = "hola" ;
 
 
-repetirMientras(libreDerecha <> falso){
-Ana.derecha(1);
-}
-siEs(paredDerecha == verdadero){
+repetirMientras(libreAbajo == verdadero){
 Ana.abajo(1);
 }
-siEs(paredDerecha == verdadero){
-Ana.izquierda(1);
+siEs(paredAbajo <> falso){
+Ana.responder("Hay pared aqu");
 }
-
+Ana.derecha(1);
 }

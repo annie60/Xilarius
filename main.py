@@ -14,6 +14,7 @@ from time import sleep
 from Function import *
 from Class import *
 from tygame.main import StaticFrame,Entry, Button, Label, render_widgets, handle_widgets #But you can put in ..\Python\Lib\site-packages
+#-------------------Global variables---------------------#
 avatars = ["Character_boy","Character_Cat_girl",
             "Character_Horn_Girl","Character_Pink_Girl"]
 avatar_index=0
@@ -21,6 +22,7 @@ main_background = "Main_Background"
 on_game = False
 on_initial = True
 blinker_on=True
+execution_errors=[]
 #------------Virtual Machine---------------#
 
 #Mapeo de memoria
@@ -45,10 +47,11 @@ class Machine:
         while self.instruction_pointer < len(self.code):
             line = self.code[self.instruction_pointer]
             operators = line[1:]
+            #Enters the execution case
             for value in operators:
                 if value != '':
-                    if (value >= temp_mem_range[0] and value <= temp_mem_range[1]) and not (value in self.memory):
-                        self.memory[value]=self.temporary[value]  
+                    if ((value >= temp_mem_range[0] and value <= temp_mem_range[1])  and not (value in self.memory)):
+                            self.memory[value]=self.temporary[value]                        
                     elif (value >= const_mem_range[0] and value <= const_mem_range[1]) and not (value in self.memory):
                         self.memory[value]=self.constant[value]
             self.dispatch(line)
@@ -57,8 +60,11 @@ class Machine:
                 character_time = pygame.time.get_ticks()
                 character.poll()
             character.show(Window)
+            render_widgets()
             pygame.display.flip()
             sleep(0.3)
+        #TODO Quitar para produccion    
+        print(self.memory)
         self.dump_vm()
     def dispatch(self, op):
         dispatch_map = {
@@ -76,6 +82,7 @@ class Machine:
             "goto":         self.goto,
             "parar":        self.stop,
             "responder":    self.respond,
+            "exit":         self.exit,
         }
 
         if op[0] in dispatch_map:
@@ -198,8 +205,8 @@ class Machine:
             total -=1
         self.instruction_pointer+=1
     def respond(self,line):
-        #TODO Conecion a interfaz para crear burbuja de dialogo
-        return 0
+        Character_talk(self.memory[line[1]])
+        self.instruction_pointer+=1
     def dump_vm(self):
         self.memory = {}
 # FIN
@@ -244,10 +251,20 @@ def Change_avatar():
     else:
         avatar_index=0
         character.change_avatar(avatars[avatar_index])
-def Character_talk():
-    global character,Window
-    #TODO Manejar logica de acuerdo al programa escrito
-    character.talk(Window,"hello")
+def Character_talk(mensaje):
+    global character,Window,character_time
+    mensaje_corto = mensaje[1:-1]
+    if len(mensaje_corto) > 11:
+        mensaje_corto = mensaje_corto[:11]
+    character.talk(mensaje_corto)
+    if pygame.time.get_ticks() - character_time >= const.time_character_poll:
+                character_time = pygame.time.get_ticks()
+                character.poll()
+    character.show(Window)
+    render_widgets()
+    pygame.display.flip()
+    sleep(2)
+    character.stop_talk()
 def Home():
     global on_game,on_initial,change_button,Label_gen,Frame,execute_button,entryForInput,back_button
     pygame.mixer.music.stop()
@@ -379,7 +396,7 @@ while True:
             if keys[K_h]:
                 But_path()
             if keys[K_t]:#TODO es instantaneo hay que cambiar
-                Character_talk()
+                Character_talk("'hola'")
             
         ##Blinker for input 
         '''

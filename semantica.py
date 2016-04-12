@@ -5,7 +5,6 @@
 # Ana Karen Reyna		A01280310
 # -----------------------------------------------------------------------------
 #Clase pila para apoyo en la construccion de tablas
-
 class Stack:
      def __init__(self):
          self.items = [] #inicializa una lista vacia
@@ -104,8 +103,8 @@ def crear_modulo(nombre,ambiente):
 def agregar_variable(nombre,valor,tipo):
     #Revisa que no este repetida la variable
     if existe_variable(nombre):
-        print("Error: Nombre de variable '"+nombre+"' repetido")
-        return False
+        return "Error: Nombre de variable '"+nombre+"' repetido"
+        
     else:
         #Revisa que la asignacion que se le hace sea
         #correspondiente al tipo de variable que es
@@ -114,13 +113,12 @@ def agregar_variable(nombre,valor,tipo):
             var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipo,global_mem_counter)
             global_mem_output[global_mem_counter] = valor
             global_mem_counter+=1
-            return True
+            return ""
         else:
-            print("Error: Asignacion no compatible")
-            return False
+            return "Error: Asignacion a '"+nombre+"' no compatible"
 
 def convertir_valor(valor):
-    #Convierte valores a tipo numericos
+    #Convierte valores a tipo indices
         if valor.isdigit():
             return 0
         elif isinstance(valor,str) and not(valor in var_boleanas) and ('"' in valor):
@@ -133,7 +131,6 @@ def convertir_valor(valor):
         elif valor == "personaje":
             return 3
         else:
-            print ("Error:Variable '"+valor+"' no declarada")
             return -1
           
 def operacion_compatible(operacion, tipouno,tipodos):
@@ -143,12 +140,11 @@ def operacion_compatible(operacion, tipouno,tipodos):
     operador =var_operaciones.index(operacion)
     if indiceValor >= 0:
         if (cubo_semantico[tipo][indiceValor][operador] == 1):
-            return True
+            return ""
         else:
-            print("Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion)
-            return False
+            return "Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion
     else:
-        return False
+        return "Error:Variable '"+tipodos+"' no declarada"
 def obtener_direccion(variable):
     global temp_mem,global_mem_counter,temp_mem_counter,const_mem_counter
     if (variable in var_dicc_funciones["miPrograma"][1]): 
@@ -175,12 +171,11 @@ def operacion(operacion, tipouno,tipodos):
     operador =var_operaciones.index(operacion)
     if indiceValor >= 0:
         if (cubo_semantico[tipo][indiceValor][operador] == 1):
-            return True
+            return ""
         else:
-            print("Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion)
-            return False
+            return "Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion
     else:
-        return False
+        return "Error:Variable '"+tipodos+"' no declarada"
 
 def existe_variable(nombre):
     global var_dicc_funciones
@@ -188,17 +183,6 @@ def existe_variable(nombre):
         return True
     else:
         return False
-def checa_operando(operando):
-    if operando in var_dicc_funciones["miPrograma"][1]:
-        return var_dicc_funciones["miPrograma"][1][operando][0]
-    elif not isinstance(operando,int):
-        if not operando.isdigit():
-            print("Error: Variable '"+str(operando)+"' no declarada")
-            return 1 
-        else:
-            return operando
-    else:
-        return operando 
 def crear_constante(valor):
     global const_mem,const_mem_counter
     const_mem[valor]=const_mem_counter

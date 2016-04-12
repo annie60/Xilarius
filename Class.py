@@ -5,7 +5,7 @@
 # Ana Karen Reyna		A01280310
 # -----------------------------------------------------------------------------
 
-from pygame import image, Rect, draw, Surface
+from pygame import image, Rect, draw, Surface, font
 from pygame.locals import *
 from random import randint, choice
 from math import sqrt
@@ -106,7 +106,7 @@ class CaseColor(object):
         self.surf.fill(color)
 class CaseImage(object):
     """
-    For the squares coloring
+    For the squares background image
     """
     def __init__(self, Pos, imagenam):
         self.pos = Pos
@@ -116,7 +116,33 @@ class CaseImage(object):
         self.rect_img = self.img.get_rect()
         self.surf = Surface((const.wc, const.hc))
         self.surf.fill(const.green)
-        self.surf.blit(self.img,self.rect_img)        
+        self.surf.blit(self.img,self.rect_img)  
+class CaseDoubleImage(object):
+    """
+    For the squares background image double size
+    """
+    def __init__(self, Pos, imagenam):
+        self.pos = Pos
+        imagename=const.imagespath+imagenam+".png"
+        self.img = image.load(imagename).convert_alpha()
+        self.img.set_colorkey(RLEACCEL)
+        self.rect_img = self.img.get_rect()
+        self.surf = Surface((const.wc*5, const.hc*2))
+        self.surf.fill(const.green)
+        self.surf.blit(self.img,self.rect_img)  
+class CaseText(object):
+    """
+    For the squares background image
+    """
+    def __init__(self, Pos,message):
+        self.pos = Pos
+        self.myfont = font.Font(None, 22)
+        self.text = self.myfont.render(message, 1, (10, 10, 10))
+        self.rect = self.text.get_rect()
+        self.surf = Surface(((const.wc*4)-15, (const.hc*2)-18))
+        self.surf.fill(const.white)
+        self.rect.centerx = self.surf.get_rect().centerx
+        self.surf.blit(self.text,self.rect)  
 #Starts character object
 #-------------------------------------------
 class Character(object):
@@ -130,7 +156,9 @@ class Character(object):
         self.mainroad = None
         self.yellow_road = []
         self.reverse = 0
-
+        
+        self.img_speech=''
+        self.speech = ''
         self.maze = maze
         #Set avatar image
         self.img = image.load(const.imagespath+"Character_boy.png").convert_alpha()
@@ -170,16 +198,22 @@ class Character(object):
         screen.blit(self.dep.surf, self.dep.pos)
         screen.blit(self.fin.surf, self.fin.pos)            
         screen.blit(self.img, self.rect_img)
+        if self.img_speech != '':
+            screen.blit(self.img_speech.surf, self.img_speech.pos)
+            screen.blit(self.speech.surf,self.speech.pos)
         
         
-        
-    def talk(self,screen,string):
+    def talk(self,message):
         #Create bubble of speech
-        self.img_speech = image.load(const.imagespath+"bubble.png").convert_alpha()
-        self.img_speech.set_colorkey(RLEACCEL)
-        self.rect_img_speech = self.img_speech.get_rect()
-        self.rect_img_speech[0], self.rect_img_speech[1] = (self.x+3 * const.wc), (self.y+5 * const.hc)
-        screen.blit(self.img_speech, self.rect_img_speech) 
+        if ((self.x+1)*(const.wc)) > self.maze.w :
+            self.img_speech = CaseDoubleImage((((self.x-5) * const.wc), (self.y * const.hc)),"bubble_small_revert")
+            self.speech = CaseText((((self.x-4.4) * const.wc), ((self.y+0.3) * const.hc)),message)
+        else:
+            self.img_speech = CaseDoubleImage((((self.x+1) * const.wc), (self.y * const.hc)),"bubble_small")
+            self.speech = CaseText((((self.x+1.4) * const.wc), ((self.y+0.3) * const.hc)),message)
+    def stop_talk(self):
+        self.img_speech = ''
+        self.speech = ''
     def move(self, dir):
         if not self.maze.get_cell(self.x, self.y).gate[dir]:
             
