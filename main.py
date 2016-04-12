@@ -8,12 +8,18 @@
 
 #-----------------------Libs import-----------------------#
 from __future__ import print_function
+import os,webbrowser
 import pygame, sys, ast
 from pygame.locals import *
 from time import sleep
 from Function import *
 from Class import *
+from scaner_parser import build_errors
 from tygame.main import StaticFrame,Entry, Button, Label, render_widgets, handle_widgets #But you can put in ..\Python\Lib\site-packages
+
+#-------------------Window Position---------------------#
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (10,150)
+
 #-------------------Global variables---------------------#
 avatars = ["Character_boy","Character_Cat_girl",
             "Character_Horn_Girl","Character_Pink_Girl"]
@@ -23,6 +29,7 @@ on_game = False
 on_initial = True
 blinker_on=True
 execution_errors=[]
+can_execute = False
 #------------Virtual Machine---------------#
 
 #Mapeo de memoria
@@ -222,27 +229,41 @@ def But_path():
     character.astar(((character.maze.w - 1), (character.maze.h - 1)))
     chemain = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
     character.go_to(chemain)
+def Compile_instruction():
+    global can_execute
+    print(can_execute)
+    if not build_errors:
+	    can_execute = True
+    else:
+        print(build_errors)
+        can_execute = False
 def Execute_instruction():
-    #Divides file of compiled code
-    file = open('result.txt','r')
-    content = file.read()
-    #Global variables
-    firstPart =content.index('$')
-    glob = ast.literal_eval(content[:firstPart])
-    content = content[firstPart+1:]
-    #Constants table
-    secondPart =content.index('$')
-    const =ast.literal_eval(content[:secondPart])
-    content = content[secondPart+1:]
-    #Temporals table
-    thirdPart =content.index('$')
-    temps =ast.literal_eval(content[:thirdPart])
-    content = content[thirdPart+1:]
-    code =ast.literal_eval(content)
-    a = Machine(glob,const,temps,code)
-    a.run()
-    #TODO Quitar para produccion
-    print(a.memory)
+    global can_execute
+    if can_execute:
+        print(can_execute)
+        #Divides file of compiled code
+        file = open('result.txt','r')
+        content = file.read()
+        #Global variables
+        firstPart =content.index('$')
+        glob = ast.literal_eval(content[:firstPart])
+        content = content[firstPart+1:]
+        #Constants table
+        secondPart =content.index('$')
+        const =ast.literal_eval(content[:secondPart])
+        content = content[secondPart+1:]
+        #Temporals table
+        thirdPart =content.index('$')
+        temps =ast.literal_eval(content[:thirdPart])
+        content = content[thirdPart+1:]
+        code =ast.literal_eval(content)
+        a = Machine(glob,const,temps,code)
+        a.run()
+        #TODO Quitar para produccion
+        print(a.memory)
+    else:
+        if not build_errors:
+            build_errors.append("No has compilado")
 def Change_avatar():
     global avatar_index,character
     if avatar_index < len(avatars)-1:
@@ -266,7 +287,7 @@ def Character_talk(mensaje):
     sleep(2)
     character.stop_talk()
 def Home():
-    global on_game,on_initial,change_button,Label_gen,Frame,execute_button,entryForInput,back_button
+    global on_game,on_initial,change_button,Label_gen,Frame,execute_button,entryForInput,back_button, compile_button
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
     #TODO: Activar
@@ -275,6 +296,7 @@ def Home():
     on_initial = True
     change_button.kill()
     execute_button.kill()
+    compile_button.kill()
     back_button.kill()
     Frame.kill()
 def Demo():
@@ -313,7 +335,7 @@ def Restart():
             
             list_x2 = fill_list_x2(list_x1)
 def Start_game():
-    global on_game,on_initial,Label_gen,Frame,change_button,back_button,execute_button,character_time,entryForInput,character,list_x1,list_x2
+    global on_game,on_initial,Label_gen,Frame,change_button,back_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
     #TODO Activar
@@ -335,20 +357,28 @@ def Start_game():
     pygame.display.flip()
     pygame.key.set_repeat(50, 55)
     #Side toolbar
+    back_button= Button(Window, text = "Atras", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Home)
+    back_button.place((435, 10))
     change_button= Button(Window, text = "Cambiar avatar ", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Change_avatar)
-    change_button.place((545, 6))
+    change_button.place((545, 10))
 
     Label_gen = Label(Frame, width = 209, height = 290, htitle = " Escribe Aqui ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
-    Label_gen.place((10, 20))
+    Label_gen.place((10, 30))
 
     entryForInput = Entry(Frame,width=190,height=270)
-    entryForInput.place((15,40))
+    entryForInput.place((15,50))
+    Label_errors = Label(Frame, width = 209, height = 100, htitle = " Errores ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
+    Label_errors.place((10, 330))
+    errors = Entry(Frame,text = "No hay errores ", width=190,height=80)
+    errors.place((15,350))
     #TODO Agregar boton para compilar 
     #y no habilitar boton de ejecutar hasta despues
-    execute_button= Button(Window, text = "Correr mi programa! ", width = 145, height = 50, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Execute_instruction)
-    execute_button.place((460, 350))
-    back_button= Button(Window, text = "Atras ", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Home)
-    back_button.place((460, 420))
+    compile_button= Button(Window, text = "Compilar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Compile_instruction)
+    compile_button.place((435, 455))
+    execute_button= Button(Window, text = "Ejecutar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Execute_instruction)
+    execute_button.place((545, 455))
+    #Open input file with browser
+    #webbrowser.open("input.txt")
 # FIN
 
 
