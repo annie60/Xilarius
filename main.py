@@ -14,7 +14,7 @@ from pygame.locals import *
 from time import sleep
 from Function import *
 from Class import *
-from scaner_parser import build_errors
+from scaner_parser import scan
 from tygame.main import StaticFrame,Entry, Button, Label, render_widgets, handle_widgets #But you can put in ..\Python\Lib\site-packages
 
 #-------------------Window Position---------------------#
@@ -30,6 +30,7 @@ on_initial = True
 blinker_on=True
 execution_errors=[]
 can_execute = False
+errors = ''
 #------------Virtual Machine---------------#
 
 #Mapeo de memoria
@@ -230,13 +231,17 @@ def But_path():
     chemain = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
     character.go_to(chemain)
 def Compile_instruction():
-    global can_execute
-    print(can_execute)
-    if not build_errors:
+    global can_execute,errors
+    
+    build_error = scan()
+    if not build_error:
 	    can_execute = True
     else:
-        print(build_errors)
+        print(build_error)
         can_execute = False
+    for error in build_error:
+        current_errors=errors.get()
+        errors.set(current_errors+" "+error)
 def Execute_instruction():
     global can_execute
     if can_execute:
@@ -369,6 +374,7 @@ def Start_game():
     entryForInput.place((15,50))
     Label_errors = Label(Frame, width = 209, height = 100, htitle = " Errores ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
     Label_errors.place((10, 330))
+    global errors
     errors = Entry(Frame,text = "No hay errores ", width=190,height=80)
     errors.place((15,350))
     #TODO Agregar boton para compilar 

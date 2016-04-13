@@ -475,7 +475,7 @@ def p_varcte(p):
     pOper.push(p[1])
 #Error handling
 def p_error(p):
-    global build_errors,error_counter
+    global build_errors
     if p:
         build_errors.append("Error de escritura cerca de '%s'" % p.value)
         build_errors.append("En linea %i"%p.lineno)
@@ -499,6 +499,6 @@ def scan():
         return build_errors
     except EOFError:
         build_errors.append("No se pudo abrir archivo." )
-
+        return build_errors
     
-scan()
+#scan()

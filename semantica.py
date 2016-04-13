@@ -108,7 +108,7 @@ def agregar_variable(nombre,valor,tipo):
     else:
         #Revisa que la asignacion que se le hace sea
         #correspondiente al tipo de variable que es
-        if operacion_compatible("=",tipo,valor):
+        if operacion_compatible("=",tipo,valor) == "":
             global global_mem_output,var_dicc_funciones,global_mem_counter
             var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipo,global_mem_counter)
             global_mem_output[global_mem_counter] = valor
