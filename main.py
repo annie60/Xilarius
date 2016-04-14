@@ -437,7 +437,32 @@ def Create_input():
     c.td(gui.Label("    "))
     c.td(gui.Label("    "))
     c.td(gui.Label("    "))
-
+    cancel_btn = gui.Button("Cancelar")
+    cancel_btn.connect(gui.CLICK,app.quit,None)
+    c.td(cancel_btn)
+    
+    c.tr()
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
     def cb():
         global input_from_user
         input_from_user = e.value
@@ -500,7 +525,14 @@ while True:
                 quit()
                 exit()
     if on_game:
-        Window.fill(const.green)    
+        Window.fill(const.green)   
+        mouse = pygame.mouse.get_pressed()
+        if mouse[0]:
+            (mousex,mousey) = pygame.mouse.get_pos()
+            if mousex > 445 and mousex < 630:
+                if mousey > 60 and mousey < 325:
+                    input_initialized = False
+            print(mousex,mousey)
         '''keys = pygame.key.get_pressed()
         ##TODO: Quitar esto de las teclas
         if keys:
@@ -532,12 +564,13 @@ while True:
             character_time = pygame.time.get_ticks()
             character.poll()
         character.show(Window)
+        if not input_initialized:
+            Create_input()
         render_widgets()
         pygame.display.flip()
         if character.x == character.maze.w - 1 and character.y == character.maze.h - 1:
             Restart()
-        if not input_initialized:
-            Create_input()
+        
     elif(on_initial):
         ## Main page
         Window.fill(const.black) 
