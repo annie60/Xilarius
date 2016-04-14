@@ -346,6 +346,7 @@ def Restart():
             mymaze = maze(16, 19)
             mymaze.generate_maze()
             character = Character(mymaze)
+            #Cleans variables
             input_from_user = ""
             while True:
                 Window.fill(const.green)
@@ -400,15 +401,12 @@ def Start_game():
     errors = Entry(Frame,text = "No hay errores ", width=190,height=90)
     errors.place((15,350))
     
-    #Btttons
+    #Buttons
     compile_button= Button(Window, text = "Compilar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Compile_instruction)
     compile_button.place((435, 455))
     execute_button= Button(Window, text = "Ejecutar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Execute_instruction)
     execute_button.place((545, 455))
 
-    #Open input file with browser
-    #webbrowser.open("input.txt")
-    
 def Create_input():
     global Window, input_initialized, Frame, input_from_user
     input_initialized = True 
@@ -493,7 +491,11 @@ def Create_input():
     c.td(gui.Label("    "))
     c.td(gui.Label("    "))
     c.td(gui.Label("    "))
-    e = gui.TextArea(value="Aqui va tu programa",width=190,height=270)
+    if input_from_user == "":
+        previous_text = "Aqui va tu programa"
+    else:
+        previous_text = input_from_user
+    e = gui.TextArea(value=previous_text,width=250,height=270)
     c.td(e)
 
     app.run(c)
@@ -532,8 +534,8 @@ while True:
             if mousex > 445 and mousex < 630:
                 if mousey > 60 and mousey < 325:
                     input_initialized = False
-            print(mousex,mousey)
-        '''keys = pygame.key.get_pressed()
+        '''
+        keys = pygame.key.get_pressed()
         ##TODO: Quitar esto de las teclas
         if keys:
             if keys[K_UP]:
@@ -552,7 +554,7 @@ while True:
                 But_path()
             if keys[K_t]:#TODO es instantaneo hay que cambiar
                 Character_talk("'hola'")
-            '''
+        '''
         Label_gen = Label(Frame, width = 209, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
         Label_gen.place((10, 30))
 

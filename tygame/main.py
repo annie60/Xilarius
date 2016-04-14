@@ -645,13 +645,13 @@ class Entry:
                         returnIndex = index + int(self.width/10)
                         accumulated_line = word[:int(self.width/10)] 
                         final_lines.append(accumulated_line)
-                        print(final_lines)
+                        
                         test_line = word[int(self.width/10):]
-                        print("line"+test_line)
-                        self.text = self.text[:returnIndex]+" \n\n"+self.text[returnIndex:]
+                        
+                        self.text = self.text[:returnIndex]+"\n\n"+self.text[returnIndex:]
                     else:
                         test_line = accumulated_line + word + " "
-                    print ('test '+test_line)
+                    
                     # Build the line while the words fit    
                     if fonts.size(test_line)[0] < self.width:
                         accumulated_line = test_line 
@@ -667,12 +667,11 @@ class Entry:
         if self._x > 0: self._x = 0
         self._buffer.fill(self.bg)
         justification =0
-        #self._buffer.blit(tmpText,(self._x,0))
         accumulated_height = 0 
         fonts = font.Font(None, 12)
         for line in final_lines: 
           if accumulated_height + fonts.size(line)[1] >= self.height:
-              print("Once word-wrapped, the text string was too tall to fit in the rect.")
+              return 0
           if line != "":
               tempsurface = self._font.render(line,self.antialias,self.textcolor)
               if justification == 0:

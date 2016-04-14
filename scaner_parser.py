@@ -493,11 +493,7 @@ import sys
 def scan(entrada):
     global build_errors,cuadruplos,ids,temp_counter,counter,types,operations,values,pOper,pilaO,braces,pSaltos
     try:
-        #TODO Cambiar en caso de usar recuadro de input
         del build_errors[:]
-        #f = open("input.txt")
-        #p = yacc.parse(f.read())
-        #for caracter in entrada:
         yacc.parse(entrada)
         #Limpieza de estructuras auxiliares
         ids.dispatch()
