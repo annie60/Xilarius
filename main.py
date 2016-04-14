@@ -77,6 +77,8 @@ class Machine:
             render_widgets()
             pygame.display.flip()
             sleep(0.3)
+        if(len(execution_errors) > 0):
+            Show_execution_errors()
         #TODO Quitar para produccion    
         print(self.memory)
         self.dump_vm()
@@ -144,13 +146,11 @@ class Machine:
             if checkforwall == 0: objeto = not objeto
         else:
             objeto = character.isFinishLine()
-        print(objeto)
-        print(value)
+
         #Makes comparison
         if objeto == value: result = True
         else: result = False
         
-        print(result)
         self.memory[line[3]] = result
         self.instruction_pointer+=1
     def noteq(self,line):
@@ -171,12 +171,10 @@ class Machine:
             if checkforwall == 0: objeto = not objeto
         else:
             objeto = character.isFinishLine()
-        print(objeto)
-        print(value)
+
         if objeto != value: result = True
         else: result = False
         
-        print(result)
         self.memory[line[3]] = result
         self.instruction_pointer+=1
 
@@ -185,7 +183,7 @@ class Machine:
         if not self.memory[line[1]]:
             self.instruction_pointer = addr
         else: self.instruction_pointer+=1
-        print(self.instruction_pointer)
+
     def goto(self,line):
         global last_position_x,last_position_y,loop_times,execution_errors
         addr=line[3]
@@ -250,27 +248,41 @@ def But_path():
     chemain = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
     character.go_to(chemain)
 def Compile_instruction():
-    global can_execute,errors, build_error,input_from_user
-    totalerror=0
+    global can_execute, build_error,input_from_user
     build_error = scan(input_from_user)
     if not build_error:
         can_execute = True
         errors.set("Exito!")
     else:
-        print(build_error)
-        errors.set('')
         can_execute = False
-        for error in build_error:
-            if totalerror > 3:
-                break
-            else:
-                totalerror +=1
-                current_errors=errors.get()
-                errors.set(current_errors+error+"\n\n")
+        Show_production_errors()
+ 
+def Show_execution_errors():
+    global execution_errors,errors
+    totalerror = 0
+    errors.set('')
+    for error in execution_errors:
+        if totalerror > 3:
+            break
+        else:
+            totalerror += 1
+            current_errors = errors.get()
+            errors.set(current_errors+error+"\n\n")
+def Show_production_errors():
+    global execution_errors,errors
+    totalerror = 0
+    errors.set('')
+    for error in build_error:
+        if totalerror > 3:
+            break
+        else:
+            totalerror +=1
+            current_errors=errors.get()
+            errors.set(current_errors+error+"\n\n")
 def Execute_instruction():
-    global can_execute, build_error
+    global can_execute, build_error,errors
     if can_execute:
-        print(can_execute)
+        errors.set("Ejecutando tu programa!")
         #Divides file of compiled code
         file = open('result.txt','r')
         content = file.read()
@@ -291,9 +303,12 @@ def Execute_instruction():
         a.run()
         #TODO Quitar para produccion
         print(a.memory)
+        
+        errors.set("Termino!")
     else:
         if not build_error:
             build_error.append("No has compilado")
+            Show_production_errors()
 def Change_avatar():
     global avatar_index,character
     if avatar_index < len(avatars)-1:
@@ -492,7 +507,7 @@ def Create_input():
     c.td(gui.Label("    "))
     c.td(gui.Label("    "))
     if input_from_user == "":
-        previous_text = "Aqui va tu programa"
+        previous_text = "miPrograma Uno;\n{\ncrearPersonaje Nombre;\nNombre.abajo(1);\n}"
     else:
         previous_text = input_from_user
     e = gui.TextArea(value=previous_text,width=250,height=270)

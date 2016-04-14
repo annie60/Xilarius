@@ -109,10 +109,8 @@ def p_programa(p):
     pass
     if not braces.isEmpty():
         braces.pop()
-    ##TODO: Quitar impresion
-    print(cuadruplos)
     crear_archivo_salida(cuadruplos)
-    #print("\n")
+
 def p_program2(p):
     '''program2 : OPENEXP'''
     braces.push(p[1])
@@ -149,8 +147,12 @@ def p_personaje(p):
 
 def p_personaje_error(p):
     '''personaje : CREARPERSONAJE error ENDLINE vars'''
-    global build_errors,error_counter
+    global build_errors
     build_errors.append("Error: No se encontro nombre de personaje")
+def p_personaje_error2(p):
+    '''personaje : error'''
+    global build_errors
+    build_errors.append("Error: No se encontro personaje")
 ##Start of the modules for flow control
 ##-----------------------------------
 def p_modulo(p):
