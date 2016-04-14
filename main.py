@@ -27,7 +27,9 @@ avatar_index=0
 main_background = "Main_Background"
 on_game = False
 on_initial = True
-blinker_on=True
+last_position_x =0
+last_position_y =0
+loop_times =0
 execution_errors=[]
 can_execute = False
 build_error = []
@@ -51,9 +53,9 @@ class Machine:
         self.instruction_pointer = 0
         self.code = cuadruplos
     def run(self):
-        global character_time,character
+        global character_time,character,execution_errors
         
-        while self.instruction_pointer < len(self.code):
+        while self.instruction_pointer < len(self.code) and len(execution_errors) == 0:
             line = self.code[self.instruction_pointer]
             operators = line[1:]
             #Enters the execution case
@@ -182,8 +184,21 @@ class Machine:
         else: self.instruction_pointer+=1
         print(self.instruction_pointer)
     def goto(self,line):
+        global last_position_x,last_position_y,loop_times,execution_errors
         addr=line[3]
-        self.instruction_pointer = addr
+        #Checking for infinite loop
+        current_pos_x = character.x
+        current_pos_y = character.y
+        if current_pos_x == last_position_x and current_pos_y == last_position_y:
+            loop_times += 1
+        else:
+            last_position_x = current_position_x
+            last_position_y = current_position_y
+            loop_times = 0
+        if loop_times > 10:
+            execution_errors.append("Error: Programa ciclado!")
+        else:
+            self.instruction_pointer = addr
         
     def bwd(self,line):
         global character
@@ -293,7 +308,7 @@ def Character_talk(mensaje):
     sleep(2)
     character.stop_talk()
 def Home():
-    global on_game,on_initial,change_button,Label_gen,Frame,execute_button,entryForInput,back_button, compile_button
+    global on_game,on_initial,change_button,Frame,execute_button,back_button, compile_button
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
     #TODO: Activar
@@ -435,16 +450,6 @@ while True:
             if keys[K_t]:#TODO es instantaneo hay que cambiar
                 Character_talk("'hola'")
             
-        ##Blinker for input 
-        '''
-        currentInput = entryForInput.get()
-        if (blinker_on):
-          entryForInput.set(currentInput+"|")
-          blinker_on =False             
-        else:
-          entryForInput.set(currentInput.replace('|',''))
-          blinker_on = True'''
-          
         ##Sets miliseconds between a display loop            
         if pygame.time.get_ticks() - character_time >= const.time_character_poll:
             character_time = pygame.time.get_ticks()
