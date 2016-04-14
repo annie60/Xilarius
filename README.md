@@ -32,7 +32,7 @@ __Dr. José Icaza__
 - En la consola ejecutar
 ` python main.py `
 - Ir a iniciar
-- Modificar archivo __input.txt__ con el programa que se desea y guardar.
+- Teclear programa en la pantalla de texto y presionar __'Guardar'__ .
 - Presionar __'Compilar'__
 - Presionar __'Correr programa'__
 
