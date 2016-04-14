@@ -24,6 +24,7 @@ __Dr. José Icaza__
 - [PLY](https://github.com/dabeaz/ply) v.3.8
 - Libreria [Pygame](http://www.pygame.org/) V.3.X
 - Libreria [Tygame](http://www.pygame.org/project-Tygame+-+GUI+Project-2081-.html)
+- Libreria [PGU](https://github.com/parogers/pgu)
 
 ## Como ejecutar?
 
