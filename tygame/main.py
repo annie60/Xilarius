@@ -619,45 +619,15 @@ class Entry:
         _widgets.append(self)
 
     def write(self,button,mods):
+        return 0
+    def get(self):
+        return self.text
+
+    def set(self,text):
         final_lines=[]
-        if mods & KMOD_SHIFT:
-            if button == "[":
-                self.text += "{"
-            elif button == "]":
-                self.text += "}"
-            elif button == "9":
-                self.text +="("
-            elif button == "0":
-                self.text +=")"
-            elif button == "'":
-                self.text +="\""
-            elif button == "-":
-                self.text +="_"
-            elif button == "=":
-                self.text +="+"
-            elif button == "8":
-                self.text +="*"
-            
-        if button == "backspace":
-            self.text = self.text[:-1]
-        elif button == "space":
-            button = " "
-        elif button == "return":
-            self.text += "\n\n"
-        if self.numonly:
-            if button.isalpha():
-                button = ""
-        
-        if 0 < mods <= 3 or 4096 < mods <= 4099 or mods >= 8192:
-            button = button.upper()
-        if len(button) == 1 and not(mods & KMOD_SHIFT):
-            self.text += button
-        if len(button) == 3 and not(mods & KMOD_SHIFT):
-            if button[0] == "[" and button[2] == "]":
-                self.text += button[1]
+        self.text = text
         tmpText = self._font.render(self.text,self.antialias,self.textcolor)
         self._x = self.width - tmpText.get_width()
-        
         requested_lines = self.text.splitlines()
             # Create a series of lines that will fit on the provided
             # rectangle.
@@ -715,16 +685,6 @@ class Entry:
                   print("Invalid justification argument: " + str(justification))
           accumulated_height += fonts.size(line)[1]
 
-    def get(self):
-        return self.text
-
-    def set(self,text):
-        self.text = text
-        tmpText = self._font.render(self.text,self.antialias,self.textcolor)
-        self._x = self.width - tmpText.get_width()
-        if self._x > 0: self._x = 0
-        self._buffer.fill(self.bg)
-        self._buffer.blit(tmpText,(self._x,0))
 
     def place(self,pos):
         self.pos = pos

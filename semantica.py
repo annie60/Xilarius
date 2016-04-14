@@ -207,6 +207,7 @@ def crear_archivo_salida(cuadruplos):
     file.write(str(temp_mem_output))
     file.write('$')
     file.write(str(cuadruplos))
+    #Limpieza de variables globales
     var_dicc_funciones.clear()
     const_mem.clear()
     const_mem_output.clear()

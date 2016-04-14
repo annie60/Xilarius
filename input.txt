@@ -7,7 +7,7 @@ var Otravar escrita = "hola" ;
 
 
 repetirMientras(libreAbajo == verdadero){
-Ana.abajo(1);
+Ana.abajo(1)
 }
 siEs(paredAbajo <> falso){
 Ana.responder("Hay pared aqu");

@@ -11,6 +11,7 @@ from __future__ import print_function
 import os,webbrowser
 import pygame, sys, ast
 from pygame.locals import *
+from pgu import gui
 from time import sleep
 from Function import *
 from Class import *
@@ -34,6 +35,8 @@ execution_errors=[]
 can_execute = False
 build_error = []
 errors = ''
+input_initialized = False
+input_from_user =""
 #------------Virtual Machine---------------#
 
 #Mapeo de memoria
@@ -192,8 +195,8 @@ class Machine:
         if current_pos_x == last_position_x and current_pos_y == last_position_y:
             loop_times += 1
         else:
-            last_position_x = current_position_x
-            last_position_y = current_position_y
+            last_position_x = current_pos_x
+            last_position_y = current_pos_y
             loop_times = 0
         if loop_times > 10:
             execution_errors.append("Error: Programa ciclado!")
@@ -247,17 +250,23 @@ def But_path():
     chemain = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
     character.go_to(chemain)
 def Compile_instruction():
-    global can_execute,errors, build_error
-    
-    build_error = scan()
+    global can_execute,errors, build_error,input_from_user
+    totalerror=0
+    build_error = scan(input_from_user)
     if not build_error:
-	    can_execute = True
+        can_execute = True
+        errors.set("Exito!")
     else:
         print(build_error)
+        errors.set('')
         can_execute = False
-    for error in build_error:
-        current_errors=errors.get()
-        errors.set(current_errors+" "+error)
+        for error in build_error:
+            if totalerror > 3:
+                break
+            else:
+                totalerror +=1
+                current_errors=errors.get()
+                errors.set(current_errors+error+"\n\n")
 def Execute_instruction():
     global can_execute, build_error
     if can_execute:
@@ -308,7 +317,7 @@ def Character_talk(mensaje):
     sleep(2)
     character.stop_talk()
 def Home():
-    global on_game,on_initial,change_button,Frame,execute_button,back_button, compile_button
+    global on_game,on_initial,input_initialized,input_from_user,change_button,Frame,execute_button,back_button, compile_button
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
     #TODO: Activar
@@ -320,14 +329,16 @@ def Home():
     compile_button.kill()
     back_button.kill()
     Frame.kill()
+    input_initialized = False
+    input_from_user = ""
 def Demo():
     pass
     #TODO: Agregar instrucciones
     #para explicar el juego
 def Restart():
-            global character,Window,list_x2,list_x1,entryForInput
+            global character,Window,input_initialized,list_x2,list_x1,input_from_user
             pygame.time.delay(300)       
-        
+            
             for Xil in list_x2:
                 Xil.show(Window)
                 pygame.display.flip()
@@ -335,9 +346,7 @@ def Restart():
             mymaze = maze(16, 19)
             mymaze.generate_maze()
             character = Character(mymaze)
-            #Restars input
-            #TODO Cambiar para el nuevo widget de input
-            entryForInput.set("")
+            input_from_user = ""
             while True:
                 Window.fill(const.green)
                 character.show(Window)
@@ -355,8 +364,9 @@ def Restart():
                 pygame.display.flip()
             
             list_x2 = fill_list_x2(list_x1)
+            input_initialized = False
 def Start_game():
-    global on_game,on_initial,Label_gen,Frame,change_button,back_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
+    global on_game,on_initial,input_from_user,Label_gen,Frame,change_button,back_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
     #TODO Activar
@@ -383,24 +393,85 @@ def Start_game():
     change_button= Button(Window, text = "Cambiar avatar ", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Change_avatar)
     change_button.place((545, 10))
 
-    Label_gen = Label(Frame, width = 209, height = 290, htitle = " Escribe Aqui ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
-    Label_gen.place((10, 30))
-
-    entryForInput = Entry(Frame,width=190,height=270)
-    entryForInput.place((15,50))
-    Label_errors = Label(Frame, width = 209, height = 100, htitle = " Errores ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
+    
+    Label_errors = Label(Frame, width = 209, height = 100, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
     Label_errors.place((10, 330))
     global errors
-    errors = Entry(Frame,text = "No hay errores ", width=190,height=80)
+    errors = Entry(Frame,text = "No hay errores ", width=190,height=90)
     errors.place((15,350))
-    #TODO Agregar boton para compilar 
-    #y no habilitar boton de ejecutar hasta despues
+    
+    #Btttons
     compile_button= Button(Window, text = "Compilar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Compile_instruction)
     compile_button.place((435, 455))
     execute_button= Button(Window, text = "Ejecutar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Execute_instruction)
     execute_button.place((545, 455))
+
     #Open input file with browser
     #webbrowser.open("input.txt")
+    
+def Create_input():
+    global Window, input_initialized, Frame, input_from_user
+    input_initialized = True 
+    app = gui.App(screen = Window,area = Frame)
+    app.connect(gui.QUIT,app.quit,None)
+    c = gui.Table(width=190,height=270)
+    c.tr()
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+
+    def cb():
+        global input_from_user
+        input_from_user = e.value
+        app.quit()
+    btn = gui.Button("Guardar")
+    btn.connect(gui.CLICK, cb)
+    
+    c.td(btn)
+    c.tr()
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    e = gui.TextArea(value="Aqui va tu programa",width=190,height=270)
+    c.td(e)
+
+    app.run(c)
 # FIN
 
 
@@ -430,7 +501,7 @@ while True:
                 exit()
     if on_game:
         Window.fill(const.green)    
-        keys = pygame.key.get_pressed()
+        '''keys = pygame.key.get_pressed()
         ##TODO: Quitar esto de las teclas
         if keys:
             if keys[K_UP]:
@@ -449,7 +520,13 @@ while True:
                 But_path()
             if keys[K_t]:#TODO es instantaneo hay que cambiar
                 Character_talk("'hola'")
-            
+            '''
+        Label_gen = Label(Frame, width = 209, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
+        Label_gen.place((10, 30))
+
+        entryForInput = Entry(Frame,width=190,height=270)
+        entryForInput.place((15,50))
+        entryForInput.set(str(input_from_user))
         ##Sets miliseconds between a display loop            
         if pygame.time.get_ticks() - character_time >= const.time_character_poll:
             character_time = pygame.time.get_ticks()
@@ -459,6 +536,8 @@ while True:
         pygame.display.flip()
         if character.x == character.maze.w - 1 and character.y == character.maze.h - 1:
             Restart()
+        if not input_initialized:
+            Create_input()
     elif(on_initial):
         ## Main page
         Window.fill(const.black) 
