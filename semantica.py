@@ -20,6 +20,8 @@ class Stack:
      def size(self):
          #Regresa el numero de elementos en la lista
          return len(self.items)
+     def dispatch(self):
+         del self.items[:]
 #Fila
 class Queue:
     def __init__(self):
@@ -34,6 +36,8 @@ class Queue:
         return self.items.pop()
     def size(self):
         return len(self.items)
+    def dispatch(self):
+        del self.items[:]
 #Diccionario
 # Uso de variables globales solamente
 # Definicion de un diccionario con llaves y una lista de atributos
@@ -194,7 +198,7 @@ def crear_temporal(valor):
     temp_mem_output[temp_mem_counter]=valor
     temp_mem_counter+=1
 def crear_archivo_salida(cuadruplos):
-    global const_mem_output,temp_mem_output,global_mem_output
+    global const_mem_output,temp_mem_output,global_mem_output,const_mem,temp_mem,global_mem_counter,temp_mem_counter,const_mem_counter
     file = open('result.txt','w')
     file.write(str(global_mem_output))
     file.write('$')
@@ -203,3 +207,12 @@ def crear_archivo_salida(cuadruplos):
     file.write(str(temp_mem_output))
     file.write('$')
     file.write(str(cuadruplos))
+    var_dicc_funciones.clear()
+    const_mem.clear()
+    const_mem_output.clear()
+    temp_mem.clear()
+    temp_mem_output.clear()
+    global_mem_output.clear()
+    global_mem_counter = 1000
+    temp_mem_counter = 20000
+    const_mem_counter = 25000

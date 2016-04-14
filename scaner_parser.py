@@ -491,14 +491,24 @@ yacc.yacc()
 
 import sys
 def scan():
-    global build_errors,error_counter
+    global build_errors,cuadruplos,ids,temp_counter,counter,types,operations,values,pOper,pilaO,braces,pSaltos
     try:
         #TODO Cambiar en caso de usar recuadro de input
+        del build_errors[:]
         f = open("input.txt")
         p = yacc.parse(f.read())
+        ids.dispatch()
+        types.dispatch()
+        operations.dispatch()
+        values.dispatch()
+        pOper.dispatch()
+        pilaO.dispatch()
+        braces.dispatch()
+        pSaltos.dispatch()
+        cuadruplos.clear()
+        temp_counter = 0
+        counter = 0
         return build_errors
     except EOFError:
         build_errors.append("No se pudo abrir archivo." )
-        return build_errors
-    
-#scan()
+        return build_error  
