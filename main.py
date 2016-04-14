@@ -30,6 +30,7 @@ on_initial = True
 blinker_on=True
 execution_errors=[]
 can_execute = False
+build_error = []
 errors = ''
 #------------Virtual Machine---------------#
 
@@ -231,7 +232,7 @@ def But_path():
     chemain = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
     character.go_to(chemain)
 def Compile_instruction():
-    global can_execute,errors
+    global can_execute,errors, build_error
     
     build_error = scan()
     if not build_error:
@@ -243,7 +244,7 @@ def Compile_instruction():
         current_errors=errors.get()
         errors.set(current_errors+" "+error)
 def Execute_instruction():
-    global can_execute
+    global can_execute, build_error
     if can_execute:
         print(can_execute)
         #Divides file of compiled code
@@ -267,8 +268,8 @@ def Execute_instruction():
         #TODO Quitar para produccion
         print(a.memory)
     else:
-        if not build_errors:
-            build_errors.append("No has compilado")
+        if not build_error:
+            build_error.append("No has compilado")
 def Change_avatar():
     global avatar_index,character
     if avatar_index < len(avatars)-1:
