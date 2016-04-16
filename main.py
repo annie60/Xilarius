@@ -15,7 +15,7 @@ from pgu import gui
 from time import sleep
 from Function import *
 from Class import *
-from scaner_parser import scan
+from scaner_parser import Scanner
 from tygame.main import StaticFrame,Entry, Button, Label, render_widgets, handle_widgets #But you can put in ..\Python\Lib\site-packages
 
 #-------------------Window Position---------------------#
@@ -28,6 +28,7 @@ avatar_index=0
 main_background = "Main_Background"
 on_game = False
 on_initial = True
+executing = False
 last_position_x =0
 last_position_y =0
 loop_times =0
@@ -200,7 +201,7 @@ class Machine:
             execution_errors.append("Error: Programa ciclado!")
         else:
             self.instruction_pointer = addr
-        
+        sleep(0.3)
     def bwd(self,line):
         global character
         total = int(self.memory[line[1]])
@@ -249,40 +250,46 @@ def But_path():
     character.go_to(chemain)
 def Compile_instruction():
     global can_execute, build_error,input_from_user
-    build_error = scan(input_from_user)
+    print(input_from_user)
+    scanner = Scanner(input_from_user)
+    build_error = scanner.scan()
     if not build_error:
         can_execute = True
         errors.set("Exito!")
     else:
         can_execute = False
         Show_production_errors()
+        del build_error[:]
  
 def Show_execution_errors():
     global execution_errors,errors
     totalerror = 0
     errors.set('')
     for error in execution_errors:
-        if totalerror > 3:
+        if totalerror > 7:
             break
         else:
             totalerror += 1
             current_errors = errors.get()
-            errors.set(current_errors+error+"\n\n")
+            errors.set(current_errors+error+"\n")
+            
 def Show_production_errors():
     global execution_errors,errors
     totalerror = 0
     errors.set('')
     for error in build_error:
-        if totalerror > 3:
+        if totalerror > 7:
             break
         else:
             totalerror +=1
             current_errors=errors.get()
-            errors.set(current_errors+error+"\n\n")
+            errors.set(current_errors+error+"\n")
+            
 def Execute_instruction():
-    global can_execute, build_error,errors
+    global can_execute, build_error,errors, executing
     if can_execute:
         errors.set("Ejecutando tu programa!")
+        executing = True
         #Divides file of compiled code
         file = open('result.txt','r')
         content = file.read()
@@ -303,12 +310,13 @@ def Execute_instruction():
         a.run()
         #TODO Quitar para produccion
         print(a.memory)
-        
+        executing = False
         errors.set("Termino!")
     else:
         if not build_error:
-            build_error.append("No has compilado")
+            build_error.append("No has compilado correctamente")
             Show_production_errors()
+            
 def Change_avatar():
     global avatar_index,character
     if avatar_index < len(avatars)-1:
@@ -317,6 +325,7 @@ def Change_avatar():
     else:
         avatar_index=0
         character.change_avatar(avatars[avatar_index])
+        
 def Character_talk(mensaje):
     global character,Window,character_time
     mensaje_corto = mensaje[1:-1]
@@ -331,8 +340,9 @@ def Character_talk(mensaje):
     pygame.display.flip()
     sleep(2)
     character.stop_talk()
+    
 def Home():
-    global on_game,on_initial,input_initialized,input_from_user,change_button,Frame,execute_button,back_button, compile_button
+    global on_game,can_execute,on_initial,input_initialized,input_from_user,change_button,Frame,execute_button,back_button, compile_button
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
     #TODO: Activar
@@ -346,12 +356,10 @@ def Home():
     Frame.kill()
     input_initialized = False
     input_from_user = ""
-def Demo():
-    pass
-    #TODO: Agregar instrucciones
-    #para explicar el juego
+    can_execute = False
+
 def Restart():
-            global character,Window,input_initialized,list_x2,list_x1,input_from_user
+            global character,can_execute,Window,input_initialized,list_x2,list_x1,input_from_user
             pygame.time.delay(300)       
             
             for Xil in list_x2:
@@ -362,6 +370,7 @@ def Restart():
             mymaze.generate_maze()
             character = Character(mymaze)
             #Cleans variables
+            can_execute = False
             input_from_user = ""
             while True:
                 Window.fill(const.green)
@@ -381,8 +390,9 @@ def Restart():
             
             list_x2 = fill_list_x2(list_x1)
             input_initialized = False
+            
 def Start_game():
-    global on_game,on_initial,input_from_user,Label_gen,Frame,change_button,back_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
+    global on_game,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,back_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
     #TODO Activar
@@ -390,6 +400,7 @@ def Start_game():
     on_game = True
     on_initial = False
     Frame = StaticFrame(Window, colour = const.Pblue, header = False, bordercolor = const.Pgreen, borderwidth = 5, width = 235, height = 485)
+    can_execute = False
     Frame.place((421, 0))
     #For maze initialization
     mymaze = maze(16, 19)
@@ -423,8 +434,9 @@ def Start_game():
     execute_button.place((545, 455))
 
 def Create_input():
-    global Window, input_initialized, Frame, input_from_user
+    global Window, input_initialized,can_execute, Frame, input_from_user
     input_initialized = True 
+    #App over toolbar
     app = gui.App(screen = Window,area = Frame)
     app.connect(gui.QUIT,app.quit,None)
     c = gui.Table(width=190,height=270)
@@ -453,7 +465,8 @@ def Create_input():
     cancel_btn = gui.Button("Cancelar")
     cancel_btn.connect(gui.CLICK,app.quit,None)
     c.td(cancel_btn)
-    
+    c.tr()
+    c.td(gui.Label("    "))
     c.tr()
     c.td(gui.Label("    "))
     c.td(gui.Label("    "))
@@ -477,13 +490,16 @@ def Create_input():
     c.td(gui.Label("    "))
     c.td(gui.Label("    "))
     def cb():
-        global input_from_user
+        global input_from_user,can_execute
         input_from_user = e.value
+        can_execute = False
         app.quit()
     btn = gui.Button("Guardar")
     btn.connect(gui.CLICK, cb)
     
     c.td(btn)
+    c.tr()
+    c.td(gui.Label("    "))
     c.tr()
     c.td(gui.Label("    "))
     c.td(gui.Label("    "))
@@ -512,7 +528,94 @@ def Create_input():
         previous_text = input_from_user
     e = gui.TextArea(value=previous_text,width=250,height=270)
     c.td(e)
-
+    c.tr()
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    c.td(gui.Label("    "))
+    def help():
+        global Window,Frame
+        second_app = gui.Desktop(screen = Window,area = Frame)
+        second_app.connect(gui.QUIT,second_app.quit,None)
+        second_app.connect(gui.QUIT,app.quit,None)
+        second_c = gui.Table(width=150,height=250)
+        second_c.tr()
+        second_c.td(gui.Label("Instrucciones"),colspan=8)
+        second_c.tr()
+        second_c.td(gui.Label("    "),colspan=8)
+        second_c.tr()
+        second_c.td(gui.Label("Movimientos"),colspan=6)
+        second_c.td(gui.Image(const.imagespath+avatars[0]+".png"))
+        second_c.td(gui.Image(const.imagespath+avatars[1]+".png"))
+        second_c.tr()
+        second_c.td(gui.Label("Usa instrucciones para mover a tu personaje."),colspan=8)
+        second_c.tr()
+        second_c.td(gui.Label("arriba"))
+        second_c.td(gui.Label("    "))
+        second_c.td(gui.Label("abajo"))
+        second_c.td(gui.Label("    "))
+        second_c.td(gui.Label("derecha"))
+        second_c.td(gui.Label("    "))
+        second_c.td(gui.Label("izquierda"))
+        second_c.td(gui.Label("    "))
+        second_c.tr()
+        second_c.td(gui.Label("    "),colspan=8)
+        second_c.tr()
+        second_c.td(gui.Label("Comparaciones"),colspan=6)
+        second_c.td(gui.Image(const.imagespath+const.dirtPatch+".png"))  
+        second_c.td(gui.Image(const.imagespath+const.grayPatch+".png"))  
+        second_c.tr()
+        second_c.td(gui.Label("Usa comparaciones para revisar el siguiente espacio."),colspan=8)
+        second_c.tr()
+        second_c.td(gui.Label("libreArriba"))
+        second_c.td(gui.Label("    "))
+        second_c.td(gui.Label("libreAbajo"))
+        second_c.td(gui.Label("    "))
+        second_c.td(gui.Label("libreDerecha"))
+        second_c.td(gui.Label("    "))
+        second_c.td(gui.Label("libreIzquierda"))
+        second_c.td(gui.Label("    "))
+        second_c.tr()
+        second_c.td(gui.Label("paredIzquierda"))
+        second_c.td(gui.Label("    "))
+        second_c.td(gui.Label("paredDerecha"))
+        second_c.td(gui.Label("    "))
+        second_c.td(gui.Label("paredArriba"))
+        second_c.td(gui.Label("    "))
+        second_c.td(gui.Label("paredAbajo"))
+        second_c.td(gui.Label("    "))
+        second_c.tr()
+        second_c.td(gui.Label("    "),colspan=8)
+        cancel_btn = gui.Button("Salir")
+        cancel_btn.connect(gui.CLICK,second_app.quit,None)
+        cancel_btn.connect(gui.CLICK,app.quit,None)
+        second_c.tr()
+        second_c.td(cancel_btn,colspan=8)
+        second_c.tr()
+        second_c.td(gui.Label("    "),colspan=8)
+        second_c.tr()
+        second_c.td(gui.Image(const.imagespath+const.ending+".png"),colspan=8) 
+        second_app.run(second_c)
+    btn_help = gui.Button("Ayuda")
+    btn_help.connect(gui.CLICK, help)
+    c.td(btn_help)
     app.run(c)
 # FIN
 
@@ -535,6 +638,7 @@ pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
 
 
 ##Main loop starts
+#----------------------------------------------#
 while True:
     pygame.time.Clock().tick(10)
     for event in handle_widgets():
@@ -543,33 +647,15 @@ while True:
                 exit()
     if on_game:
         Window.fill(const.green)   
+        ##Mouse events for the input detection
         mouse = pygame.mouse.get_pressed()
-        if mouse[0]:
+        if mouse[0] and not executing :
             (mousex,mousey) = pygame.mouse.get_pos()
             if mousex > 445 and mousex < 630:
                 if mousey > 60 and mousey < 325:
                     input_initialized = False
-        '''
-        keys = pygame.key.get_pressed()
-        ##TODO: Quitar esto de las teclas
-        if keys:
-            if keys[K_UP]:
-                if not character.yellow_road:
-                    character.move(const.up)
-            if keys[K_DOWN]:
-                if not character.yellow_road:
-                    character.move(const.down)
-            if keys[K_LEFT]:
-                if not character.yellow_road:
-                    character.move(const.left)
-            if keys[K_RIGHT]:
-                if not character.yellow_road:
-                    character.move(const.right)
-            if keys[K_h]:
-                But_path()
-            if keys[K_t]:#TODO es instantaneo hay que cambiar
-                Character_talk("'hola'")
-        '''
+                    can_execute = False
+        #Second set of widgets
         Label_gen = Label(Frame, width = 209, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
         Label_gen.place((10, 30))
 
@@ -580,6 +666,7 @@ while True:
         if pygame.time.get_ticks() - character_time >= const.time_character_poll:
             character_time = pygame.time.get_ticks()
             character.poll()
+        ##Renders rest of display
         character.show(Window)
         if not input_initialized:
             Create_input()
@@ -608,9 +695,5 @@ while True:
         img.set_colorkey(RLEACCEL)
         rect = Rect((75,70), (101, 171))
         Window.blit(img, rect)
-        # TODO Dibujar el resto de la pantalla
         render_widgets()
         pygame.display.flip()
-    else:
-        #TODO Logica para pantalla de instrucciones
-        pass

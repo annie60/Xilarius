@@ -97,8 +97,7 @@ def t_error(t):
     t.lexer.skip(1)
     
 # Build the lexer
-import ply.lex as lex
-lex.lex()
+
 #Debbuging instruction
 #lex.runmain()
 
@@ -487,17 +486,25 @@ def p_error(p):
             build_errors.append("Error: Falta '}' o ')'")
         build_errors.append("Error de escritura al final del archivo")
 
-import ply.yacc as yacc
-yacc.yacc()
+
 
 
 import sys
-def scan(entrada):
-    global build_errors,cuadruplos,ids,temp_counter,counter,types,operations,values,pOper,pilaO,braces,pSaltos
-    try:
+class Scanner(object):
+    def __init__(self, entrada):
+        self.entrada = entrada
+    def __del__(self):
+        return 0
+    def scan(self):
+        global build_errors,cuadruplos,ids,temp_counter,counter,types,operations,values,pOper,pilaO,braces,pSaltos
+        #Lex construction
+        import ply.lex as lex
+        lex.lex()
+        #Sintax construction
+        import ply.yacc as yacc
+        yacc.yacc()
         del build_errors[:]
-        yacc.parse(entrada)
-        #Limpieza de estructuras auxiliares
+        #Structure cleaning
         ids.dispatch()
         types.dispatch()
         operations.dispatch()
@@ -509,7 +516,6 @@ def scan(entrada):
         cuadruplos.clear()
         temp_counter = 0
         counter = 0
+        yacc.parse(self.entrada)
         return build_errors
-    except EOFError:
-        build_errors.append("No se pudo abrir archivo." )
-        return build_error  
+ 
