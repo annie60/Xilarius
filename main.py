@@ -389,7 +389,7 @@ def Start_game():
     #pygame.mixer.music.play(-1,0.0)
     on_game = True
     on_initial = False
-    Frame = StaticFrame(Window, colour = const.Pblue, header = False, bordercolor = const.Pgreen, borderwidth = 5, width = 229, height = 480)
+    Frame = StaticFrame(Window, colour = const.Pblue, header = False, bordercolor = const.Pgreen, borderwidth = 5, width = 235, height = 485)
     Frame.place((421, 0))
     #For maze initialization
     mymaze = maze(16, 19)
@@ -590,9 +590,9 @@ while True:
         
     elif(on_initial):
         ## Main page
-        Window.fill(const.black) 
+        Window.fill(const.black)
         start_button= Button(Window, text = "Iniciar! ", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 18, target = Start_game)
-        start_button.place((545, 6))
+        start_button.place((565, 6))
 		## Background image
         img = image.load(const.imagespath+"Main_Background.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
@@ -601,12 +601,12 @@ while True:
 		## Character
         img = image.load(const.imagespath+"Character_boy_Large.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
-        rect = Rect((-10,70), (101, 171))
+        rect = Rect((-10,115), (101, 171))
         Window.blit(img, rect)
         ## Bubble message
         img = image.load(const.imagespath+"bubble.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
-        rect = Rect((80,20), (101, 171))
+        rect = Rect((75,70), (101, 171))
         Window.blit(img, rect)
         # TODO Dibujar el resto de la pantalla
         render_widgets()
