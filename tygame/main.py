@@ -642,18 +642,19 @@ class Entry:
                 # if any of our words are too long to fit, return.
                 for word in words:
                     if fonts.size(word)[0] >= int(self.width/8):
-                        returnIndex = index + int(self.width/10)
-                        accumulated_line = word[:int(self.width/10)] 
+                        returnIndex = int(self.width/10)+index
+                        accumulated_line = accumulated_line+word[:int(self.width/10)] 
                         final_lines.append(accumulated_line)
                         
                         test_line = word[int(self.width/10):]
-                        
-                        self.text = self.text[:returnIndex]+"\n\n"+self.text[returnIndex:]
+                        if index > 0:
+                            self.text = self.text[:index]+"\n\n"+self.text[(index+1):returnIndex]
+                            
                     else:
                         test_line = accumulated_line + word + " "
                     
                     # Build the line while the words fit    
-                    if fonts.size(test_line)[0] < self.width:
+                    if fonts.size(test_line)[0] < int(self.width/8):
                         accumulated_line = test_line 
                     else: 
                         final_lines.append(accumulated_line) 

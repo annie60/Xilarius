@@ -173,11 +173,16 @@ def operacion(operacion, tipouno,tipodos):
     tipo=convertir_valor(tipouno)
     indiceValor = convertir_valor(tipodos)
     operador =var_operaciones.index(operacion)
-    if indiceValor >= 0:
+    if indiceValor >= 0 and tipo >=0 :
         if (cubo_semantico[tipo][indiceValor][operador] == 1):
             return ""
         else:
-            return "Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion
+            if tipo == indiceValor:
+                return "Error: "+var_tipos[indiceValor]+" no es compatible con operacion "+operacion
+            else:
+                return "Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion
+    elif tipo < 0:
+        return "Error: Variable '"+tipouno+"' no declarada"
     else:
         return "Error:Variable '"+tipodos+"' no declarada"
 
