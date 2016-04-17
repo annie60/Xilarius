@@ -66,18 +66,22 @@ class Machine:
             for value in operators:
                 if value != '':
                     if ((value >= temp_mem_range[0] and value <= temp_mem_range[1])  and not (value in self.memory)):
-                            self.memory[value]=self.temporary[value]                        
+                        self.memory[value]=self.temporary[value]                        
                     elif (value >= const_mem_range[0] and value <= const_mem_range[1]) and not (value in self.memory):
                         self.memory[value]=self.constant[value]
-            self.dispatch(line)
-            ##Sets miliseconds between a display loop            
-            if pygame.time.get_ticks() - character_time >= const.time_character_poll:
-                character_time = pygame.time.get_ticks()
-                character.poll()
-            character.show(Window)
-            render_widgets()
-            pygame.display.flip()
-            sleep(0.3)
+                    else:
+                        execution_errors.append("Error: Falta de memoria.")
+            if len(execution_errors) == 0 :
+                self.dispatch(line)
+                ##Sets miliseconds between a display loop            
+                if pygame.time.get_ticks() - character_time >= const.time_character_poll:
+                    character_time = pygame.time.get_ticks()
+                    character.poll()
+                ##Re displays to update screen
+                character.show(Window)
+                render_widgets()
+                pygame.display.flip()
+                sleep(0.3)
         if(len(execution_errors) > 0):
             Show_execution_errors()
         #TODO Quitar para produccion    
@@ -250,7 +254,6 @@ def But_path():
     character.go_to(chemain)
 def Compile_instruction():
     global can_execute, build_error,input_from_user
-    print(input_from_user)
     scanner = Scanner(input_from_user)
     build_error = scanner.scan()
     if not build_error:
