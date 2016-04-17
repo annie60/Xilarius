@@ -435,144 +435,60 @@ def Start_game():
 
 def Create_input():
     global Window, input_initialized,can_execute, Frame, input_from_user
-    input_initialized = True 
+    input_initialized = True
+
     #App over toolbar
     app = gui.App(screen = Window,area = Frame)
     app.connect(gui.QUIT,app.quit,None)
-    c = gui.Table(width=190,height=270)
-    c.tr()
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
+    my_container1 = gui.Container(width =670,height = 500)
 
+    #Cancel button
     cancel_btn = gui.Button("Cancelar")
     cancel_btn.connect(gui.CLICK,app.quit,None)
-    c.td(cancel_btn)
-    c.tr()
-    c.td(gui.Label("    "))
-    c.tr()
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
+
     def cb():
         global input_from_user,can_execute
         input_from_user = e.value
         can_execute = False
         app.quit()
-    
+
+    #Save button
     btn = gui.Button("Guardar")
     btn.connect(gui.CLICK, cb)
-    
-    c.td(btn)
-    c.tr()
-    c.td(gui.Label("    "))
-    c.tr()
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
+
     if input_from_user == "":
         previous_text = "miPrograma Uno;\n{\ncrearPersonaje Nombre;\nNombre.abajo(1);\n}"
     else:
         previous_text = input_from_user
-    e = gui.TextArea(value=previous_text,width=250,height=270)
-    c.td(e)
-    c.tr()
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
-    c.td(gui.Label("    "))
+    e = gui.TextArea(value=previous_text,width=250,height=360)
+
     def help():
         global Window,Frame
         #App over toolbar
         second_app = gui.Desktop(screen = Window,area = Frame)
-        my_container = gui.Container(width =670,height = 500)
+        my_container2 = gui.Container(width =670,height = 500)
         second_app.connect(gui.QUIT,second_app.quit,None)
         second_app.connect(gui.QUIT,app.quit,None)
         #Exit button
         cancel_btn = gui.Button("Salir")
         cancel_btn.connect(gui.CLICK,second_app.quit,None)
         cancel_btn.connect(gui.CLICK,app.quit,None)
-        #Add Background image and button
-        my_container.add(gui.Image(const.imagespath+"Instrucciones_Background.png"),0,0)
-        my_container.add(cancel_btn,610,10)
-        second_app.run(my_container)
+        #Add items to container
+        my_container2.add(gui.Image(const.imagespath+"Instrucciones_Background.png"),0,0)
+        my_container2.add(cancel_btn,610,10)
+        second_app.run(my_container2)
         pygame.display.flip()
-   
-    btn_help = gui.Button("Ayuda")
+
+    #Help button
+    btn_help = gui.Button("Instrucciones")
     btn_help.connect(gui.CLICK, help)
-    c.td(btn_help)
-    app.run(c)
+
+    #Add items to container
+    my_container1.add(cancel_btn,500,20)
+    my_container1.add(btn,502,50)
+    my_container1.add(e,416,80)
+    my_container1.add(btn_help,480,460)
+    app.run(my_container1)
 # FIN
 
 
