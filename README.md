@@ -73,6 +73,7 @@ miPrograma Primerprograma;
 ## Notas
 * Este proyecto esta probado correctamente para sistema operativo windows, cualquier otro sistemas podria tener fallas.
 * Hubo cambios a la libreria tygame, en epecifico el archivo __main.py__ ,por lo que se tiene que tomar del directorio local en este repositorio.
+* Hubo cambios en la libreria pgu-gui, el archivo __textarea.py__ tiene que tomarse del repositorio.
 * La base para la interfaz grafica del laberinto se tomo del codigo compartido en [Bipo Maze](http://www.pygame.org/project-Bipo+Maze-2159-.html)
 
 ## Licencia
