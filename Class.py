@@ -71,7 +71,8 @@ const.wc = 26 # width of a square on the maze
 const.hc = 26 # height of the square on the maze
 
 const.time_character_poll = 75
-
+#Objets
+const.instructions =[]
   
     
 class Point(object):
@@ -313,19 +314,23 @@ class Character(object):
         
         actual = desti
         mainroad = []
-        
+        const.instructions.append("miPrograma Uno;\n{\n\ncrearPersonaje Xilarius;")
         while actual and (actual.x != source.x or actual.y != source.y):
             if actual.x == actual.parent.x - 1:
                 self.yellow_road.append(actual)
+                const.instructions.append("Xilarius.arriba(1);")
                 mainroad.append(const.right)
             if actual.x == actual.parent.x + 1:
                 self.yellow_road.append(actual)
+                const.instructions.append("Xilarius.izquierda(1);")
                 mainroad.append(const.left)
             if actual.y == actual.parent.y - 1:
                 self.yellow_road.append(actual)
+                const.instructions.append("Xilarius.abajo(1);")
                 mainroad.append(const.down)
             if actual.y == actual.parent.y + 1:
                 self.yellow_road.append(actual)
+                const.instructions.append("Xilarius.arriba(1);")
                 mainroad.append(const.up)
                 
             actual = actual.parent
@@ -337,7 +342,7 @@ class Character(object):
             return_road.append(self.maze.notdir(mainroad[id]))
             id -= 1
             
-        
+        const.instructions.append("}")
         return return_road
         
     def poll(self):
