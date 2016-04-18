@@ -38,6 +38,7 @@ build_error = []
 errors = ''
 input_initialized = False
 input_from_user =""
+
 #------------Virtual Machine---------------#
 
 #Mapeo de memoria
@@ -244,13 +245,20 @@ class Machine:
     
 ##To find solution
 def But_path():
-
-    global character
-
+    global character,input_from_user
     character.yellow_road = []
     character.reverse = 0
+    line_counter = 0
     character.astar(((character.maze.w - 1), (character.maze.h - 1)))
     chemain = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
+    #Creates input from the solution found.
+    for instruction in const.instructions:
+        if line_counter < 20:
+            temp_entry = input_from_user
+            input_from_user = temp_entry+instruction+"\n\n"
+            line_counter += 1
+        else:
+            break;
     character.go_to(chemain)
 def Compile_instruction():
     global can_execute, build_error,input_from_user
@@ -262,6 +270,7 @@ def Compile_instruction():
     else:
         can_execute = False
         Show_production_errors()
+        #Destroy build errors each time its called
         del build_error[:]
  
 def Show_execution_errors():
@@ -427,7 +436,7 @@ def Start_game():
     Label_errors = Label(Frame, width = 209, height = 100, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
     Label_errors.place((10, 330))
     global errors
-    errors = Entry(Frame,text = "No hay errores ", width=190,height=90)
+    errors = Entry(Frame,text = "No hay errores ",textcolor=Color("Red"), width=190,height=90)
     errors.place((15,350))
     
     #Buttons
@@ -458,7 +467,7 @@ def Create_input():
     #Save button
     btn = gui.Button("Guardar")
     btn.connect(gui.CLICK, cb)
-
+    #Checks for previous program
     if input_from_user == "":
         previous_text = "miPrograma Uno;\n{\ncrearPersonaje Nombre;\nNombre.abajo(1);\n}"
     else:
@@ -521,7 +530,12 @@ while True:
                 quit()
                 exit()
     if on_game:
-        Window.fill(const.green)   
+        Window.fill(const.green)
+        keys = pygame.key.get_pressed()
+        #Keyboard help finding solution
+        if keys:
+            if keys[K_h] and not executing:
+                But_path()
         ##Mouse events for the input detection
         mouse = pygame.mouse.get_pressed()
         if mouse[0] and not executing :
