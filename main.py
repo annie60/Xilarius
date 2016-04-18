@@ -69,7 +69,7 @@ class Machine:
                         self.memory[value]=self.temporary[value]                        
                     elif (value >= const_mem_range[0] and value <= const_mem_range[1]) and not (value in self.memory):
                         self.memory[value]=self.constant[value]
-                    else:
+                    elif not (value in self.memory) and (value > const_mem_range[1] or value > temp_mem_range[1]):
                         execution_errors.append("Error: Falta de memoria.")
             if len(execution_errors) == 0 :
                 self.dispatch(line)

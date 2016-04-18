@@ -96,10 +96,7 @@ def t_error(t):
     build_errors.append("Caracter ilegal: '%s'" % t.value[0])
     t.lexer.skip(1)
     
-# Build the lexer
 
-#Debbuging instruction
-#lex.runmain()
 
 # Parsing rules
 
@@ -516,6 +513,7 @@ class Scanner(object):
         cuadruplos.clear()
         temp_counter = 0
         counter = 0
+        #Compiling entry
         yacc.parse(self.entrada)
         return build_errors
  
