@@ -243,22 +243,28 @@ class Machine:
 # FIN
 #---------------------Buttons functions--------------------#
     
-##To find solution
 def But_path():
     global character,input_from_user
     character.yellow_road = []
     character.reverse = 0
     line_counter = 0
     character.astar(((character.maze.w - 1), (character.maze.h - 1)))
+    #Checks for previous written input from user
+    if len(input_from_user) > 0:
+        input_from_user = ""
+        
+    del const.instructions[:]
+    #Gets path to follow
     chemain = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
     #Creates input from the solution found.
     for instruction in const.instructions:
-        if line_counter < 20:
+        if line_counter < 15:
             temp_entry = input_from_user
-            input_from_user = temp_entry+instruction+"\n\n"
+            input_from_user = temp_entry+instruction+"\n"
             line_counter += 1
         else:
             break;
+    render_widgets()
     character.go_to(chemain)
 def Compile_instruction():
     global can_execute, build_error,input_from_user
@@ -436,7 +442,7 @@ def Start_game():
     Label_errors = Label(Frame, width = 209, height = 110, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
     Label_errors.place((10, 330))
     global errors
-    errors = Entry(Frame,text = "No hay errores ",textcolor=Color("Red"), width=195,height=90)
+    errors = Entry(Frame,text = "No hay errores ",textcolor=Color("Red"), width=195,height=90,fontsize=10)
     errors.place((15,350))
     
     #Buttons
@@ -475,7 +481,9 @@ def Create_input():
     e = gui.TextArea(value=previous_text,width=250,height=360)
 
     def help():
-        global Window,Frame
+        global Window,Frame,input_from_user
+        #Saves changes on the input
+        input_from_user = e.value
         #App over toolbar
         second_app = gui.Desktop(screen = Window,area = Frame)
         my_container2 = gui.Container(width =670,height = 500)
@@ -545,12 +553,21 @@ while True:
                     input_initialized = False
                     can_execute = False
         #Second set of widgets
-        Label_gen = Label(Frame, width = 209, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
-        Label_gen.place((10, 30))
-
+        Label_gen = Label(Frame, width = 220, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
+        Label_gen.place((3, 30))
+        
+        entry_line_no = Entry(Frame,width=15,height=270,textcolor = Color("blue"),bold=True)
+        entry_line_no.place((5,50))
+        line_no = ""
+        for value in range(1,50):
+            line_no = line_no+str(value)+"\n\n"
+        entry_line_no.set(line_no)
+        
         entryForInput = Entry(Frame,width=195,height=270)
-        entryForInput.place((15,50))
-        entryForInput.set(str(input_from_user))
+        entryForInput.place((20,50))
+        input_formatted = str(input_from_user)
+        input_formatted = input_formatted.replace("\n","\n\n")
+        entryForInput.set(input_formatted)
         ##Sets miliseconds between a display loop            
         if pygame.time.get_ticks() - character_time >= const.time_character_poll:
             character_time = pygame.time.get_ticks()

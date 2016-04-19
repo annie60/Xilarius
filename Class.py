@@ -314,23 +314,19 @@ class Character(object):
         
         actual = desti
         mainroad = []
-        const.instructions.append("miPrograma Uno;\n{\n\ncrearPersonaje Xilarius;")
+        const.instructions.append("miPrograma Uno;\n{\ncrearPersonaje Xilarius;")
         while actual and (actual.x != source.x or actual.y != source.y):
             if actual.x == actual.parent.x - 1:
                 self.yellow_road.append(actual)
-                const.instructions.append("Xilarius.arriba(1);")
                 mainroad.append(const.right)
             if actual.x == actual.parent.x + 1:
                 self.yellow_road.append(actual)
-                const.instructions.append("Xilarius.izquierda(1);")
                 mainroad.append(const.left)
             if actual.y == actual.parent.y - 1:
                 self.yellow_road.append(actual)
-                const.instructions.append("Xilarius.abajo(1);")
                 mainroad.append(const.down)
             if actual.y == actual.parent.y + 1:
                 self.yellow_road.append(actual)
-                const.instructions.append("Xilarius.arriba(1);")
                 mainroad.append(const.up)
                 
             actual = actual.parent
@@ -396,12 +392,16 @@ class maze(object):
     
     def notdir(self, dir):
         if dir == const.right:
+            const.instructions.append("Xilarius.izquierda(1);")
             return const.left
         if dir == const.left:
+            const.instructions.append("Xilarius.derecha(1);")
             return const.right
         if dir == const.up:
+            const.instructions.append("Xilarius.abajo(1);")
             return const.down
         if dir == const.down:
+            const.instructions.append("Xilarius.arriba(1);")
             return const.up
         
     def generate_maze(self, x = -1, y = -1):
