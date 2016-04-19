@@ -194,9 +194,15 @@ def asignar_valor_variable(nombre, valor):
         tipoDeCte = atributos[1]
         dir = obtener_direccion(nombre)
         #print(atributos[0])
-        var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipoDeCte,dir)
-        global_mem_output[dir] = valor
-        atributos = var_dicc_funciones["miPrograma"][1][nombre]
+        if existe_variable(valor):
+            atributos2 = var_dicc_funciones["miPrograma"][1][valor]
+            var_dicc_funciones["miPrograma"][1][nombre]=(atributos2[0],tipoDeCte,dir)
+            global_mem_output[dir] = atributos2[0]
+            atributos = var_dicc_funciones["miPrograma"][1][nombre]
+        else:
+            var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipoDeCte,dir)
+            global_mem_output[dir] = valor
+            atributos = var_dicc_funciones["miPrograma"][1][nombre]
         #print(atributos[0])
         return operacion_compatible("=",tipoDeCte,valor)
     else:
