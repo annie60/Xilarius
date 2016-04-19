@@ -469,7 +469,7 @@ def Create_input():
     btn.connect(gui.CLICK, cb)
     #Checks for previous program
     if input_from_user == "":
-        previous_text = "miPrograma Uno;\n{\ncrearPersonaje Nombre;\nNombre.abajo(1);\n}"
+        previous_text = "miPrograma Uno;\n{\ncrearPersonaje Nombre;\nvar Mi numero = 3;\nMi = 5;\nNombre.abajo(1);\n}"
     else:
         previous_text = input_from_user
     e = gui.TextArea(value=previous_text,width=250,height=360)

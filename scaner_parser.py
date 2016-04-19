@@ -6,7 +6,7 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica import obtener_direccion,agregar_variable,operacion_compatible,crear_modulo,operacion
+from semantica import obtener_direccion,agregar_variable,operacion_compatible,crear_modulo,operacion, asignar_valor_variable
 from semantica import Stack,crear_archivo_salida
 from semantica import Queue
 sys.path.insert(0,"../..")
@@ -126,7 +126,7 @@ def p_declarar(p):
 ##Character declaration
 ##-----------------------------------
 def p_personaje(p):
-    '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars'''
+    '''personaje : CREARPERSONAJE IDENTIFICADOR ENDLINE vars asignarvalor'''
     pass
 ##Glob. var. declaration
     ids.enqueue(p[2])
@@ -337,7 +337,27 @@ def p_vars2(p):
             respuesta_semantica =agregar_variable(identificador,valor,tipo)
             if (respuesta_semantica != ""):
                 build_errors.append(respuesta_semantica)
-
+#Asign values
+def p_asignarvalor(p):
+        '''asignarvalor : 
+                          | asignarvalor2'''
+        pass
+def p_asignarvalor1(p):
+    '''asignarvalor1 : COMA asignarvalor2
+                       | ENDLINE'''
+    pass  
+def p_asignarvalor2(p):
+        '''asignarvalor2 : IDENTIFICADOR EQUALS varcte asignarvalor1'''
+        pass
+        global build_errors
+        ids.enqueue(p[1])
+        if ids.size() >= 1:
+            valor = values.pop()
+            identificador =ids.dequeue()
+            pOper.pop()
+            respuesta_semantica =asignar_valor_variable(identificador,valor)
+        if (respuesta_semantica != ""):
+            build_errors.append(respuesta_semantica)
 ##Start of control/decision expresions
 ##-----------------------------------------------
 def p_laberinto(p):

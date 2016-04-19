@@ -185,7 +185,20 @@ def operacion(operacion, tipouno,tipodos):
         return "Error: Variable '"+tipouno+"' no declarada"
     else:
         return "Error:Variable '"+tipodos+"' no declarada"
-
+#Para asignar valor a variable ya declarada
+def asignar_valor_variable(nombre, valor):
+    global global_mem_output,var_dicc_funciones,global_mem_counter
+    if existe_variable(nombre):
+        atributos = var_dicc_funciones["miPrograma"][1][nombre]
+        #print(atributos[1])
+        tipoDeCte = atributos[1]
+        dir = obtener_direccion(nombre)
+        #print(atributos[0])
+        var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipoDeCte,dir)
+        global_mem_output[dir] = valor
+        atributos = var_dicc_funciones["miPrograma"][1][nombre]
+        #print(atributos[0])
+        return operacion_compatible("=",tipoDeCte,valor)
 def existe_variable(nombre):
     global var_dicc_funciones
     if nombre in var_dicc_funciones["miPrograma"][1] :
