@@ -433,17 +433,17 @@ def Start_game():
     change_button.place((545, 10))
 
     
-    Label_errors = Label(Frame, width = 209, height = 100, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
+    Label_errors = Label(Frame, width = 209, height = 110, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
     Label_errors.place((10, 330))
     global errors
-    errors = Entry(Frame,text = "No hay errores ",textcolor=Color("Red"), width=190,height=90)
+    errors = Entry(Frame,text = "No hay errores ",textcolor=Color("Red"), width=195,height=90)
     errors.place((15,350))
     
     #Buttons
     compile_button= Button(Window, text = "Compilar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Compile_instruction)
-    compile_button.place((435, 455))
+    compile_button.place((435, 460))
     execute_button= Button(Window, text = "Ejecutar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Execute_instruction)
-    execute_button.place((545, 455))
+    execute_button.place((545, 460))
 
 def Create_input():
     global Window, input_initialized,can_execute, Frame, input_from_user
@@ -548,7 +548,7 @@ while True:
         Label_gen = Label(Frame, width = 209, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
         Label_gen.place((10, 30))
 
-        entryForInput = Entry(Frame,width=190,height=270)
+        entryForInput = Entry(Frame,width=195,height=270)
         entryForInput.place((15,50))
         entryForInput.set(str(input_from_user))
         ##Sets miliseconds between a display loop            
