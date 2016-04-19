@@ -199,6 +199,8 @@ def asignar_valor_variable(nombre, valor):
         atributos = var_dicc_funciones["miPrograma"][1][nombre]
         #print(atributos[0])
         return operacion_compatible("=",tipoDeCte,valor)
+    else:
+        return "Error: Variable '" + nombre + "' no declarada"
 def existe_variable(nombre):
     global var_dicc_funciones
     if nombre in var_dicc_funciones["miPrograma"][1] :
