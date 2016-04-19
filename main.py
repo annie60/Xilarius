@@ -94,6 +94,7 @@ class Machine:
             "+":            self.plus,
             "-":            self.minus,
             "/":            self.div,
+            "=":            self.assign,
             "==":           self.eq,
             "<>":           self.noteq,
             "arriba":       self.bwd,
@@ -118,7 +119,9 @@ class Machine:
         self.instruction_pointer+=1
     def exit(self):
         sys.exit(0)
-
+    def assign(self,line):
+        self.memory[line[2]]= self.memory[line[1]]
+        self.instruction_pointer+=1
     def minus(self,line):
         self.memory[line[3]] = int(self.memory[line[1]]) - int(self.memory[line[2]])
         self.instruction_pointer+=1
@@ -442,7 +445,7 @@ def Start_game():
     Label_errors = Label(Frame, width = 209, height = 110, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
     Label_errors.place((10, 330))
     global errors
-    errors = Entry(Frame,text = "No hay errores ",textcolor=Color("Red"), width=195,height=90,fontsize=10)
+    errors = Entry(Frame,text = "No hay errores ",textcolor=Color("Red"), width=195,height=90,fontsize=11)
     errors.place((15,350))
     
     #Buttons

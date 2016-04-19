@@ -134,12 +134,14 @@ def convertir_valor(valor):
             return var_tipos.index(atributos[1])
         elif valor == "personaje":
             return 3
+        elif valor in var_tipos:
+            return var_tipos.index(valor)
         else:
             return -1
           
 def operacion_compatible(operacion, tipouno,tipodos):
     #Obtiene la informacion del parser
-    tipo=var_tipos.index(tipouno)
+    tipo=convertir_valor(tipouno)
     indiceValor = convertir_valor(tipodos)
     operador =var_operaciones.index(operacion)
     if indiceValor >= 0:
