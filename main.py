@@ -97,6 +97,7 @@ class Machine:
             "=":            self.assign,
             "==":           self.eq,
             "<>":           self.noteq,
+            "no":           self.negative,
             "arriba":       self.bwd,
             "abajo":        self.fwd,
             "derecha":      self.right,
@@ -133,7 +134,6 @@ class Machine:
         self.instruction_pointer+=1
     def stop(self,line):
         self.instruction_pointer+=1
-
     def eq(self,line):
         value = self.memory[line[1]]
         #Transalte reserved word to instruction
@@ -186,7 +186,9 @@ class Machine:
         
         self.memory[line[3]] = result
         self.instruction_pointer+=1
-
+    def negative(self,line):
+        self.memory[line[3]]= not self.memory[line[1]]
+        self.instruction_pointer+=1
     def gotof(self,line):
         addr=line[3]
         if not self.memory[line[1]]:

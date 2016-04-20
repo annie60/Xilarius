@@ -19,6 +19,7 @@ pOper = Stack()
 pilaO =Stack()
 braces = Stack()
 pSaltos = Stack()
+negative = Stack()
 cuadruplos = {}
 build_errors=[]
 #Helper counters
@@ -35,7 +36,7 @@ tokens = (
     'ABAJO','DERECHA','IZQUIERDA','VAR','EQUALS','COMA',
     'PAREDDERECHA','PAREDIZQUIERDA','PAREDARRIBA','PAREDABAJO','LIBREDERECHA','LIBREIZQUIERDA','LIBREARRIBA','LIBREABAJO','METADERECHA','METAIZQUIERDA','METAARRIBA','METAABAJO','IGUALA','DIFERENTEA',
     'SUMA','RESTA','DIVISION','MULTIPLICACION',
-	'CTEENTERA','TIPONUMERO','TIPOESCRITA','TIPODECISION'
+	'CTEENTERA','TIPONUMERO','TIPOESCRITA','TIPODECISION','NOT'
     )
 
 # Tokens
@@ -84,6 +85,7 @@ t_CTEENTERA = r'[0-9][0-9]*'
 t_TIPONUMERO = r'numero'
 t_TIPOESCRITA = r'escrita'
 t_TIPODECISION = r'decision'
+t_NOT = r'no'
 
 t_ignore = " \t"
 
@@ -201,7 +203,7 @@ def p_modulo2_error(p):
 def p_instruccion(p):
     '''instruccion : instruccion5 instruccionaux'''
     pass
-#Equality control for braces
+    #Equality control for braces
     braces.push('{')
 def p_instruccion5(p):
     '''instruccion5 : IDENTIFICADOR instruccion6 ENDLINE'''
@@ -264,9 +266,9 @@ def p_instruccion5_error(p):
         pOper.push("temp"+str(temp_counter))
         cuadruplos[counter] = [operador,dir_izq,dir_der,""]
         counter+=1
-##TODO Revisar bien reglas de errores
-def p_instruccion6_error(p):
-    '''instruccion6 : error varcte'''
+#Specific error generation
+def p_instruccion5_error2(p):
+    '''instruccion5 : IDENTIFICADOR error ENDLINE'''
     global build_errors
     build_errors.append("Error: Falta '.' o '='")
     types.push(p[1])
@@ -370,7 +372,6 @@ def p_vars2(p):
             if (respuesta_semantica != ""):
                 build_errors.append(respuesta_semantica)
 #Asign values
-
 def p_asignarvalor(p):
         '''asignarvalor : EQUALS expresion'''
         pass
@@ -378,7 +379,7 @@ def p_asignarvalor(p):
 ##Start of control/decision expresions
 ##-----------------------------------------------
 def p_laberinto(p):
-    '''laberinto : laberinto1 laberinto2 varcte'''
+    '''laberinto : laberinto3 laberinto1 laberinto2 varcte'''
     pass
     if values.size() >= 1:
         global counter,temp_counter
@@ -397,12 +398,17 @@ def p_laberinto(p):
         else:
             build_errors.append(respuesta_semantica)
         #Creates structure of operators for vm
-        pOper.push("temp"+str(temp_counter))
         temp_counter+=1
         cuadruplos[counter]=[operation,dir_izq,dir_der,dir_temp]
         counter+=1
+        #In case of a negative operator
+        if not negative.isEmpty():
+            dir_temp2 = obtener_direccion("temp"+str(temp_counter))
+            cuadruplos[counter]=[negative.pop(),dir_temp,"",dir_temp2]
+            temp_counter+=1
+            dir_temp = dir_temp2
+            counter+=1
         pSaltos.push(counter)
-        pOper.pop()
         #Constructor of logic operator
         cuadruplos[counter]=["gotof",dir_temp,"",""]
         counter+=1
@@ -428,6 +434,12 @@ def p_laberinto2(p):
 	| IGUALA'''
     pass
     operations.push(p[1])
+def p_laberinto3(p):
+    '''laberinto3 : NOT
+                   | '''
+    pass
+    if len(p) > 1:
+        negative.push(p[1])
 ##Regular expresions start
 ##----------------------------------
 def p_expresion(p):
@@ -435,8 +447,7 @@ def p_expresion(p):
     pass 
 #Specific error generation
 def p_expresion_error(p):
-    '''expresion : error exp
-                | termino error'''
+    '''expresion : error exp'''
     global build_errors
     build_errors.append("Error: Operacion matematica incorrecta")
 def p_exp(p):
@@ -462,7 +473,8 @@ def p_exp2(p):
         temp_counter+=1
         cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
         counter+=1
-#Specific error generation
+#Start of term definition
+#----------------------------------------------------
 def p_termino(p):
     '''termino : varcte termino2'''
     pass
@@ -488,6 +500,8 @@ def p_termino3(p):
         temp_counter+=1
         cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
         counter+=1
+#Start of type and constant
+#-----------------------------
 def p_tipo(p):
     '''tipo : TIPONUMERO
 		| TIPOESCRITA
