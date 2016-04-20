@@ -36,7 +36,7 @@ tokens = (
     'ABAJO','DERECHA','IZQUIERDA','VAR','EQUALS','COMA',
     'PAREDDERECHA','PAREDIZQUIERDA','PAREDARRIBA','PAREDABAJO','LIBREDERECHA','LIBREIZQUIERDA','LIBREARRIBA','LIBREABAJO','METADERECHA','METAIZQUIERDA','METAARRIBA','METAABAJO','IGUALA','DIFERENTEA',
     'SUMA','RESTA','DIVISION','MULTIPLICACION',
-	'CTEENTERA','TIPONUMERO','TIPOESCRITA','TIPODECISION','NOT'
+	'CTEENTERA','TIPONUMERO','TIPOESCRITA','TIPODECISION','NOT','HACERESCRITA'
     )
 
 # Tokens
@@ -86,6 +86,7 @@ t_TIPONUMERO = r'numero'
 t_TIPOESCRITA = r'escrita'
 t_TIPODECISION = r'decision'
 t_NOT = r'no'
+t_HACERESCRITA = r'hacerEscrita'
 
 t_ignore = " \t"
 
@@ -229,7 +230,7 @@ def p_instruccion5(p):
             dir_der=obtener_direccion(operder)
             dir_izq=obtener_direccion(operizq)
             build_errors.append(respuesta_semantica)
-        obtener_direccion("temp"+str(temp_counter))
+        
         pOper.push("temp"+str(temp_counter))
         cuadruplos[counter] = [operador,dir_izq,dir_der,""]
         counter+=1
@@ -262,7 +263,7 @@ def p_instruccion5_error(p):
             dir_der=obtener_direccion(operder)
             dir_izq=obtener_direccion(operizq)
             build_errors.append(respuesta_semantica)
-        obtener_direccion("temp"+str(temp_counter))
+        
         pOper.push("temp"+str(temp_counter))
         cuadruplos[counter] = [operador,dir_izq,dir_der,""]
         counter+=1
@@ -292,7 +293,7 @@ def p_instruccion5_error2(p):
             dir_der=obtener_direccion(operder)
             dir_izq=obtener_direccion(operizq)
             build_errors.append(respuesta_semantica)
-        obtener_direccion("temp"+str(temp_counter))
+        
         pOper.push("temp"+str(temp_counter))
         cuadruplos[counter] = [operador,dir_izq,dir_der,""]
         counter+=1
@@ -373,9 +374,37 @@ def p_vars2(p):
                 build_errors.append(respuesta_semantica)
 #Asign values
 def p_asignarvalor(p):
-        '''asignarvalor : EQUALS expresion'''
+        '''asignarvalor : EQUALS valores'''
         pass
         pilaO.push(p[1])
+def p_valores(p):
+        '''valores : expresion
+                    | convierte'''
+        pass
+def p_convierte(p):
+    '''convierte : HACERESCRITA OPENCOND expresion CLOSECOND'''
+    pass
+    pilaO.push(p[1])
+    if values.size() >= 1:
+        global counter,temp_counter
+        valor = values.pop()
+        values.push("escrita")
+        tipo ="escrita"
+        operizq =pOper.pop()
+        operador = pilaO.pop()
+        respuesta_semantica = operacion_compatible(operador,valor,tipo)
+        global build_errors
+        if respuesta_semantica == "":
+            dir_izq=obtener_direccion(operizq)
+            dir_temp = obtener_direccion("temp"+str(temp_counter))
+        else:
+            dir_izq=obtener_direccion(operizq)
+            dir_temp = obtener_direccion("temp"+str(temp_counter))
+            build_errors.append(respuesta_semantica)
+        pOper.push("temp"+str(temp_counter))
+        temp_counter+=1
+        cuadruplos[counter] = [operador,dir_izq,"",dir_temp]
+        counter+=1
 ##Start of control/decision expresions
 ##-----------------------------------------------
 def p_laberinto(p):

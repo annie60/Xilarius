@@ -98,6 +98,7 @@ class Machine:
             "==":           self.eq,
             "<>":           self.noteq,
             "no":           self.negative,
+            "hacerEscrita": self.convert,
             "arriba":       self.bwd,
             "abajo":        self.fwd,
             "derecha":      self.right,
@@ -188,6 +189,9 @@ class Machine:
         self.instruction_pointer+=1
     def negative(self,line):
         self.memory[line[3]]= not self.memory[line[1]]
+        self.instruction_pointer+=1
+    def convert(self,line):
+        self.memory[line[3]]= '"'+str(self.memory[line[1]])+'"'
         self.instruction_pointer+=1
     def gotof(self,line):
         addr=line[3]

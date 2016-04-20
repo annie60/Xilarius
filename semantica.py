@@ -56,47 +56,47 @@ const_mem_counter = 25000
 #Definicion de operadores,tipos y palabras reservadas
 var_boleanas = ("verdadero","falso")
 var_tipos = ("numero","escrita","decision","personaje")
-var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","arriba","abajo","derecha","izquierda")
+var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","arriba","abajo","derecha","izquierda","hacerEscrita")
 var_constantes = ("verdadero","falso","paredDerecha","paredIzquierda","paredArriba","paredAbajo","libreDerecha","libreIzquierda","libreArriba","libreAbajo","metaDerecha","metaIzquierda","metaArriba","metaAbajo")
 #Formato de matriz para cubo
-#                       =       +       -       *       /       <>      ==      p   r   at  ad   d   i
-#numero     numero      1       1       1       1       1       -1      -1     -1  -1  -1   -1  -1  -1
-#numero     escrita     -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   
-#numero     decision    -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1
-#numero     personaje   -1      -1      -1      -1      -1      -1      -1     -1  -1   1    1   1   1
-#escrita    numero      -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   
-#escrita    escrita      1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   
-#escrita    decision    -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1
-#escita     personaje   -1      -1      -1      -1      -1      -1      -1     -1   1  -1   -1  -1  -1
-#decision   numero      -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1  
-#decision   escrita     -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   
-#decision   decision     1      -1      -1      -1      -1       1       1     -1  -1  -1   -1  -1  -1
-#decision   personaje   -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1
-#personaje  numero      -1      -1      -1      -1      -1      -1      -1     -1  -1   1    1   1   1
-#personaje  escrita     -1      -1      -1      -1      -1      -1      -1     -1   1  -1   -1  -1  -1
-#personaje  decision    -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1
-#personaje  personaje    1      -1      -1      -1      -1      -1      -1      1  -1  -1   -1  -1  -1
+#                       =       +       -       *       /       <>      ==      p   r   at  ad   d   i   conv
+#numero     numero      1       1       1       1       1       -1      -1     -1  -1  -1   -1  -1  -1   -1
+#numero     escrita     -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1    1
+#numero     decision    -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   -1
+#numero     personaje   -1      -1      -1      -1      -1      -1      -1     -1  -1   1    1   1   1   -1
+#escrita    numero      -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   -1
+#escrita    escrita      1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   -1
+#escrita    decision    -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   -1
+#escita     personaje   -1      -1      -1      -1      -1      -1      -1     -1   1  -1   -1  -1  -1   -1
+#decision   numero      -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   -1
+#decision   escrita     -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1    1
+#decision   decision     1      -1      -1      -1      -1       1       1     -1  -1  -1   -1  -1  -1   -1
+#decision   personaje   -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   -1
+#personaje  numero      -1      -1      -1      -1      -1      -1      -1     -1  -1   1    1   1   1   -1
+#personaje  escrita     -1      -1      -1      -1      -1      -1      -1     -1   1  -1   -1  -1  -1   -1
+#personaje  decision    -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1   -1
+#personaje  personaje    1      -1      -1      -1      -1      -1      -1      1  -1  -1   -1  -1  -1   -1
 
 cubo_semantico = (
-    ((1,1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1,-1,-1,1,1,1,1)
+    ((1,1,1,1,1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,1,1,1,1,-1)
     ),
-    ((-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-    (1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1)
+    ((-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1)
     ),
-    ((-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-    (1,-1,-1,-1,-1,1,1,-1,-1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
+    ((-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1),
+    (1,-1,-1,-1,-1,1,1,-1,-1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
     ),
-    ((-1,-1,-1,-1,-1,-1,-1,-1,-1,1,1,1,1),
-    (-1,-1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1),
-    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
-    (1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1)
+    ((-1,-1,-1,-1,-1,-1,-1,-1,-1,1,1,1,1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1),
+    (-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1),
+    (1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1)
     )
     ) 
 #Definicion de tabla de funciones
@@ -192,10 +192,8 @@ def asignar_valor_variable(nombre, valor):
     global global_mem_output,var_dicc_funciones,global_mem_counter
     if existe_variable(nombre):
         atributos = var_dicc_funciones["miPrograma"][1][nombre]
-        #print(atributos[1])
         tipoDeCte = atributos[1]
         dir = obtener_direccion(nombre)
-        #print(atributos[0])
         if existe_variable(valor):
             atributos2 = var_dicc_funciones["miPrograma"][1][valor]
             var_dicc_funciones["miPrograma"][1][nombre]=(atributos2[0],tipoDeCte,dir)
@@ -205,7 +203,6 @@ def asignar_valor_variable(nombre, valor):
             var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipoDeCte,dir)
             global_mem_output[dir] = valor
             atributos = var_dicc_funciones["miPrograma"][1][nombre]
-        #print(atributos[0])
         return operacion_compatible("=",tipoDeCte,valor)
     else:
         return "Error: Variable '" + nombre + "' no declarada"
