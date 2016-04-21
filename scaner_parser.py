@@ -102,12 +102,13 @@ def t_error(t):
 
 
 # Parsing rules
-
+#----------------------------------------------
 def p_programa(p):
     '''program : declarar ENDLINE program2 personaje modulo CLOSEEXP'''
     pass
     if not braces.isEmpty():
         braces.pop()
+    #At the end sends the information to an output file
     crear_archivo_salida(cuadruplos)
 
 def p_program2(p):
@@ -125,6 +126,8 @@ def p_declarar(p):
     if ids.size() >= 1:
         tipo = types.pop()
         identificador =ids.dequeue()
+        #Creates main structure of function dictionary
+        #For further semantics validation
         crear_modulo(identificador,tipo)
 ##Character declaration
 ##-----------------------------------
@@ -140,10 +143,11 @@ def p_personaje(p):
         tipo = types.pop()
         valor = values.pop()
         identificador =ids.dequeue()
+        #Checks for semantic mistakes
         respuesta_semantica =agregar_variable(identificador,valor,tipo)
         if (respuesta_semantica != ""):
             build_errors.append(respuesta_semantica)
-
+#Specific error handling
 def p_personaje_error(p):
     '''personaje : CREARPERSONAJE error ENDLINE vars'''
     global build_errors
@@ -179,6 +183,7 @@ def p_modulo4(p):
         global counter
         cuadruplos[pSaltos.pop()][3]=counter+1
         #Loops operation creation for vm
+        #So it can jump back to check condition
         if not pSaltos.isEmpty():
             cuadruplos[counter]=["goto","","",pSaltos.pop()]
             counter+=1
@@ -205,9 +210,13 @@ def p_modulo5(p):
     '''modulo5 : O '''
     pass
     global counter
+    #Removes current gotof
     falso = pSaltos.pop()
+    #Fills with current pointer plus one
     cuadruplos[falso][3] = counter+1
+    #Inserts current pointer to attend later
     pSaltos.push(counter)
+    #Creates jump quadruple
     cuadruplos[counter]=["goto","","",""]
     counter+=1
 def p_modulo6(p):
@@ -261,8 +270,10 @@ def p_instruccion5_error(p):
     pOper.push(p[1])
     if values.size() >= 1:
         global counter,temp_counter
+        #For compatibility oepration
         valor = values.pop()
         tipo = types.pop()
+        #For quadruples
         operder =pOper.pop()
         operizq = pOper.pop()
         operador = pilaO.pop()
@@ -271,6 +282,7 @@ def p_instruccion5_error(p):
         else:
             operation = operations.pop()
             respuesta_semantica = operacion(operation,valor,tipo)
+        #Get logical directions for vm
         if respuesta_semantica == "":
             dir_der=obtener_direccion(operder)
             dir_izq=obtener_direccion(operizq)
@@ -278,7 +290,7 @@ def p_instruccion5_error(p):
             dir_der=obtener_direccion(operder)
             dir_izq=obtener_direccion(operizq)
             build_errors.append(respuesta_semantica)
-        
+        #Insert result to stack
         pOper.push("temp"+str(temp_counter))
         cuadruplos[counter] = [operador,dir_izq,dir_der,""]
         counter+=1
@@ -388,6 +400,7 @@ def p_vars2(p):
             if (respuesta_semantica != ""):
                 build_errors.append(respuesta_semantica)
 #Asign values
+#------------------------------------------
 def p_asignarvalor(p):
         '''asignarvalor : EQUALS valores'''
         pass
@@ -396,6 +409,8 @@ def p_valores(p):
         '''valores : expresion
                     | convierte'''
         pass
+#Types change
+#----------------------------------------
 def p_convierte(p):
     '''convierte : HACERESCRITA OPENCOND expresion CLOSECOND'''
     pass
@@ -456,7 +471,7 @@ def p_laberinto(p):
         #Constructor of logic operator
         cuadruplos[counter]=["gotof",dir_temp,"",""]
         counter+=1
-        
+#Language own boolean reserved words        
 def p_laberinto1(p):
     '''laberinto1 : PAREDDERECHA
                 | PAREDIZQUIERDA
@@ -473,6 +488,7 @@ def p_laberinto1(p):
     pass
     types.push("decision")
     pOper.push(p[1])
+#Comparison operators
 def p_laberinto2(p):
     '''laberinto2 : DIFERENTEA
 	| IGUALA'''
@@ -485,7 +501,7 @@ def p_laberinto3(p):
     if len(p) > 1:
         negative.push(p[1])
 ##Regular expresions start
-##----------------------------------
+##----------------------------------------------------
 def p_expresion(p):
     '''expresion : termino exp'''
     pass 
@@ -498,7 +514,7 @@ def p_exp(p):
     '''exp :
             | exp2 exp'''
     pass
-
+#Sums and substractions
 def p_exp2(p):
     '''exp2 : RESTA termino 
             | SUMA termino'''
@@ -526,7 +542,7 @@ def p_termino2(p):
     '''termino2 : 
                 | termino3 termino2'''
     pass
-    
+ #Divition and multiplication   
 def p_termino3(p):
     '''termino3 : DIVISION varcte
                 | MULTIPLICACION varcte'''
@@ -534,9 +550,11 @@ def p_termino3(p):
     pilaO.push(p[1])
     if pilaO.top() == "*" or pilaO.top() == "/":
         global counter,temp_counter
+        #To keep consistency in stacks
         operador = pilaO.pop()
         operDer = pOper.pop()
         operIzq = pOper.pop()
+        #For operations
         dir_der = obtener_direccion(operDer)
         dir_izq = obtener_direccion(operIzq)
         dir_temp = obtener_direccion("temp"+str(temp_counter))
@@ -544,8 +562,8 @@ def p_termino3(p):
         temp_counter+=1
         cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
         counter+=1
-#Start of type and constant
-#-----------------------------
+#Start of types and constants
+#-----------------------------------------
 def p_tipo(p):
     '''tipo : TIPONUMERO
 		| TIPOESCRITA
@@ -581,8 +599,6 @@ import sys
 class Scanner(object):
     def __init__(self, entrada):
         self.entrada = entrada
-    def __del__(self):
-        return 0
     def scan(self):
         global build_errors,cuadruplos,ids,temp_counter,counter,types,operations,values,pOper,pilaO,braces,pSaltos
         #Lex construction
@@ -606,5 +622,6 @@ class Scanner(object):
         counter = 0
         #Compiling entry
         yacc.parse(self.entrada)
+        #Return the build error's array or null in case there weren't any
         return build_errors
  
