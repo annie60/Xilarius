@@ -36,6 +36,7 @@ execution_errors=[]
 can_execute = False
 build_error = []
 errors = ''
+used_help = False
 input_initialized = False
 input_from_user =""
 
@@ -74,14 +75,7 @@ class Machine:
                         execution_errors.append("Error: Falta de memoria.")
             if len(execution_errors) == 0 :
                 self.dispatch(line)
-                ##Sets miliseconds between a display loop            
-                if pygame.time.get_ticks() - character_time >= const.time_character_poll:
-                    character_time = pygame.time.get_ticks()
-                    character.poll()
-                ##Re displays to update screen
-                character.show(Window)
-                render_widgets()
-                pygame.display.flip()
+                Update_display()
                 sleep(0.3)
         if(len(execution_errors) > 0):
             Show_execution_errors()
@@ -171,7 +165,7 @@ class Machine:
         checkforwall = 0
         if objeto[:5] == "pared": checkforwall = 1
         elif objeto[:4] == "meta": checkforwall = 2
-        
+        #Translates directive
         if checkforwall < 3:
             if objeto[5:] == "Derecha": objeto = character.isWall(const.right)
             elif objeto[5:] == "Izquierda": objeto = character.isWall(const.left)
@@ -205,6 +199,8 @@ class Machine:
         #Checking for infinite loop
         current_pos_x = character.x
         current_pos_y = character.y
+        #Checks if the current position hasn't change for over 10 cycles
+        #if it hasn't then it's consider to be on an infinite loop.
         if current_pos_x == last_position_x and current_pos_y == last_position_y:
             loop_times += 1
         else:
@@ -215,12 +211,14 @@ class Machine:
             execution_errors.append("Error: Programa ciclado!")
         else:
             self.instruction_pointer = addr
-        sleep(0.3)
+        sleep(0.05)
     def bwd(self,line):
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
             character.move(const.up)
+            Update_display()
+            sleep(0.05)
             total -=1
         self.instruction_pointer+=1
     def fwd(self,line):
@@ -228,6 +226,8 @@ class Machine:
         total = int(self.memory[line[1]])
         while(total > 0):
             character.move(const.down)
+            Update_display()
+            sleep(0.05)
             total -=1
         self.instruction_pointer+=1
     def right(self,line):
@@ -235,6 +235,8 @@ class Machine:
         total = int(self.memory[line[1]])
         while(total > 0):
             character.move(const.right)
+            Update_display()
+            sleep(0.05)
             total -=1
         self.instruction_pointer+=1
     def left(self,line):
@@ -242,6 +244,8 @@ class Machine:
         total = int(self.memory[line[1]])
         while(total > 0):
             character.move(const.left)
+            Update_display()
+            sleep(0.05)
             total -=1
         self.instruction_pointer+=1
     def respond(self,line):
@@ -267,22 +271,20 @@ def But_path():
     chemain = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
     #Creates input from the solution found.
     for instruction in const.instructions:
-        if line_counter < 15:
-            temp_entry = input_from_user
-            input_from_user = temp_entry+instruction+"\n"
-            line_counter += 1
-        else:
-            break;
+        temp_entry = input_from_user
+        input_from_user = temp_entry+instruction+"\n"
+        line_counter += 1
     render_widgets()
     character.go_to(chemain)
 def Compile_instruction():
-    global can_execute, build_error,input_from_user
+    global can_execute, build_error,input_from_user,executing
     scanner = Scanner(input_from_user)
     build_error = scanner.scan()
-    if not build_error:
+    ##Checks if there is not a previous instance running
+    if not build_error and not executing:
         can_execute = True
         errors.set("Exito!")
-    else:
+    elif(build_error and not executing):
         can_execute = False
         Show_production_errors()
         #Destroy build errors each time its called
@@ -305,16 +307,25 @@ def Show_production_errors():
     totalerror = 0
     errors.set('')
     for error in build_error:
+        #Only produces 7 since the entry doesn't have scroll
         if totalerror > 7:
             break
         else:
             totalerror +=1
             current_errors=errors.get()
             errors.set(current_errors+error+"\n")
-            
+def Update_display():
+    global character,character_time,Window
+    ##Sets miliseconds between a display loop            
+    if pygame.time.get_ticks() - character_time >= const.time_character_poll:
+        character_time = pygame.time.get_ticks()
+        character.poll()
+    character.show(Window)
+    render_widgets()
+    pygame.display.flip()
 def Execute_instruction():
     global can_execute, build_error,errors, executing
-    if can_execute:
+    if can_execute and not executing:
         errors.set("Ejecutando tu programa!")
         executing = True
         #Divides file of compiled code
@@ -339,7 +350,7 @@ def Execute_instruction():
         print(a.memory)
         executing = False
         errors.set("Termino!")
-    else:
+    elif(not can_execute and not executing):
         if not build_error:
             build_error.append("No has compilado correctamente")
             Show_production_errors()
@@ -355,16 +366,12 @@ def Change_avatar():
         
 def Character_talk(mensaje):
     global character,Window,character_time
+    #Formats message so it can fit on the bubble
     mensaje_corto = mensaje[1:-1]
     if len(mensaje_corto) > 11:
         mensaje_corto = mensaje_corto[:11]
     character.talk(mensaje_corto)
-    if pygame.time.get_ticks() - character_time >= const.time_character_poll:
-                character_time = pygame.time.get_ticks()
-                character.poll()
-    character.show(Window)
-    render_widgets()
-    pygame.display.flip()
+    Update_display()
     sleep(2)
     character.stop_talk()
     
@@ -376,6 +383,7 @@ def Home():
     #pygame.mixer.music.play(-1,0.0)
     on_game = False
     on_initial = True
+    #Clears display
     change_button.kill()
     execute_button.kill()
     compile_button.kill()
@@ -386,9 +394,9 @@ def Home():
     can_execute = False
 
 def Restart():
-            global character,can_execute,Window,input_initialized,list_x2,list_x1,input_from_user
+            global character,used_help,can_execute,Window,input_initialized,list_x2,list_x1,input_from_user
             pygame.time.delay(300)       
-            
+            #Avatar wall displayed on the screen
             for Xil in list_x2:
                 Xil.show(Window)
                 pygame.display.flip()
@@ -398,7 +406,12 @@ def Restart():
             character = Character(mymaze)
             #Cleans variables
             can_execute = False
-            input_from_user = ""
+            #Checks if there was use of help on the last game
+            if used_help:
+                used_help = False
+            else:
+                input_from_user = ""
+            #Creates solution for the new maze
             while True:
                 Window.fill(const.green)
                 character.show(Window)
@@ -416,10 +429,12 @@ def Restart():
                 pygame.display.flip()
             
             list_x2 = fill_list_x2(list_x1)
+            #To display again the input widget
             input_initialized = False
             
 def Start_game():
     global on_game,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,back_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
+    #Load background music
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
     #TODO Activar
@@ -432,10 +447,8 @@ def Start_game():
     #For maze initialization
     mymaze = maze(16, 19)
     mymaze.generate_maze()
-    character = Character(mymaze) 
-    
+    character = Character(mymaze)  
     character_time = 0
-
     list_x1 = list_xil(WW, WH)
     list_x2 = fill_list_x2(list_x1)
     #Pygame directive
@@ -447,7 +460,7 @@ def Start_game():
     change_button= Button(Window, text = "Cambiar avatar ", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Change_avatar)
     change_button.place((545, 10))
 
-    
+    #Errors output section
     Label_errors = Label(Frame, width = 209, height = 110, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
     Label_errors.place((10, 330))
     global errors
@@ -472,7 +485,7 @@ def Create_input():
     #Cancel button
     cancel_btn = gui.Button("Cancelar")
     cancel_btn.connect(gui.CLICK,app.quit,None)
-
+    #To save current input on the display
     def cb():
         global input_from_user,can_execute
         input_from_user = e.value
@@ -553,6 +566,7 @@ while True:
         if keys:
             if keys[K_h] and not executing:
                 But_path()
+                used_help =True
         ##Mouse events for the input detection
         mouse = pygame.mouse.get_pressed()
         if mouse[0] and not executing :
@@ -564,14 +578,14 @@ while True:
         #Second set of widgets
         Label_gen = Label(Frame, width = 220, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
         Label_gen.place((3, 30))
-        
+        #Widget for line counter
         entry_line_no = Entry(Frame,width=15,height=270,textcolor = Color("blue"),bold=True)
         entry_line_no.place((5,50))
         line_no = ""
         for value in range(1,50):
             line_no = line_no+str(value)+"\n\n"
         entry_line_no.set(line_no)
-        
+        #Visual of current code , non editable
         entryForInput = Entry(Frame,width=195,height=270)
         entryForInput.place((20,50))
         input_formatted = str(input_from_user)
@@ -587,6 +601,7 @@ while True:
             Create_input()
         render_widgets()
         pygame.display.flip()
+        #If the character is on the finish line
         if character.x == character.maze.w - 1 and character.y == character.maze.h - 1:
             Restart()
         
