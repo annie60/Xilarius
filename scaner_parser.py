@@ -36,7 +36,7 @@ tokens = (
     'ABAJO','DERECHA','IZQUIERDA','VAR','EQUALS','COMA',
     'PAREDDERECHA','PAREDIZQUIERDA','PAREDARRIBA','PAREDABAJO','LIBREDERECHA','LIBREIZQUIERDA','LIBREARRIBA','LIBREABAJO','METADERECHA','METAIZQUIERDA','METAARRIBA','METAABAJO','IGUALA','DIFERENTEA',
     'SUMA','RESTA','DIVISION','MULTIPLICACION',
-	'CTEENTERA','TIPONUMERO','TIPOESCRITA','TIPODECISION','NOT','HACERESCRITA'
+	'CTEENTERA','TIPONUMERO','TIPOESCRITA','TIPODECISION','NOT','HACERESCRITA','O'
     )
 
 # Tokens
@@ -87,7 +87,7 @@ t_TIPOESCRITA = r'escrita'
 t_TIPODECISION = r'decision'
 t_NOT = r'no'
 t_HACERESCRITA = r'hacerEscrita'
-
+t_O = r'o'
 t_ignore = " \t"
 
 # Error handling
@@ -167,11 +167,11 @@ def p_moduloaux1(p):
     pass
 ##Loops and decitions control
 def p_modulo3(p):
-    '''modulo3 : CLOSEEXP'''
+    '''modulo3 : CLOSEEXP modulo6'''
     pass
     if not pSaltos.isEmpty():
         global counter
-        cuadruplos[pSaltos.pop()][3]=counter
+        cuadruplos[pSaltos.pop()][3]=counter   
 def p_modulo4(p):
     '''modulo4 : CLOSEEXP'''
     pass
@@ -185,6 +185,7 @@ def p_modulo4(p):
 def p_moduloaux2(p):
     '''moduloaux2 : moduloaux3 OPENCOND laberinto CLOSECOND modulo2 instruccionaux modulo4 instruccionaux'''
     pass
+## While rules
 def p_moduloaux3(p):
     '''moduloaux3 : REPETIRMIENTRAS'''
     pass
@@ -199,6 +200,20 @@ def p_modulo2_error(p):
     '''modulo2 : error'''
     global build_errors
     build_errors.append("Error: Falta '{'")
+##If else rules
+def p_modulo5(p):
+    '''modulo5 : O '''
+    pass
+    global counter
+    falso = pSaltos.pop()
+    cuadruplos[falso][3] = counter+1
+    pSaltos.push(counter)
+    cuadruplos[counter]=["goto","","",""]
+    counter+=1
+def p_modulo6(p):
+    '''modulo6 : modulo5 moduloaux1
+                | '''
+    pass
 ##Character instructions start
 ## -------------------------
 def p_instruccion(p):
