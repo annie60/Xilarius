@@ -39,6 +39,9 @@ errors = ''
 used_help = False
 input_initialized = False
 input_from_user =""
+easy_maze =[10,13]
+hard_maze = [16,19]
+dificulty_level = 1
 
 #------------Virtual Machine---------------#
 
@@ -400,8 +403,9 @@ def Complete_cleanup(all):
         input_from_user = ""
     input_initialized = False
 def Home():
-    global on_game,executing,on_initial,change_button,Frame,execute_button,back_button, compile_button
+    global on_game,executing,on_initial,change_button,Frame,execute_button,back_button, compile_button,dificulty_level
     if not executing:
+        dificulty_level = 1
         pygame.mixer.music.stop()
         pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
         #TODO: Activar
@@ -424,7 +428,10 @@ def Restart():
                 Xil.show(Window)
                 pygame.display.flip()
             #Re generates maze
-            mymaze = maze(16, 19)
+            if dificulty_leve == 1:
+                mymaze = maze(easy_maze[0],easy_maze[1])
+            else:
+                mymaze = maze(hard_maze[0],hard_maze[1])
             mymaze.generate_maze()
             character = Character(mymaze)
             
@@ -468,7 +475,10 @@ def Start_game():
     can_execute = False
     Frame.place((421, 0))
     #For maze initialization
-    mymaze = maze(16, 19)
+    if dificulty_level == 1:
+        mymaze = maze(easy_maze[0],easy_maze[1])
+    else:
+        mymaze = maze(hard_maze[0],hard_maze[1])
     mymaze.generate_maze()
     character = Character(mymaze)  
     character_time = 0
@@ -495,7 +505,12 @@ def Start_game():
     compile_button.place((435, 460))
     execute_button= Button(Window, text = "Ejecutar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Execute_instruction)
     execute_button.place((545, 460))
-
+    
+def Expert_mode():
+    global dificulty_level
+    dificulty_level = 2
+    Start_game()
+    
 def Create_input():
     global Window, input_initialized,can_execute, Frame, input_from_user
     input_initialized = True
@@ -633,12 +648,14 @@ while True:
         Window.fill(const.black)
         start_button= Button(Window, text = "Iniciar! ", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 18, target = Start_game)
         start_button.place((565, 6))
-		## Background image
+        expert_button= Button(Window, text = "Modo Experto! ", width = 120, height = 30, bordercolor = const.white, colour = const.red, fontsize = 16, target = Expert_mode)
+        expert_button.place((540, 70))
+	## Background image
         img = image.load(const.imagespath+"Main_Background.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
         rect = Rect((0,0), (0, 0))
         Window.blit(img, rect)
-		## Character
+        ## Character
         img = image.load(const.imagespath+"Character_boy_Large.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
         rect = Rect((-10,115), (101, 171))

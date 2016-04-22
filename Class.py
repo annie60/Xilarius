@@ -378,15 +378,18 @@ class maze(object):
                 localY = loop
                 loop += 1
             #Random patches generation
-            if randint(0, 50) < 10:
-                    a.background = CaseImage((localX* self.wc,localY * self.hc), const.brownPatch)
-            elif randint(0,50) < 5:
-                 a.background = CaseImage((localX* self.wc,localY * self.hc), const.dirtPatch)
+            if (localY == 0.1 and localX >= (self.w+0.1) ):
+                a.background = CaseColor((localX * self.wc,localY* self.hc),const.green)
             else:
-                a.background = CaseImage((localX * self.wc,localY* self.hc), const.greenPatch)
-            
+                if randint(0, 50) < 10:
+                    a.background = CaseImage((localX* self.wc,localY * self.hc), const.brownPatch)
+                elif randint(0,50) < 5:
+                    a.background = CaseImage((localX* self.wc,localY * self.hc), const.dirtPatch)
+                else:
+                    a.background = CaseImage((localX * self.wc,localY* self.hc), const.greenPatch)
+                
             self.cases.append(a)
-        
+
     def get_cell(self, x, y):
         return self.cases[(y*self.w) + x]
     
