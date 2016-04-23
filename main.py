@@ -43,6 +43,7 @@ input_from_user =""
 easy_maze =[10,13]
 hard_maze = [16,19]
 dificulty_level = 1
+running = True
 
 #------------Virtual Machine---------------#
 
@@ -404,7 +405,7 @@ def Complete_cleanup(all):
         input_from_user = ""
     input_initialized = False
 def Home():
-    global on_game,executing,on_initial,change_button,Frame,execute_button,back_button, compile_button,dificulty_level
+    global on_game,executing,on_initial,change_button,Frame,execute_button,home_button, compile_button,dificulty_level
     if not executing:
         dificulty_level = 1
         pygame.mixer.music.stop()
@@ -417,9 +418,13 @@ def Home():
         change_button.kill()
         execute_button.kill()
         compile_button.kill()
-        back_button.kill()
+        home_button.kill()
         Frame.kill()
         Complete_cleanup(0)
+
+def Exit():
+    global running
+    running = False
 
 def Restart():
             global character,used_help,Window,input_initialized,list_x2,list_x1,input_from_user
@@ -464,7 +469,6 @@ def Restart():
             
             
 def Start_game():
-    global on_game,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,back_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
     #Load background music
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
@@ -489,17 +493,19 @@ def Start_game():
     pygame.display.flip()
     pygame.key.set_repeat(50, 55)
     #Side toolbar
-    back_button= Button(Window, text = "Atras", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Home)
-    back_button.place((435, 10))
-    change_button= Button(Window, text = "Cambiar avatar ", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Change_avatar)
-    change_button.place((545, 10))
+    home_button= Button(Window, text = "Inicio", width = 50, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Home)
+    home_button.place((430, 10))
+    change_button= Button(Window, text = "  Cambiar avatar ", width = 80, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Change_avatar)
+    change_button.place((500, 10))
+    exit_button= Button(Window, text = "Salir", width = 50, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Exit)
+    exit_button.place((600, 10))
 
     #Errors output section
-    Label_errors = Label(Frame, width = 209, height = 110, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
-    Label_errors.place((10, 330))
+    Label_errors = Label(Frame, width = 220, height = 110, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
+    Label_errors.place((7, 330))
     global errors
-    errors = Entry(Frame,text = "No hay errores ",textcolor=Color("Red"), width=195,height=90,fontsize=11)
-    errors.place((15,350))
+    errors = Entry(Frame,text = "No hay errores ",textcolor=Color("Red"), width=206,height=90,fontsize=11)
+    errors.place((12,350))
     
     #Buttons
     compile_button= Button(Window, text = "Compilar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Compile_instruction)
@@ -534,42 +540,45 @@ def Create_input():
     app.connect(gui.QUIT,app.quit,None)
     my_container1 = gui.Container(width =670,height = 500)
 
+    #Label to write code
+    Label_code = gui.Label("Escribe/modifica tu código:")
+
     #Cancel button
     cancel_btn = gui.Button("Cancelar")
     cancel_btn.connect(gui.CLICK,app.quit,None)
     #To save current input on the display
     def cb():
         global input_from_user,can_execute
-        input_from_user = e.value
+        input_from_user = textarea_code.value
         can_execute = False
         app.quit()
 
     #Save button
-    btn = gui.Button("Guardar")
-    btn.connect(gui.CLICK, cb)
+    save_btn = gui.Button("Guardar")
+    save_btn.connect(gui.CLICK, cb)
     #Checks for previous program
     if input_from_user == "":
         previous_text = "miPrograma Uno;\n{\ncrearPersonaje Nombre;\nvar Mi numero = 3;\nMi = 5;\nNombre.abajo(1);\n}"
     else:
         previous_text = input_from_user
-    e = gui.TextArea(value=previous_text,width=250,height=360)
+    textarea_code = gui.TextArea(value=previous_text,width=235,height=360)
 
     def help():
         global Window,Frame,input_from_user
         #Saves changes on the input
-        input_from_user = e.value
+        input_from_user = textarea_code.value
         #App over toolbar
         second_app = gui.Desktop(screen = Window,area = Frame)
         my_container2 = gui.Container(width =670,height = 500)
         second_app.connect(gui.QUIT,second_app.quit,None)
         second_app.connect(gui.QUIT,app.quit,None)
         #Exit button
-        cancel_btn = gui.Button("Salir")
+        cancel_btn = gui.Button("Regresar")
         cancel_btn.connect(gui.CLICK,second_app.quit,None)
         cancel_btn.connect(gui.CLICK,app.quit,None)
         #Add items to container
         my_container2.add(gui.Image(const.imagespath+"Instrucciones_Background.png"),0,0)
-        my_container2.add(cancel_btn,610,10)
+        my_container2.add(cancel_btn,575,10)
         second_app.run(my_container2)
         pygame.display.flip()
 
@@ -593,11 +602,12 @@ def Create_input():
     btn_file.connect(gui.CLICK,file_treat)
     
     #Add items to container
-    my_container1.add(cancel_btn,500,20)
-    my_container1.add(btn,502,50)
-    my_container1.add(btn_file,595,20)
-    my_container1.add(e,416,80)
-    my_container1.add(btn_help,480,460)
+    my_container1.add(cancel_btn,500,10)
+    my_container1.add(save_btn,502,45)
+    my_container1.add(btn_file,595,10)
+    my_container1.add(Label_code, 416, 75)
+    my_container1.add(textarea_code,416,95)
+    my_container1.add(btn_help,480,470)
     app.run(my_container1) 
 # FIN
 
@@ -621,7 +631,7 @@ pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
 
 ##Main loop starts
 #----------------------------------------------#
-while True:
+while running:
     pygame.time.Clock().tick(10)
     for event in handle_widgets():
             if event.type == QUIT:
@@ -629,6 +639,12 @@ while True:
                 exit()
     if on_game:
         Window.fill(const.green)
+        #Hint images for level 1
+        if dificulty_level == 1:
+            img = image.load(const.imagespath+"Ayuda1.png").convert_alpha()
+            img.set_colorkey(RLEACCEL)
+            rect = Rect((-90,325), (200, 450))
+            Window.blit(img, rect)
         keys = pygame.key.get_pressed()
         #Keyboard help finding solution
         if keys:
@@ -645,17 +661,17 @@ while True:
                     can_execute = False
         #Second set of widgets
         Label_gen = Label(Frame, width = 220, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
-        Label_gen.place((3, 30))
+        Label_gen.place((7, 30))
         #Widget for line counter
-        entry_line_no = Entry(Frame,width=15,height=270,textcolor = Color("blue"),bold=True)
-        entry_line_no.place((5,50))
+        entry_line_no = Entry(Frame,width=12,height=270,textcolor = Color("blue"),bold=True)
+        entry_line_no.place((12,50))
         line_no = ""
         for value in range(1,50):
             line_no = line_no+str(value)+"\n\n"
         entry_line_no.set(line_no)
         #Visual of current code , non editable
-        entryForInput = Entry(Frame,width=195,height=270)
-        entryForInput.place((20,50))
+        entryForInput = Entry(Frame,width=191,height=270)
+        entryForInput.place((27,50))
         input_formatted = str(input_from_user)
         input_formatted = input_formatted.replace("\n","\n\n")
         entryForInput.set(input_formatted)
@@ -676,10 +692,10 @@ while True:
     elif(on_initial):
         ## Main page
         Window.fill(const.black)
-        start_button= Button(Window, text = "Iniciar! ", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 18, target = Start_game)
+        start_button= Button(Window, text = "Principiante", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 18, target = Start_game)
         start_button.place((565, 6))
-        expert_button= Button(Window, text = "Modo Experto! ", width = 120, height = 30, bordercolor = const.white, colour = const.red, fontsize = 16, target = Expert_mode)
-        expert_button.place((540, 70))
+        expert_button= Button(Window, text = "Experto", width = 95, height = 30, bordercolor = const.white, colour = const.red, fontsize = 18, target = Expert_mode)
+        expert_button.place((565, 45))
 	## Background image
         img = image.load(const.imagespath+"Main_Background.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
