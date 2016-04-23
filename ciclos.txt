@@ -1,0 +1,13 @@
+miPrograma Uno;
+{
+crearPersonaje Ana;
+var Mi numero = 1,
+var Otra escrita = "l";
+
+repetirMientras(libreAbajo == verdadero){
+Mi = Mi + 1;
+Ana.abajo(1);
+}
+Otra = hacerEscrita(Mi);
+Ana.responder(Otra);
+}

@@ -29,6 +29,7 @@ main_background = "Main_Background"
 on_game = False
 on_initial = True
 executing = False
+input_file = gui.Input()
 last_position_x =0
 last_position_y =0
 loop_times =0
@@ -510,7 +511,20 @@ def Expert_mode():
     global dificulty_level
     dificulty_level = 2
     Start_game()
+def open_file_browser():
+    d = gui.FileDialog()
+    d.connect(gui.CHANGE, handle_file_browser_closed, d)
+    d.open()
     
+def handle_file_browser_closed(dlg):
+    global input_from_user
+    if dlg.value: input_file.value = dlg.value
+    if '.txt' in input_file.value:
+        file = open(input_file.value,'r')
+        content = file.read()
+        content.replace('\n','\n\n')
+        input_from_user = content
+
 def Create_input():
     global Window, input_initialized,can_execute, Frame, input_from_user
     input_initialized = True
@@ -562,13 +576,29 @@ def Create_input():
     #Help button
     btn_help = gui.Button("Instrucciones")
     btn_help.connect(gui.CLICK, help)
-
+    def file_treat():
+        global Window,Frame
+        third_app = gui.Desktop(screen = Window,area = Frame)
+        third_app.connect(gui.QUIT,third_app.quit,None)
+        third_app.connect(gui.QUIT,app.quit,None)
+        my_container3 = gui.Container(width =670,height = 500)
+        open_btn = gui.Button("Abrir")
+        open_btn.connect(gui.CLICK,open_file_browser,None)
+        my_container3.add(open_btn,300,200)
+        third_app.run(my_container3)
+        pygame.display.flip()
+    
+    #file treatment
+    btn_file = gui.Button("Archivo")
+    btn_file.connect(gui.CLICK,file_treat)
+    
     #Add items to container
     my_container1.add(cancel_btn,500,20)
     my_container1.add(btn,502,50)
+    my_container1.add(btn_file,595,20)
     my_container1.add(e,416,80)
     my_container1.add(btn_help,480,460)
-    app.run(my_container1)
+    app.run(my_container1) 
 # FIN
 
 
