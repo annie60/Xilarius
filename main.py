@@ -469,6 +469,7 @@ def Restart():
             
             
 def Start_game():
+    global on_game,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,home_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
     #Load background music
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
@@ -641,9 +642,9 @@ while running:
         Window.fill(const.green)
         #Hint images for level 1
         if dificulty_level == 1:
-            img = image.load(const.imagespath+"Ayuda1.png").convert_alpha()
+            img = image.load(const.imagespath+"NivelPrincipiante.png").convert_alpha()
             img.set_colorkey(RLEACCEL)
-            rect = Rect((-90,325), (200, 450))
+            rect = Rect((-8,35), (0, 0))
             Window.blit(img, rect)
         keys = pygame.key.get_pressed()
         #Keyboard help finding solution
