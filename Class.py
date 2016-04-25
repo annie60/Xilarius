@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Interfaz grafica: Xilarius
+# Objetos de interfaz grafica: Xilarius
 # Proyecto
 # Ana Arellano   		A01089996
 # Ana Karen Reyna		A01280310
@@ -133,7 +133,7 @@ class CaseDoubleImage(object):
         self.surf.blit(self.img,self.rect_img)  
 class CaseText(object):
     """
-    For the squares background image
+    For the squares background image and overlay text
     """
     def __init__(self, Pos,message):
         self.pos = Pos

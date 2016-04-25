@@ -138,31 +138,41 @@ def convertir_valor(valor):
             return var_tipos.index(valor)
         else:
             return -1
-          
+#Para expresiones matematicas          
 def operacion_compatible(operacion, tipouno,tipodos):
     #Obtiene la informacion del parser
     tipo=convertir_valor(tipouno)
     indiceValor = convertir_valor(tipodos)
     operador =var_operaciones.index(operacion)
-    if indiceValor >= 0:
+    if indiceValor >= 0 and tipo >=0 :
         if (cubo_semantico[tipo][indiceValor][operador] == 1):
             return ""
-        else:
-            return "Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion
+        else: #Operacion no compatible
+            if tipo == indiceValor:
+                return "Error: "+var_tipos[indiceValor]+" no es compatible con operacion "+operacion
+            else:
+                return "Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion
+    elif tipo < 0:
+        return "Error: Variable '"+tipouno+"' no declarada"
     else:
         return "Error:Variable '"+tipodos+"' no declarada"
 def obtener_direccion(variable):
     global temp_mem,global_mem_counter,temp_mem_counter,const_mem_counter
+    #Revisa si es variable global, constante o temporal
     if (variable in var_dicc_funciones["miPrograma"][1]): 
         return var_dicc_funciones["miPrograma"][1][variable][2]
     elif isinstance(variable,int) or variable.isdigit() or (variable in var_constantes):
+        #Si ya existe solo regresa direccion de memoria
         if (variable in const_mem):
             return const_mem[variable]
         else:
+        #Si no existe crea la constante y 
+        #regresa el valor de memoria usado
             crear_constante(variable)
             return (const_mem_counter - 1)
         
     else:
+        #Si ya existe solo regresa direccion de memoria
         if not (variable in temp_mem):
             crear_temporal(variable)
             return (temp_mem_counter - 1)
@@ -178,7 +188,7 @@ def operacion(operacion, tipouno,tipodos):
     if indiceValor >= 0 and tipo >=0 :
         if (cubo_semantico[tipo][indiceValor][operador] == 1):
             return ""
-        else:
+        else: #Operacion no compatible
             if tipo == indiceValor:
                 return "Error: "+var_tipos[indiceValor]+" no es compatible con operacion "+operacion
             else:
@@ -187,25 +197,7 @@ def operacion(operacion, tipouno,tipodos):
         return "Error: Variable '"+tipouno+"' no declarada"
     else:
         return "Error:Variable '"+tipodos+"' no declarada"
-#Para asignar valor a variable ya declarada
-def asignar_valor_variable(nombre, valor):
-    global global_mem_output,var_dicc_funciones,global_mem_counter
-    if existe_variable(nombre):
-        atributos = var_dicc_funciones["miPrograma"][1][nombre]
-        tipoDeCte = atributos[1]
-        dir = obtener_direccion(nombre)
-        if existe_variable(valor):
-            atributos2 = var_dicc_funciones["miPrograma"][1][valor]
-            var_dicc_funciones["miPrograma"][1][nombre]=(atributos2[0],tipoDeCte,dir)
-            global_mem_output[dir] = atributos2[0]
-            atributos = var_dicc_funciones["miPrograma"][1][nombre]
-        else:
-            var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipoDeCte,dir)
-            global_mem_output[dir] = valor
-            atributos = var_dicc_funciones["miPrograma"][1][nombre]
-        return operacion_compatible("=",tipoDeCte,valor)
-    else:
-        return "Error: Variable '" + nombre + "' no declarada"
+#Revisa si es variable ya existente en la tabla    
 def existe_variable(nombre):
     global var_dicc_funciones
     if nombre in var_dicc_funciones["miPrograma"][1] :
@@ -225,6 +217,7 @@ def crear_temporal(valor):
 def crear_archivo_salida(cuadruplos):
     global const_mem_output,temp_mem_output,global_mem_output,const_mem,temp_mem,global_mem_counter,temp_mem_counter,const_mem_counter
     file = open('result.txt','w')
+    #Crea bloques seprados por '$' para cada seccion necesaria
     file.write(str(global_mem_output))
     file.write('$')
     file.write(str(const_mem_output))

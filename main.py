@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Interfaz grafica: Xilarius
+# Maquina virtual e interfaz grafica: Xilarius
 # Proyecto
 # Ana Arellano   		A01089996
 # Ana Karen Reyna		A01280310
@@ -322,14 +322,17 @@ def Show_production_errors():
     global execution_errors,errors
     totalerror = 0
     errors.set('')
+    print(build_error)
+    final_errors=""
     for error in build_error:
         #Only produces 7 since the entry doesn't have scroll
         if totalerror > 7:
             break
         else:
             totalerror +=1
-            current_errors=errors.get()
-            errors.set(current_errors+error+"\n")
+            final_errors = final_errors+error+"\n"
+            
+    errors.set(final_errors)
 def Update_display():
     global character,character_time,Window
     ##Sets miliseconds between a display loop            
@@ -404,6 +407,7 @@ def Complete_cleanup(all):
     if all == 0:
         input_from_user = ""
     input_initialized = False
+    
 def Home():
     global on_game,executing,on_initial,change_button,Frame,execute_button,home_button, compile_button,dificulty_level
     if not executing:
@@ -518,19 +522,26 @@ def Expert_mode():
     global dificulty_level
     dificulty_level = 2
     Start_game()
-def open_file_browser():
+    
+def open_file_browser(mode):
     d = gui.FileDialog()
-    d.connect(gui.CHANGE, handle_file_browser_closed, d)
+    d.connect(gui.CHANGE, handle_file_browser_closed, d,mode)
     d.open()
     
-def handle_file_browser_closed(dlg):
+def handle_file_browser_closed(dlg,write):
     global input_from_user
-    if dlg.value: input_file.value = dlg.value
-    if '.txt' in input_file.value:
-        file = open(input_file.value,'r')
+    file_name = input_file.value
+    if dlg.value: file_name = dlg.value
+    #Checks if its to write or read a file
+    if ('.txt' in file_name) and write:
+        file = open(file_name,'r')
         content = file.read()
         content.replace('\n','\n\n')
         input_from_user = content
+    else:
+        file = open(file_name,'w')
+        input_from_user = input_from_user.replace('\n\n','\n')
+        file.write(input_from_user)
 
 def Create_input():
     global Window, input_initialized,can_execute, Frame, input_from_user
@@ -586,15 +597,26 @@ def Create_input():
     #Help button
     btn_help = gui.Button("Instrucciones")
     btn_help.connect(gui.CLICK, help)
+    
     def file_treat():
         global Window,Frame
         third_app = gui.Desktop(screen = Window,area = Frame)
         third_app.connect(gui.QUIT,third_app.quit,None)
         third_app.connect(gui.QUIT,app.quit,None)
         my_container3 = gui.Container(width =670,height = 500)
+        #Open button
         open_btn = gui.Button("Abrir")
-        open_btn.connect(gui.CLICK,open_file_browser,None)
-        my_container3.add(open_btn,300,200)
+        open_btn.connect(gui.CLICK,open_file_browser,True)
+        #Save button
+        save_btn = gui.Button("Guardar")
+        save_btn.connect(gui.CLICK,open_file_browser,False)
+        #Continue button / close file treatment
+        ok_btn = gui.Button("Listo!")
+        ok_btn.connect(gui.CLICK,third_app.quit,None)
+        ok_btn.connect(gui.CLICK,app.quit,None)
+        my_container3.add(open_btn,300,70)
+        my_container3.add(save_btn,300,150)
+        my_container3.add(ok_btn,300,250)
         third_app.run(my_container3)
         pygame.display.flip()
     

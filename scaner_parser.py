@@ -6,14 +6,13 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica import obtener_direccion,agregar_variable,operacion_compatible,crear_modulo,operacion, asignar_valor_variable
+from semantica import obtener_direccion,agregar_variable,operacion_compatible,crear_modulo
 from semantica import Stack,crear_archivo_salida
 from semantica import Queue
 sys.path.insert(0,"../..")
 #Helpers initialization
 ids = Queue()
 types = Stack()
-operations = Stack()
 values = Stack()
 pOper = Stack()
 pilaO =Stack()
@@ -108,7 +107,7 @@ def p_programa(p):
     pass
     if not braces.isEmpty():
         braces.pop()
-    #At the end sends the information to an output file
+    #At the end sends the intermediate code to an output file
     crear_archivo_salida(cuadruplos)
 
 def p_program2(p):
@@ -143,11 +142,11 @@ def p_personaje(p):
         tipo = types.pop()
         valor = values.pop()
         identificador =ids.dequeue()
-        #Checks for semantic mistakes
+        #Checks for semantics
         respuesta_semantica =agregar_variable(identificador,valor,tipo)
         if (respuesta_semantica != ""):
             build_errors.append(respuesta_semantica)
-#Specific error handling
+#Specific error handling for character
 def p_personaje_error(p):
     '''personaje : CREARPERSONAJE error ENDLINE vars'''
     global build_errors
@@ -241,11 +240,8 @@ def p_instruccion5(p):
         operder =pOper.pop()
         operizq = pOper.pop()
         operador = pilaO.pop()
-        if operations.isEmpty():
-            respuesta_semantica = operacion_compatible(operador,valor,tipo)
-        else:
-            operation = operations.pop()
-            respuesta_semantica = operacion(operation,valor,tipo)
+        #Checks semantics
+        respuesta_semantica = operacion_compatible(operador,valor,tipo)
         global build_errors
         if respuesta_semantica == "":
             dir_der=obtener_direccion(operder)
@@ -277,11 +273,8 @@ def p_instruccion5_error(p):
         operder =pOper.pop()
         operizq = pOper.pop()
         operador = pilaO.pop()
-        if operations.isEmpty():
-            respuesta_semantica = operacion_compatible(operador,valor,tipo)
-        else:
-            operation = operations.pop()
-            respuesta_semantica = operacion(operation,valor,tipo)
+        #Checks semantics
+        respuesta_semantica = operacion_compatible(operador,valor,tipo)
         #Get logical directions for vm
         if respuesta_semantica == "":
             dir_der=obtener_direccion(operder)
@@ -308,11 +301,9 @@ def p_instruccion5_error2(p):
         operder =pOper.pop()
         operizq = pOper.pop()
         operador = pilaO.pop()
-        if operations.isEmpty():
-            respuesta_semantica = operacion_compatible(operador,valor,tipo)
-        else:
-            operation = operations.pop()
-            respuesta_semantica = operacion(operation,valor,tipo)
+        #Checks for semantics
+        respuesta_semantica = operacion_compatible(operador,valor,tipo)
+        #Translates values to virtual memoria slots
         if respuesta_semantica == "":
             dir_der=obtener_direccion(operder)
             dir_izq=obtener_direccion(operizq)
@@ -339,14 +330,12 @@ def p_instruccion1(p):
 def p_instruccion4(p):
     '''instruccion4 : PARAR'''
     pass
-    operations.push(p[1])
     values.push("personaje")
     pilaO.push(p[1])
     pOper.push("")
 def p_instruccion3(p):
     '''instruccion3 : RESPONDER OPENCOND instruccion2 CLOSECOND'''
     pass 
-    operations.push(p[1])
     pilaO.push(p[1])
 def p_instruccion2(p):
     '''instruccion2 : CTEESCRITA
@@ -360,7 +349,6 @@ def p_mover(p):
 		| DERECHA
 		| IZQUIERDA'''
     pass
-    operations.push(p[1])
     pilaO.push(p[1])
 ##Global vars. definition rules
 ##-------------------------------------------
@@ -444,7 +432,7 @@ def p_laberinto(p):
         global counter,temp_counter
         valor = values.pop()
         tipo = types.pop()
-        operation = operations.pop()
+        operation = pilaO.pop()
         operadorizq=pOper.pop()
         operador=pOper.pop()
         global build_errors
@@ -456,6 +444,9 @@ def p_laberinto(p):
             dir_temp = obtener_direccion("temp"+str(temp_counter))
         else:
             build_errors.append(respuesta_semantica)
+            dir_izq = 0
+            dir_der=0
+            dir_temp=0
         #Creates structure of operators for vm
         temp_counter+=1
         cuadruplos[counter]=[operation,dir_izq,dir_der,dir_temp]
@@ -493,7 +484,7 @@ def p_laberinto2(p):
     '''laberinto2 : DIFERENTEA
 	| IGUALA'''
     pass
-    operations.push(p[1])
+    pilaO.push(p[1])
 def p_laberinto3(p):
     '''laberinto3 : NOT
                    | '''
@@ -600,7 +591,7 @@ class Scanner(object):
     def __init__(self, entrada):
         self.entrada = entrada
     def scan(self):
-        global build_errors,cuadruplos,ids,temp_counter,counter,types,operations,values,pOper,pilaO,braces,pSaltos
+        global build_errors,cuadruplos,ids,temp_counter,counter,types,values,pOper,pilaO,braces,pSaltos
         #Lex construction
         import ply.lex as lex
         lex.lex()
@@ -611,7 +602,6 @@ class Scanner(object):
         #Structure cleaning
         ids.dispatch()
         types.dispatch()
-        operations.dispatch()
         values.dispatch()
         pOper.dispatch()
         pilaO.dispatch()
