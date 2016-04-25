@@ -31,7 +31,7 @@ __Dr. José Icaza__
 #### Interfaz Grafica y maquina virtual
 - En la consola ejecutar
 ` python main.py `
-- Ir a iniciar
+- Ir a __'Principiante'__ o __'Experto'__
 - Teclear programa en la pantalla de texto y presionar __'Guardar'__ .
 - Presionar __'Compilar'__
 - Presionar __'Correr programa'__
@@ -51,9 +51,20 @@ miPrograma Primerprograma;
 ```
     var Mivar escrita = "hola";
 ```
+##### Asignación de valores
+```
+    Mivar = hacerEscrita(3);
+    Miotravar = 5*7-1;
+```
 ##### Condiciones
 ```
     siEs (paredDerecha == verdadero){
+    ...
+    }
+```
+
+```
+    siEs(no libreIzquieda == verdadero){
     ...
     }
 ```
@@ -71,7 +82,7 @@ miPrograma Primerprograma;
     Minombre.parar;
 ```
 ## Notas
-* Este proyecto esta probado correctamente para sistema operativo windows, cualquier otro sistemas podria tener fallas.
+* Este proyecto esta probado correctamente para sistema operativo **Windows**, cualquier otro sistemas podria tener fallas.
 * Hubo cambios a la libreria tygame, en epecifico el archivo __main.py__ ,por lo que se tiene que tomar del directorio local en este repositorio.
 * Hubo cambios en la libreria pgu-gui, el archivo __textarea.py__ tiene que tomarse del repositorio.
 * La base para la interfaz grafica del laberinto se tomo del codigo compartido en [Bipo Maze](http://www.pygame.org/project-Bipo+Maze-2159-.html)
