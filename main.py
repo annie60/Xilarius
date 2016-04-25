@@ -276,22 +276,24 @@ def But_path():
 #Compiles current code as input from user
 def Compile_instruction():
     global can_execute, loop_times,build_error,input_from_user,executing,executing_errors
-    scanner = Scanner(input_from_user)
-    build_error = scanner.scan()
     ##Checks if there is not a previous instance running
-    if not build_error and not executing:
-        can_execute = True
-        errors.set("Exito!")
+    if not executing:
+        scanner = Scanner(input_from_user)
+        build_error = scanner.scan()
+        #Checks if there where any compilation errors
+        if not build_error:
+            can_execute = True
+            errors.set("Exito!")
+            loop_times = 0
+        else:
+            can_execute = False
+            Show_production_errors()
+            #Destroy build errors each time its called
+            del build_error[:]
+            loop_times = 0
+        #Destroy exection errors each time its called
         del execution_errors[:]
-        loop_times = 0
-    elif(build_error and not executing):
-        can_execute = False
-        Show_production_errors()
-        #Destroy build errors each time its called
-        del build_error[:]
-        del execution_errors[:]
-        loop_times = 0
-#Shows execution errors
+#Shows execution errors generated on the compilation
 def Show_execution_errors():
     global execution_errors,errors
     totalerror = 0
@@ -304,7 +306,7 @@ def Show_execution_errors():
             totalerror += 1
             final_errors = final_errors+error+"\n"
     errors.set(final_errors)
-            
+#Displays mistakes produced while running the application            
 def Show_production_errors():
     global execution_errors,errors
     totalerror = 0
@@ -319,6 +321,7 @@ def Show_production_errors():
             final_errors = final_errors+error+"\n"
             
     errors.set(final_errors)
+#Re renders objects on the screen with the changes made on the values
 def Update_display():
     global character,character_time,Window
     ##Sets miliseconds between a display loop            
@@ -328,8 +331,11 @@ def Update_display():
     character.show(Window)
     render_widgets()
     pygame.display.flip()
+#Executes the intermediate code generated previously
 def Execute_instruction():
     global can_execute, build_error,errors, executing, execution_Error
+    #If there where no mistakes during compilation and there is no
+    #previous instance running then continue
     if can_execute and not executing:
         errors.set("Ejecutando tu programa!")
         #Flag to disable any other feature meanwhile the program executes
@@ -358,10 +364,12 @@ def Execute_instruction():
         if len(execution_errors) == 0:
             errors.set("Termino!")
     elif(not can_execute and not executing):
+        #If there are no errors but it can't execute then if means
+        #it hasn't been compile
         if not build_error:
             build_error.append("No has compilado correctamente")
             Show_production_errors()
-            
+#Gets another image to display as the avatar            
 def Change_avatar():
     global avatar_index,character
     if avatar_index < len(avatars)-1:
@@ -370,7 +378,7 @@ def Change_avatar():
     else:
         avatar_index=0
         character.change_avatar(avatars[avatar_index])
-        
+#Handles the use of character's dialog        
 def Character_talk(mensaje):
     global character,Window
     #Formats message so it can fit on the bubble
@@ -381,7 +389,7 @@ def Character_talk(mensaje):
     Update_display()
     sleep(2)
     character.stop_talk()
-    
+#Cleans all variables used on the session    
 def Complete_cleanup(all):
     global can_execute,executing,avatar_index,on_game,input_from_user,build_error,execution_errors,loop_times,input_from_user,input_initialized,used_help
     can_execute = False
@@ -394,7 +402,8 @@ def Complete_cleanup(all):
     if all == 0:
         input_from_user = ""
     input_initialized = False
-    
+#Renders initial screen for the game when return from an instance
+#of the game
 def Home():
     global on_game,executing,on_initial,change_button,Frame,execute_button,home_button, compile_button,dificulty_level
     if not executing:
@@ -416,9 +425,9 @@ def Home():
 def Exit():
     global running
     running = False
-
+#Creates new instance of the game with the same dificulty 
 def Restart():
-            global character,dificulty_level,used_help,Window,input_initialized,list_x2,list_x1,input_from_user
+            global character,dificulty_level,used_help,Window,list_x2,list_x1
             pygame.time.delay(300)       
             #Avatar wall displayed on the screen
             for Xil in list_x2:
@@ -458,7 +467,7 @@ def Restart():
             
             list_x2 = fill_list_x2(list_x1)
             
-            
+#Initialize game's screen and its controlers            
 def Start_game():
     global on_game,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,home_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
     #Load background music
@@ -504,12 +513,13 @@ def Start_game():
     compile_button.place((435, 460))
     execute_button= Button(Window, text = "Ejecutar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Execute_instruction)
     execute_button.place((545, 460))
-    
+#Change dificulty level and calls to start game    
 def Expert_mode():
     global dificulty_level
     dificulty_level = 2
     Start_game()
-    
+#File treatment section
+#-------------------------------------
 def open_file_browser(mode):
     d = gui.FileDialog()
     d.connect(gui.CHANGE, handle_file_browser_closed, d,mode)
@@ -529,7 +539,8 @@ def handle_file_browser_closed(dlg,write):
         file = open(file_name,'w')
         input_from_user = input_from_user.replace('\n\n','\n')
         file.write(input_from_user)
-
+#--------------------------------------------
+#Opens screen to handle text input from the user
 def Create_input():
     global Window, input_initialized,can_execute, Frame, input_from_user
     input_initialized = True
