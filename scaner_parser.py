@@ -6,9 +6,9 @@
 # -----------------------------------------------------------------------------
 
 import sys
-from semantica import obtener_direccion,agregar_variable,operacion_compatible,crear_modulo
-from semantica import Stack,crear_archivo_salida
-from semantica import Queue
+from semantics import obtener_direccion,agregar_variable,operacion_compatible,crear_modulo
+from semantics import Stack,crear_archivo_salida
+from semantics import Queue
 sys.path.insert(0,"../..")
 #Helpers initialization
 ids = Queue()

@@ -1,0 +1,8 @@
+miPrograma Uno;
+{
+crearPersonaje Ana;
+var Mi numero = 1;
+repetirMientras(metaDerecha <> verdadero){
+Mi = Mi + 1;
+}
+}
