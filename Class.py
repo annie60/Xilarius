@@ -241,7 +241,7 @@ class Character(object):
         else:
             return True
     
-    def astar(self, dest):
+    def goal(self, dest):
         desti = Point(dest)
         openL = []
         closeL = []
@@ -307,7 +307,7 @@ class Character(object):
             c.Fille = c.Homme + c.Garcon
             openL.append(c)
             
-    def get_astar(self, csource, cdesti):
+    def get_goal(self, csource, cdesti):
         
         source = self.maze.get_cell(csource[0], csource[1])
         desti = self.maze.get_cell(cdesti[0], cdesti[1])

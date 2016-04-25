@@ -134,12 +134,10 @@ class Machine:
         self.instruction_pointer+=1
     def stop(self,line):
         self.instruction_pointer+=1
-    def eq(self,line):
-        value = self.memory[line[1]]
+    def translate(self,value,objeto):
         #Transalte reserved word to instruction
         if value == "verdadero": value = True
         elif value == "falso": value = False
-        objeto = self.memory[line[2]]
         #Flag to check for wall or free cell
         checkforwall = 0
         if objeto[:5] == "pared": checkforwall = 1
@@ -161,35 +159,18 @@ class Machine:
         #Makes comparison
         if objeto == value: result = True
         else: result = False
-        
+        return result
+    def eq(self,line):
+        value = self.memory[line[1]]
+        object = self.memory[line[2]]
+        result = self.translate(value,object)
         self.memory[line[3]] = result
         self.instruction_pointer+=1
     def noteq(self,line):
         value = self.memory[line[1]]
-        if value == "verdadero": value = True
-        elif value == "falso": value = False
-        objeto = self.memory[line[2]]
-        checkforwall = 0
-        if objeto[:5] == "pared": checkforwall = 1
-        elif objeto[:4] == "meta": checkforwall = 2
-        #Translates directive
-        if checkforwall < 3:
-            if objeto[5:] == "Derecha": objeto = character.isWall(const.right)
-            elif objeto[5:] == "Izquierda": objeto = character.isWall(const.left)
-            elif objeto[5:] == "Arriba": objeto = character.isWall(const.up)
-            elif objeto[5:] == "Abajo": objeto = character.isWall(const.down)
-            
-            if checkforwall == 0: objeto = not objeto
-        else:
-            if objeto[4:] == "Derecha": objeto = character.isFinishLine(character.x+1,character.y)
-            elif objeto[4:] == "Izquierda": objeto = character.isFinishLine(character.x-1,character.y)
-            elif objeto[4:] == "Arriba": objeto = character.isFinishLine(character.x,character.y+1)
-            elif objeto[4:] == "Abajo": objeto = character.isFinishLine(character.x,character.y-1)
-
-        if objeto != value: result = True
-        else: result = False
-        
-        self.memory[line[3]] = result
+        object = self.memory[line[2]]
+        result = self.translate(value,object)
+        self.memory[line[3]] = not result
         self.instruction_pointer+=1
     def negative(self,line):
         self.memory[line[3]]= not self.memory[line[1]]
@@ -213,6 +194,8 @@ class Machine:
         #if it hasn't then it's consider to be on an infinite loop.
         if current_pos_x == last_position_x and current_pos_y == last_position_y:
             loop_times += 1
+        #Checks if the position is changing just between two points
+        #if its then is getting cycle
         elif current_pos_x == (last_position_x -1) or current_pos_y == (last_position_y-1):
             loop_times += 1
         else:
@@ -273,14 +256,14 @@ def But_path():
     character.yellow_road = []
     character.reverse = 0
     line_counter = 0
-    character.astar(((character.maze.w - 1), (character.maze.h - 1)))
+    character.goal(((character.maze.w - 1), (character.maze.h - 1)))
     #Checks for previous written input from user
     if len(input_from_user) > 0:
         input_from_user = ""
         
     del const.instructions[:]
     #Gets path to follow
-    road = character.get_astar((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
+    road = character.get_goal((character.x, character.y), ((character.maze.w - 1), (character.maze.h - 1)))
     #Creates input from the solution found.
     for instruction in const.instructions:
         temp_entry = input_from_user
@@ -310,19 +293,19 @@ def Show_execution_errors():
     global execution_errors,errors
     totalerror = 0
     errors.set('')
+    final_errors=""
     for error in execution_errors:
         if totalerror > 7:
             break
         else:
             totalerror += 1
-            current_errors = errors.get()
-            errors.set(current_errors+error+"\n")
+            final_errors = final_errors+error+"\n"
+    errors.set(final_errors)
             
 def Show_production_errors():
     global execution_errors,errors
     totalerror = 0
     errors.set('')
-    print(build_error)
     final_errors=""
     for error in build_error:
         #Only produces 7 since the entry doesn't have scroll
@@ -346,6 +329,7 @@ def Execute_instruction():
     global can_execute, build_error,errors, executing, execution_Error
     if can_execute and not executing:
         errors.set("Ejecutando tu programa!")
+        #Flag to disable any other feature meanwhile the program executes
         executing = True
         #Divides file of compiled code
         file = open('result.txt','r')
@@ -387,10 +371,10 @@ def Change_avatar():
 def Character_talk(mensaje):
     global character,Window
     #Formats message so it can fit on the bubble
-    mensaje_corto = mensaje[1:-1]
-    if len(mensaje_corto) > 11:
-        mensaje_corto = mensaje_corto[:11]
-    character.talk(mensaje_corto)
+    short_message = mensaje[1:-1]
+    if len(short_message) > 11:
+        short_message = short_message[:11]
+    character.talk(short_message)
     Update_display()
     sleep(2)
     character.stop_talk()
@@ -431,14 +415,14 @@ def Exit():
     running = False
 
 def Restart():
-            global character,used_help,Window,input_initialized,list_x2,list_x1,input_from_user
+            global character,dificulty_level,used_help,Window,input_initialized,list_x2,list_x1,input_from_user
             pygame.time.delay(300)       
             #Avatar wall displayed on the screen
             for Xil in list_x2:
                 Xil.show(Window)
                 pygame.display.flip()
             #Re generates maze
-            if dificulty_leve == 1:
+            if dificulty_level == 1:
                 mymaze = maze(easy_maze[0],easy_maze[1])
             else:
                 mymaze = maze(hard_maze[0],hard_maze[1])
@@ -447,10 +431,10 @@ def Restart():
             
             #Checks if there was use of help on the last game
             if used_help:
-                #Cleans variables
+                #Cleans variables with exeption of code generated
                 Complete_cleanup(1)
             else:
-                #Cleans variables
+                #Cleans variables completly
                 Complete_cleanup(0)
             #Creates solution for the new maze
             while True:
@@ -600,6 +584,7 @@ def Create_input():
     
     def file_treat():
         global Window,Frame
+        #TODO Agregar imagen a botones y estilo a fondo
         third_app = gui.Desktop(screen = Window,area = Frame)
         third_app.connect(gui.QUIT,third_app.quit,None)
         third_app.connect(gui.QUIT,app.quit,None)
