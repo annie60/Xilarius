@@ -1,50 +1,48 @@
 # -----------------------------------------------------------------------------
-# Analisis semantico de variables y funciones: Xilarius
-# Proyecto
+# Semantic analysis: Xilarius
+# Project
 # Ana Arellano   		A01089996
 # Ana Karen Reyna		A01280310
 # -----------------------------------------------------------------------------
-#Clase pila para apoyo en la construccion de tablas
+#Class to support the construction of semantic structures
 class Stack:
      def __init__(self):
-         self.items = [] #inicializa una lista vacia
-
+         self.items = [] 
      def isEmpty(self):
-         return self.items == [] #esta vacia la lista T|F
-     def top(self):
+         return self.items == [] #list empty? T|F
+     def top(self): #Top element of list
          return self.items[len(self.items)-1]
      def push(self, item):
          self.items.append(item) 
      def pop(self):
          return self.items.pop() 
      def size(self):
-         #Regresa el numero de elementos en la lista
          return len(self.items)
-     def dispatch(self):
+     def dispatch(self): #Cleans structure
          del self.items[:]
-#Fila
+#Class to support construction of semantic structures
 class Queue:
     def __init__(self):
         self.items =[]
     def isEmpty(self):
         return self.items ==[]
-    def top(self):
+    def top(self): #Return top element
          return self.items[len(self.items)-1]
-    def enqueue(self,item): #Agregar elemento a la lista
+    def enqueue(self,item): 
         self.items.insert(0,item)
-    def dequeue(self): #Sacar elemento de una fila
+    def dequeue(self): 
         return self.items.pop()
     def size(self):
         return len(self.items)
-    def dispatch(self):
+    def dispatch(self): #Cleans structure
         del self.items[:]
-#Diccionario
-# Uso de variables globales solamente
-# Definicion de un diccionario con llaves y una lista de atributos
-# { "nombre" : (valor,tipoDeCte,direccion)}
+#Dictionary
+# Use of global variables ONLY
+# Dictionary definition
+# { "nombre" : (value,constantType,virtualDirection)}
 var_dicc_funciones = {}
 #Helper structures
-#Constantes {numeroenmemoria :  valor}
+#Constants {memoryDirection :  value}
 const_mem={}
 const_mem_output={}
 temp_mem = {}
@@ -53,12 +51,12 @@ global_mem_output= {}
 global_mem_counter = 1000
 temp_mem_counter = 20000
 const_mem_counter = 25000
-#Definicion de operadores,tipos y palabras reservadas
+#Operators, types and reserve words definition
 var_boleanas = ("verdadero","falso")
 var_tipos = ("numero","escrita","decision","personaje")
 var_operaciones = ("=","+","-","*","/","<>","==","parar","responder","arriba","abajo","derecha","izquierda","hacerEscrita")
 var_constantes = ("verdadero","falso","paredDerecha","paredIzquierda","paredArriba","paredAbajo","libreDerecha","libreIzquierda","libreArriba","libreAbajo","metaDerecha","metaIzquierda","metaArriba","metaAbajo")
-#Formato de matriz para cubo
+#Semantics cube format
 #                       =       +       -       *       /       <>      ==      p   r   at  ad   d   i   conv
 #numero     numero      1       1       1       1       1       -1      -1     -1  -1  -1   -1  -1  -1   -1
 #numero     escrita     -1      -1      -1      -1      -1      -1      -1     -1  -1  -1   -1  -1  -1    1
@@ -99,19 +97,19 @@ cubo_semantico = (
     (1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1)
     )
     ) 
-#Definicion de tabla de funciones
+#Function's table definition
 def crear_modulo(nombre,ambiente):
     global var_dicc_funciones
     var_dicc_funciones[ambiente] = (nombre,{})
-#Funcion para crear 'tabla' de variables
+#Creates variable's table
 def agregar_variable(nombre,valor,tipo):
-    #Revisa que no este repetida la variable
+    #Checks if the name is already in use
     if existe_variable(nombre):
         return "Error: Nombre de variable '"+nombre+"' repetido"
         
     else:
-        #Revisa que la asignacion que se le hace sea
-        #correspondiente al tipo de variable que es
+        #Checks that the assignment of the value 
+        #has consistency with the type of variable
         if operacion_compatible("=",tipo,valor) == "":
             global global_mem_output,var_dicc_funciones,global_mem_counter
             var_dicc_funciones["miPrograma"][1][nombre]=(valor,tipo,global_mem_counter)
@@ -121,8 +119,8 @@ def agregar_variable(nombre,valor,tipo):
         else:
             return "Error: Asignacion a '"+nombre+"' no compatible"
 
+#Transforms value to index of type's array
 def convertir_valor(valor):
-    #Convierte valores a tipo indices
         if valor.isdigit():
             return 0
         elif isinstance(valor,str) and not(valor in var_boleanas) and ('"' in valor):
@@ -138,7 +136,8 @@ def convertir_valor(valor):
             return var_tipos.index(valor)
         else:
             return -1
-#Para expresiones matematicas          
+#Defines compatiblity between types and operations
+#according to the semantics cube defined previously
 def operacion_compatible(operacion, tipouno,tipodos):
     #Obtiene la informacion del parser
     tipo=convertir_valor(tipouno)
@@ -156,68 +155,59 @@ def operacion_compatible(operacion, tipouno,tipodos):
         return "Error: Variable '"+tipouno+"' no declarada"
     else:
         return "Error:Variable '"+tipodos+"' no declarada"
+#Translates to virtual memory numbers or unique pointers
 def obtener_direccion(variable):
     global temp_mem,global_mem_counter,temp_mem_counter,const_mem_counter
-    #Revisa si es variable global, constante o temporal
+    #Checks if variable is global,constant or temporary
     if (variable in var_dicc_funciones["miPrograma"][1]): 
         return var_dicc_funciones["miPrograma"][1][variable][2]
     elif isinstance(variable,int) or variable.isdigit() or (variable in var_constantes):
-        #Si ya existe solo regresa direccion de memoria
+        #If it already exists then just return 
+        #the memory direction associated
         if (variable in const_mem):
             return const_mem[variable]
         else:
-        #Si no existe crea la constante y 
-        #regresa el valor de memoria usado
+        #If it doesn't exists then it creates the space
+        #and returns the memory direction used
             crear_constante(variable)
             return (const_mem_counter - 1)
         
     else:
-        #Si ya existe solo regresa direccion de memoria
+        #If it doesn't exists then it creates the space
+        #and returns the memory direction used
         if not (variable in temp_mem):
             crear_temporal(variable)
             return (temp_mem_counter - 1)
         else:
+        #If it already exists then just return 
+        #the memory direction associated
             return temp_mem[variable]
         
-#Para funciones propias como: parar, responder, adelante....
-def operacion(operacion, tipouno,tipodos):
-    #Obtiene la informacion del parser
-    tipo=convertir_valor(tipouno)
-    indiceValor = convertir_valor(tipodos)
-    operador =var_operaciones.index(operacion)
-    if indiceValor >= 0 and tipo >=0 :
-        if (cubo_semantico[tipo][indiceValor][operador] == 1):
-            return ""
-        else: #Operacion no compatible
-            if tipo == indiceValor:
-                return "Error: "+var_tipos[indiceValor]+" no es compatible con operacion "+operacion
-            else:
-                return "Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion
-    elif tipo < 0:
-        return "Error: Variable '"+tipouno+"' no declarada"
-    else:
-        return "Error:Variable '"+tipodos+"' no declarada"
-#Revisa si es variable ya existente en la tabla    
+#Checks for previous name declaration
+#meaning is a repeated variable name use
 def existe_variable(nombre):
     global var_dicc_funciones
     if nombre in var_dicc_funciones["miPrograma"][1] :
         return True
     else:
         return False
+#Helper funtion to create specific constant slot of memory
 def crear_constante(valor):
     global const_mem,const_mem_counter
     const_mem[valor]=const_mem_counter
     const_mem_output[const_mem_counter] =valor
     const_mem_counter+=1
+#Helper funtion to create specific temporary slot of memory
 def crear_temporal(valor):
     global temp_mem,const_mem_output,temp_mem_counter
     temp_mem[valor]=temp_mem_counter
     temp_mem_output[temp_mem_counter]=valor
     temp_mem_counter+=1
+#Generates intermediate code file
 def crear_archivo_salida(cuadruplos):
     global const_mem_output,temp_mem_output,global_mem_output,const_mem,temp_mem,global_mem_counter,temp_mem_counter,const_mem_counter
     file = open('result.txt','w')
-    #Crea bloques seprados por '$' para cada seccion necesaria
+    #Creates blocks delimited by '$' in between each section
     file.write(str(global_mem_output))
     file.write('$')
     file.write(str(const_mem_output))
@@ -225,7 +215,7 @@ def crear_archivo_salida(cuadruplos):
     file.write(str(temp_mem_output))
     file.write('$')
     file.write(str(cuadruplos))
-    #Limpieza de variables globales
+    #Cleanup
     var_dicc_funciones.clear()
     const_mem.clear()
     const_mem_output.clear()

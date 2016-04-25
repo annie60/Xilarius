@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
-# Maquina virtual e interfaz grafica: Xilarius
-# Proyecto
+# Virtual machine and graphic interface: Xilarius
+# Project
 # Ana Arellano   		A01089996
 # Ana Karen Reyna		A01280310
 # -----------------------------------------------------------------------------
@@ -47,10 +47,10 @@ running = True
 
 #------------Virtual Machine---------------#
 
-#Mapeo de memoria
-#1000 - 19999 <- Globales
-#20000- 24999 <- Temporales
-#25000- 25999 <- Constantes
+#Memory map
+#1000 - 19999 <- Globals
+#20000- 24999 <- Temporals
+#25000- 25999 <- Constants
 global_mem_range = [1000,19999]
 temp_mem_range = [20001,24999]
 const_mem_range = [25000,25999]
@@ -248,14 +248,15 @@ class Machine:
         self.instruction_pointer+=1
     def dump_vm(self):
         self.memory = {}
-# FIN
+
 #---------------------Buttons functions--------------------#
-    
+#Generates solution and solves current maze    
 def But_path():
     global character,input_from_user
     character.yellow_road = []
     character.reverse = 0
     line_counter = 0
+    #Gets where the goal is
     character.goal(((character.maze.w - 1), (character.maze.h - 1)))
     #Checks for previous written input from user
     if len(input_from_user) > 0:
@@ -270,7 +271,9 @@ def But_path():
         input_from_user = temp_entry+instruction+"\n"
         line_counter += 1
     render_widgets()
+    #Moves character accordingly
     character.go_to(road)
+#Compiles current code as input from user
 def Compile_instruction():
     global can_execute, loop_times,build_error,input_from_user,executing,executing_errors
     scanner = Scanner(input_from_user)
@@ -288,7 +291,7 @@ def Compile_instruction():
         del build_error[:]
         del execution_errors[:]
         loop_times = 0
- 
+#Shows execution errors
 def Show_execution_errors():
     global execution_errors,errors
     totalerror = 0

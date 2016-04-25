@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
-# Objetos de interfaz grafica: Xilarius
-# Proyecto
+# Graphic interface objects: Xilarius
+# Project
 # Ana Arellano   		A01089996
 # Ana Karen Reyna		A01280310
 # -----------------------------------------------------------------------------
@@ -10,10 +10,8 @@ from pygame.locals import *
 from random import randint, choice
 from math import sqrt
 
-"""
-Funcion:
-"""
 
+#Helper to get distance from point to point, given as parameters
 def distance(p1, p2):
     return(sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2))
 
@@ -66,7 +64,6 @@ const.up = 2
 const.down = 3
 
 #Sizes
-
 const.wc = 26 # width of a square on the maze
 const.hc = 26 # height of the square on the maze
 
@@ -98,7 +95,7 @@ class Case(object):
 		
 class CaseColor(object):
     """
-    For the squares coloring
+    For the squares background coloring
     """
     def __init__(self, Pos, color):
         self.pos = Pos
@@ -169,13 +166,14 @@ class Character(object):
         ##Sets begin and end
         self.dep = CaseImage((0, 0), const.beginning)
         self.fin = CaseImage(((self.maze.w * const.wc - const.wc), (self.maze.h * const.hc - const.hc)), const.ending)
+    #Changes image used as character
     def change_avatar(self,imagenam):
         imagename=const.imagespath+imagenam+".png"
         self.img = image.load(imagename).convert_alpha()
         self.img.set_colorkey(RLEACCEL)
         self.rect_img = self.img.get_rect()
         self.rect_img[0], self.rect_img[1] = (self.x * const.wc), (self.y * const.hc)
-        
+   #Display the environment 
     def show(self, screen):
 
         caseL = []
@@ -190,8 +188,6 @@ class Character(object):
             for id, c in enumerate(self.yellow_road): 
                     caseL.append(CaseColor(((c.x * const.wc), (c.y * const.hc)), const.yellow))
                     
-                    
-        
         caseL.reverse()
         for c in caseL:
             screen.blit(c.surf, c.pos)
@@ -203,18 +199,21 @@ class Character(object):
             screen.blit(self.img_speech.surf, self.img_speech.pos)
             screen.blit(self.speech.surf,self.speech.pos)
         
-        
+    #Create bubble of speech    
     def talk(self,message):
-        #Create bubble of speech
+        #Checks if the character is on the edges
+        #and generates the speech bubble on the oposite direction
         if ((self.x+1)*(const.wc)) >= (self.maze.w *15):
             self.img_speech = CaseDoubleImage((((self.x-5) * const.wc), (self.y * const.hc)),"bubble_small_revert")
             self.speech = CaseText((((self.x-4.4) * const.wc), ((self.y+0.3) * const.hc)),message)
         else:
             self.img_speech = CaseDoubleImage((((self.x+1) * const.wc), (self.y * const.hc)),"bubble_small")
             self.speech = CaseText((((self.x+1.4) * const.wc), ((self.y+0.3) * const.hc)),message)
+    #Destroy bubble of speech
     def stop_talk(self):
         self.img_speech = ''
         self.speech = ''
+    #Generates the action that involve moving spaces
     def move(self, dir):
         if not self.maze.get_cell(self.x, self.y).gate[dir]:
             
@@ -228,19 +227,20 @@ class Character(object):
                 self.y += 1
                 
             self.rect_img[0], self.rect_img[1] = (self.x * const.wc), (self.y * const.hc)
-    
+    #Checks if there is a wall in the direction given as parameter
     def isWall(self,dir):
         #Checks if next step has a wall
         if not self.maze.get_cell(self.x, self.y).gate[dir]:
             return False
         else:
             return True
+    #Checks if the finish line is on the direction given as paramater
     def isFinishLine(self,x,y):
         if self.maze.get_cell((self.maze.w - 1), (self.maze.h - 1)) != self.maze.get_cell(x,y):
             return False
         else:
             return True
-    
+    #Set the goal case(Cell) of the current maze
     def goal(self, dest):
         desti = Point(dest)
         openL = []
@@ -278,9 +278,9 @@ class Character(object):
             
             openL.remove(openL[min_id])
             
-            
         
-        
+    #Function to evaluate the rest of the path
+    #to help get the correct direction to use
     def _traitement(self, closeL, openL, x, y, dir, parent, desti):
         if parent.gate[dir]:
             return
@@ -306,7 +306,9 @@ class Character(object):
             c.Homme = distance((x, y), (desti.x, desti.y))
             c.Fille = c.Homme + c.Garcon
             openL.append(c)
-            
+    #Generates the path to follow according to all the
+    #posible directions to go from the current position
+    #to the finish line, given as parameters
     def get_goal(self, csource, cdesti):
         
         source = self.maze.get_cell(csource[0], csource[1])
@@ -340,7 +342,7 @@ class Character(object):
             
         const.instructions.append("}")
         return return_road
-        
+    #Iluminates solution's path    
     def poll(self):
         if self.mainroad:
             self.move(self.mainroad.pop(0))
@@ -389,10 +391,12 @@ class maze(object):
                     a.background = CaseImage((localX * self.wc,localY* self.hc), const.greenPatch)
                 
             self.cases.append(a)
-
+    #Gets cell that is on the coordinates given as parameters
     def get_cell(self, x, y):
         return self.cases[(y*self.w) + x]
-    
+    #Filters possible directions to take on the path
+    #and the directions of the solution to translate in the actions
+    #that are needed
     def notdir(self, dir):
         if dir == const.right:
             const.instructions.append("Xilarius.izquierda(1);")
@@ -406,7 +410,7 @@ class maze(object):
         if dir == const.down:
             const.instructions.append("Xilarius.arriba(1);")
             return const.up
-        
+    #Create new maze
     def generate_maze(self, x = -1, y = -1):
         if x == -1:
             x = randint(0, self.w - 1)
@@ -442,7 +446,7 @@ class maze(object):
                     
                     else:
                         tab.remove(C)
-                    
+    #Renders object Maze            
     def show(self, screen):
         W, H = self.wc, self.hc
         sx , sy = self.sx, self.sy
@@ -460,7 +464,7 @@ class maze(object):
                     draw.line(screen, const.gray, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                                      
         x = self.w - 1
-        
+        #Creates walls from buttom to top
         for y in range(self.h - 1):
             c = self.get_cell(x, y)
             
@@ -468,7 +472,7 @@ class maze(object):
                 draw.line(screen, const.gray, ((sx + (x * W)), (sy + ((y+1) * H))), (sx + ((x + 1) * W), sy + ((y+1) * H)), 3)
                 
         y = self.h - 1
-        
+        #Creates walls from left to right
         for x in range(self.w - 1):
             c = self.get_cell(x, y)
             

@@ -1,6 +1,6 @@
 from Class import Xilarius
 
-
+#Helper to generate new list of cells
 def list_xil(WW, WH):
     list_x = []
     
@@ -19,7 +19,7 @@ def list_xil(WW, WH):
         Yi += 1    
         
     return list_x
-
+#Helper to fill temporary list of cells
 def fill_list_x2(list_x1):
     list_x2 = []
     for i in list_x1:

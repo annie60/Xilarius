@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
-# Escaner y Parser: Xilarius
-# Proyecto
+# Scaner and parser: Xilarius
+# Project
 # Ana Arellano   		A01089996
 # Ana Karen Reyna		A01280310
 # -----------------------------------------------------------------------------
