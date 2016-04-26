@@ -44,6 +44,7 @@ easy_maze =[10,13]
 hard_maze = [16,19]
 dificulty_level = 1
 running = True
+numero_hint = 1
 
 #------------Virtual Machine---------------#
 
@@ -593,8 +594,8 @@ def Create_input():
         pygame.display.flip()
 
     #Help button
-    btn_help = gui.Button("Instrucciones")
-    btn_help.connect(gui.CLICK, help)
+    help_btn = gui.Button("Instrucciones")
+    help_btn.connect(gui.CLICK, help)
     
     def file_treat():
         global Window,Frame
@@ -613,23 +614,55 @@ def Create_input():
         ok_btn = gui.Button("Listo!")
         ok_btn.connect(gui.CLICK,third_app.quit,None)
         ok_btn.connect(gui.CLICK,app.quit,None)
-        my_container3.add(open_btn,300,70)
-        my_container3.add(save_btn,300,150)
-        my_container3.add(ok_btn,300,250)
+        my_container3.add(gui.Image(const.imagespath+"Archivo_Background.png"),0,0)
+        my_container3.add(open_btn,155,330)
+        my_container3.add(save_btn,455,330)
+        my_container3.add(ok_btn,310,375)
         third_app.run(my_container3)
         pygame.display.flip()
     
     #file treatment
-    btn_file = gui.Button("Archivo")
-    btn_file.connect(gui.CLICK,file_treat)
-    
+    file_btn = gui.Button("Archivo")
+    file_btn.connect(gui.CLICK,file_treat)
+
+    # Display the background when playing as beginner
+    def hint():
+        global numero_hint, Window
+        #Window.fill(const.green)
+        if numero_hint < 5:
+            numero_hint = numero_hint + 1
+        else:
+            numero_hint = 1
+        #Hint images for level 1
+        if dificulty_level == 1:
+            if numero_hint == 1:
+                img = image.load(const.imagespath+"Ayuda1_Background.png").convert_alpha()
+            elif numero_hint == 2:
+                img = image.load(const.imagespath+"Ayuda2_Background.png").convert_alpha()
+            elif numero_hint == 3:
+                img = image.load(const.imagespath+"Ayuda3_Background.png").convert_alpha()
+            elif numero_hint == 4:
+                img = image.load(const.imagespath+"Ayuda4_Background.png").convert_alpha()
+            elif numero_hint == 5:
+                img = image.load(const.imagespath+"Ayuda5_Background.png").convert_alpha()
+            img.set_colorkey(RLEACCEL)
+            rect = Rect((-8,35), (0, 0))
+            #Window.fill(const.green)
+            Window.blit(img, rect)
+            pygame.display.flip()
+    #Next tip button
+    hint_btn = gui.Button("Siguiente tip")
+    hint_btn.connect(gui.CLICK, hint)
+
     #Add items to container
-    my_container1.add(cancel_btn,500,10)
-    my_container1.add(save_btn,502,45)
-    my_container1.add(btn_file,595,10)
-    my_container1.add(Label_code, 416, 75)
-    my_container1.add(textarea_code,416,95)
-    my_container1.add(btn_help,480,470)
+    my_container1.add(cancel_btn,450,45)
+    my_container1.add(save_btn,550,45)
+    my_container1.add(file_btn,500,10)
+    my_container1.add(Label_code, 419, 75)
+    my_container1.add(textarea_code,419,95)
+    my_container1.add(help_btn,480,470)
+    if dificulty_level == 1:
+        my_container1.add(hint_btn,145,415)
     app.run(my_container1) 
 # FIN
 
@@ -663,7 +696,16 @@ while running:
         Window.fill(const.green)
         #Hint images for level 1
         if dificulty_level == 1:
-            img = image.load(const.imagespath+"NivelPrincipiante.png").convert_alpha()
+            if numero_hint == 1:
+                img = image.load(const.imagespath+"Ayuda1_Background.png").convert_alpha()
+            elif numero_hint == 2:
+                img = image.load(const.imagespath+"Ayuda2_Background.png").convert_alpha()
+            elif numero_hint == 3:
+                img = image.load(const.imagespath+"Ayuda3_Background.png").convert_alpha()
+            elif numero_hint == 4:
+                img = image.load(const.imagespath+"Ayuda4_Background.png").convert_alpha()
+            elif numero_hint == 5:
+                img = image.load(const.imagespath+"Ayuda5_Background.png").convert_alpha()
             img.set_colorkey(RLEACCEL)
             rect = Rect((-8,35), (0, 0))
             Window.blit(img, rect)
