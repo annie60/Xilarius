@@ -406,7 +406,7 @@ def Complete_cleanup(all):
 #Renders initial screen for the game when return from an instance
 #of the game
 def Home():
-    global on_game,executing,on_initial,change_button,Frame,execute_button,home_button, compile_button,dificulty_level
+    global on_game,executing,on_initial,change_button,Frame,execute_button,home_button, compile_button,dificulty_level,exit_button
     if not executing:
         dificulty_level = 1
         pygame.mixer.music.stop()
@@ -421,6 +421,7 @@ def Home():
         compile_button.kill()
         home_button.kill()
         Frame.kill()
+        exit_button.kill()
         Complete_cleanup(0)
 
 def Exit():
@@ -470,7 +471,7 @@ def Restart():
             
 #Initialize game's screen and its controlers            
 def Start_game():
-    global on_game,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,home_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button
+    global on_game,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,home_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button,exit_button
     #Load background music
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
@@ -767,11 +768,15 @@ while running:
     elif(on_initial):
         ## Main page
         Window.fill(const.black)
+        # Buttons
+        # Levels section
+        Label_level_buttons = Label(Window, width = 120, height = 95, htitle = " Niveles ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
+        Label_level_buttons.place((545, 0))
         start_button= Button(Window, text = "Principiante", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 18, target = Start_game)
-        start_button.place((565, 6))
+        start_button.place((555, 20))
         expert_button= Button(Window, text = "Experto", width = 95, height = 30, bordercolor = const.white, colour = const.red, fontsize = 18, target = Expert_mode)
-        expert_button.place((565, 45))
-	## Background image
+        expert_button.place((555, 59))
+	    ## Background image
         img = image.load(const.imagespath+"Main_Background.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
         rect = Rect((0,0), (0, 0))
@@ -786,5 +791,10 @@ while running:
         img.set_colorkey(RLEACCEL)
         rect = Rect((75,70), (101, 171))
         Window.blit(img, rect)
+        # Bubble message text
+        Label_message = Label(Window, width = 108, height = 10, htitle = "Bienvenid@ a", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(1,72,152), colour = Color(100,200,255))
+        Label_message.place((100, 105))
+        Label_message2 = Label(Window, width = 80, height = 10, htitle = "Xilarius!!!", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(1,72,152), colour = Color(100,200,255))
+        Label_message2.place((120, 125))
         render_widgets()
         pygame.display.flip()
