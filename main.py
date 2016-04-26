@@ -553,6 +553,8 @@ def Create_input():
 
     #Label to write code
     Label_code = gui.Label("Escribe/modifica tu código:")
+    #Label to buttons
+    Label_buttons = gui.Label("Cambios realizados:")
 
     #Cancel button
     cancel_btn = gui.Button("Cancelar")
@@ -614,10 +616,17 @@ def Create_input():
         ok_btn = gui.Button("Listo!")
         ok_btn.connect(gui.CLICK,third_app.quit,None)
         ok_btn.connect(gui.CLICK,app.quit,None)
+        #Cancel button
+        cancel_btn = gui.Button("Cancelar")
+        cancel_btn.connect(gui.CLICK,third_app.quit,None)
+        cancel_btn.connect(gui.CLICK,app.quit,None)
+
+        #Add elements to container
         my_container3.add(gui.Image(const.imagespath+"Archivo_Background.png"),0,0)
         my_container3.add(open_btn,155,330)
         my_container3.add(save_btn,455,330)
         my_container3.add(ok_btn,310,375)
+        my_container3.add(cancel_btn,580,10)
         third_app.run(my_container3)
         pygame.display.flip()
     
@@ -649,15 +658,17 @@ def Create_input():
             rect = Rect((-8,35), (0, 0))
             #Window.fill(const.green)
             Window.blit(img, rect)
+            #Update_display()
             pygame.display.flip()
     #Next tip button
     hint_btn = gui.Button("Siguiente tip")
     hint_btn.connect(gui.CLICK, hint)
 
     #Add items to container
-    my_container1.add(cancel_btn,450,45)
-    my_container1.add(save_btn,550,45)
-    my_container1.add(file_btn,500,10)
+    my_container1.add(Label_buttons, 462, 30)
+    my_container1.add(cancel_btn,450,50)
+    my_container1.add(save_btn,550,50)
+    my_container1.add(file_btn,500,5)
     my_container1.add(Label_code, 419, 75)
     my_container1.add(textarea_code,419,95)
     my_container1.add(help_btn,480,470)
