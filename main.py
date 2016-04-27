@@ -28,6 +28,7 @@ avatar_index=0
 main_background = "Main_Background"
 on_game = False
 on_initial = True
+correct_message=["Perfecto! Tu programa esta listo","Excelente!,ahora paso 2","Muy bien! Ahora a probarlo.","Genial! Es turno del paso 2"]
 executing = False
 input_file = gui.Input()
 last_position_x =0
@@ -53,7 +54,7 @@ numero_hint = 1
 #20000- 24999 <- Temporals
 #25000- 25999 <- Constants
 global_mem_range = [1000,19999]
-temp_mem_range = [20001,24999]
+temp_mem_range = [20000,24999]
 const_mem_range = [25000,25999]
 #Starts all virtual machine functions
 class Machine:
@@ -78,7 +79,7 @@ class Machine:
                     elif (value >= const_mem_range[0] and value <= const_mem_range[1]) and not (value in self.memory):
                         self.memory[value]=self.constant[value]
                     elif not (value in self.memory) and (value > const_mem_range[1] or value > temp_mem_range[1]):
-                        execution_errors.append("Error: Falta de memoria.")
+                        execution_errors.append("Error: Ya no hay memoria.")
             if len(execution_errors) == 0 :
                 self.dispatch(line)
                 Update_display()
@@ -204,7 +205,8 @@ class Machine:
             last_position_y = current_pos_y
             loop_times = 0
         if loop_times > 10:
-            execution_errors.append("Error: Programa ciclado!")
+            execution_errors.append("Oh oh hubo un error")
+            execution_errors.append("El programa se ciclo!")
         else:
             self.instruction_pointer = addr
         sleep(0.05)
@@ -276,7 +278,7 @@ def But_path():
     character.go_to(road)
 #Compiles current code as input from user
 def Compile_instruction():
-    global can_execute, loop_times,build_error,input_from_user,executing,executing_errors
+    global can_execute,correct_message, loop_times,build_error,input_from_user,executing,executing_errors
     ##Checks if there is not a previous instance running
     if not executing:
         scanner = Scanner(input_from_user)
@@ -284,7 +286,7 @@ def Compile_instruction():
         #Checks if there where any compilation errors
         if not build_error:
             can_execute = True
-            errors.set("Exito!")
+            errors.set(correct_message[randint(0,3)])
             loop_times = 0
         else:
             can_execute = False
@@ -338,7 +340,7 @@ def Execute_instruction():
     #If there where no mistakes during compilation and there is no
     #previous instance running then continue
     if can_execute and not executing:
-        errors.set("Ejecutando tu programa!")
+        errors.set("Ejecutando tu programa!\nPsst ve como Xilarius se mueve!")
         #Flag to disable any other feature meanwhile the program executes
         executing = True
         #Divides file of compiled code
@@ -363,12 +365,12 @@ def Execute_instruction():
         print(a.memory)
         executing = False
         if len(execution_errors) == 0:
-            errors.set("Termino!")
+            errors.set("Tu programa termino!")
     elif(not can_execute and not executing):
         #If there are no errors but it can't execute then if means
         #it hasn't been compile
         if not build_error:
-            build_error.append("No has compilado correctamente")
+            build_error.append("Ups! No has hecho el paso uno")
             Show_production_errors()
 #Gets another image to display as the avatar            
 def Change_avatar():
@@ -498,9 +500,9 @@ def Start_game():
     #Side toolbar
     home_button= Button(Window, text = "Inicio", width = 50, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Home)
     home_button.place((430, 10))
-    change_button= Button(Window, text = "  Cambiar avatar ", width = 80, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Change_avatar)
+    change_button= Button(Window, text = "  Cambiar avatar ", width = 80, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 11, target = Change_avatar)
     change_button.place((500, 10))
-    exit_button= Button(Window, text = "Salir", width = 50, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 12, target = Exit)
+    exit_button= Button(Window, text = "Salir", width = 50, height = 20, bordercolor = const.white, colour = const.red, fontsize = 12, target = Exit)
     exit_button.place((600, 10))
 
     #Errors output section
@@ -511,9 +513,9 @@ def Start_game():
     errors.place((12,350))
     
     #Buttons
-    compile_button= Button(Window, text = "Compilar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Compile_instruction)
+    compile_button= Button(Window, text = "Paso 1", width = 95, height = 20, bordercolor = const.white, colour = const.Porange, fontsize = 16, target = Compile_instruction)
     compile_button.place((435, 460))
-    execute_button= Button(Window, text = "Ejecutar", width = 95, height = 20, bordercolor = const.Porange, colour = const.yellow, fontsize = 16, target = Execute_instruction)
+    execute_button= Button(Window, text = "Paso 2", width = 95, height = 20, bordercolor = const.white, colour = const.green, fontsize = 16, target = Execute_instruction)
     execute_button.place((545, 460))
 #Change dificulty level and calls to start game    
 def Expert_mode():
@@ -546,7 +548,7 @@ def handle_file_browser_closed(dlg,write):
 def Create_input():
     global Window, input_initialized,can_execute, Frame, input_from_user
     input_initialized = True
-
+    
     #App over toolbar
     app = gui.App(screen = Window,area = Frame)
     app.connect(gui.QUIT,app.quit,None)
@@ -770,17 +772,16 @@ while running:
         Window.fill(const.black)
         # Buttons
         # Levels section
-        Label_level_buttons = Label(Window, width = 120, height = 95, htitle = " Niveles ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
-        Label_level_buttons.place((545, 0))
         start_button= Button(Window, text = "Principiante", width = 95, height = 30, bordercolor = const.Porange, colour = const.yellow, fontsize = 18, target = Start_game)
-        start_button.place((555, 20))
+        start_button.place((555, 25))
         expert_button= Button(Window, text = "Experto", width = 95, height = 30, bordercolor = const.white, colour = const.red, fontsize = 18, target = Expert_mode)
-        expert_button.place((555, 59))
-	    ## Background image
+        expert_button.place((555, 64))
+	## Background image
         img = image.load(const.imagespath+"Main_Background.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
         rect = Rect((0,0), (0, 0))
         Window.blit(img, rect)
+        
         ## Character
         img = image.load(const.imagespath+"Character_boy_Large.png").convert_alpha()
         img.set_colorkey(RLEACCEL)
@@ -792,9 +793,17 @@ while running:
         rect = Rect((75,70), (101, 171))
         Window.blit(img, rect)
         # Bubble message text
-        Label_message = Label(Window, width = 108, height = 10, htitle = "Bienvenid@ a", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(1,72,152), colour = Color(100,200,255))
-        Label_message.place((100, 105))
-        Label_message2 = Label(Window, width = 80, height = 10, htitle = "Xilarius!!!", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(1,72,152), colour = Color(100,200,255))
-        Label_message2.place((120, 125))
+        font = pygame.font.Font(None, 22)
+        text = font.render("Bienvenid@ a", 1, Color(1,72,152))
+        textpos = Rect((90,85),(125,195))
+        Window.blit(text, textpos)
+        text = font.render("Xilarius!!", 1, Color(1,72,152))
+        textpos = Rect((120,125),(115,185))
+        Window.blit(text, textpos)
+        #Levels message
+        font = pygame.font.Font(None, 22)
+        text = font.render("Niveles", 1, (10,10,10))
+        textpos = Rect((575,5),(50,45))
+        Window.blit(text, textpos)
         render_widgets()
         pygame.display.flip()

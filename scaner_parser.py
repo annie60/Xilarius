@@ -95,7 +95,7 @@ def t_newline(t):
     t.lexer.lineno += t.value.count("\n")                 
 def t_error(t):
     global build_errors
-    build_errors.append("Caracter ilegal: '%s'" % t.value[0])
+    build_errors.append("Caracter no valido: '%s'" % t.value[0])
     t.lexer.skip(1)
     
 
@@ -117,7 +117,7 @@ def p_program2_error(p):
     '''program2 : error'''
     pass
     global build_errors
-    build_errors.append("Error: Falta '{'")
+    build_errors.append("Cuidado! Falta '{'")
 def p_declarar(p):
     '''declarar : MIPROGRAMA IDENTIFICADOR'''
     ids.enqueue(p[2])
@@ -150,23 +150,23 @@ def p_personaje(p):
 def p_personaje_error(p):
     '''personaje : CREARPERSONAJE error ENDLINE vars'''
     global build_errors
-    build_errors.append("Error: No se encontro nombre de personaje")
+    build_errors.append("O no! tu personaje no tiene nombre!")
 def p_personaje_error2(p):
     '''personaje : error'''
     global build_errors
-    build_errors.append("Error: No se encontro personaje")
+    build_errors.append("Mmm no haz creado tu personaje")
 ##Start of the modules for flow control
 ##-----------------------------------
 def p_modulo(p):
-    '''modulo : moduloaux1 
-		| moduloaux2
+    '''modulo : moduloaux1 instruccionaux
+		| moduloaux2 instruccionaux
                 | instruccion'''
     pass
     ##Braces equality check
     if not braces.isEmpty():
         braces.pop()
 def p_moduloaux1(p):
-    '''moduloaux1 : SIES OPENCOND laberinto CLOSECOND modulo2 instruccionaux modulo3 instruccionaux'''
+    '''moduloaux1 : SIES OPENCOND laberinto CLOSECOND modulo2 instruccionaux modulo3 '''
     pass
 ##Loops and decitions control
 def p_modulo3(p):
@@ -187,7 +187,7 @@ def p_modulo4(p):
             cuadruplos[counter]=["goto","","",pSaltos.pop()]
             counter+=1
 def p_moduloaux2(p):
-    '''moduloaux2 : moduloaux3 OPENCOND laberinto CLOSECOND modulo2 instruccionaux modulo4 instruccionaux'''
+    '''moduloaux2 : moduloaux3 OPENCOND laberinto CLOSECOND modulo2 instruccionaux modulo4 '''
     pass
 ## While rules
 def p_moduloaux3(p):
@@ -203,7 +203,7 @@ def p_modulo2(p):
 def p_modulo2_error(p):
     '''modulo2 : error'''
     global build_errors
-    build_errors.append("Error: Falta '{'")
+    build_errors.append("Cuidado! Falta '{'")
 ##If else rules
 def p_modulo5(p):
     '''modulo5 : O '''
@@ -261,7 +261,7 @@ def p_instruccion6(p):
 def p_instruccion5_error(p):
     '''instruccion5 : IDENTIFICADOR instruccion6 error'''
     global build_errors
-    build_errors.append("Error: Falta ';'")
+    build_errors.append("Cuidado! Puede faltar ';'")
     types.push(p[1])
     pOper.push(p[1])
     if values.size() >= 1:
@@ -284,34 +284,6 @@ def p_instruccion5_error(p):
             dir_izq=obtener_direccion(operizq)
             build_errors.append(respuesta_semantica)
         #Insert result to stack
-        pOper.push("temp"+str(temp_counter))
-        cuadruplos[counter] = [operador,dir_izq,dir_der,""]
-        counter+=1
-#Specific error generation
-def p_instruccion5_error2(p):
-    '''instruccion5 : IDENTIFICADOR error ENDLINE'''
-    global build_errors
-    build_errors.append("Error: Falta '.' o '='")
-    types.push(p[1])
-    pOper.push(p[1])
-    if values.size() >= 1:
-        global counter,temp_counter
-        valor = values.pop()
-        tipo = types.pop()
-        operder =pOper.pop()
-        operizq = pOper.pop()
-        operador = pilaO.pop()
-        #Checks for semantics
-        respuesta_semantica = operacion_compatible(operador,valor,tipo)
-        #Translates values to virtual memoria slots
-        if respuesta_semantica == "":
-            dir_der=obtener_direccion(operder)
-            dir_izq=obtener_direccion(operizq)
-        else:
-            dir_der=obtener_direccion(operder)
-            dir_izq=obtener_direccion(operizq)
-            build_errors.append(respuesta_semantica)
-        
         pOper.push("temp"+str(temp_counter))
         cuadruplos[counter] = [operador,dir_izq,dir_der,""]
         counter+=1
@@ -360,11 +332,11 @@ def p_vars(p):
 def p_vars_error(p):
     '''vars : error IDENTIFICADOR tipo EQUALS varcte vars1'''
     global build_errors
-    build_errors.append("Error: Declaracion incorrecta")
+    build_errors.append("Algo anda mal en como creaste las variables")
 #Specific error handling
 def p_vars_error2(p):
     '''vars : CREARPERSONAJE error'''
-    build_errors.append("Error: Mas de un personaje declarado")
+    build_errors.append("Espera! Solo puedes crear un personaje")
 def p_vars1(p):
     '''vars1 : COMA vars2
         	| ENDLINE'''
@@ -373,7 +345,7 @@ def p_vars1(p):
 def p_vars2_error(p):
     '''vars1 : COMA error ENDLINE'''
     global build_errors
-    build_errors.append("Error: Extra ','")
+    build_errors.append("Hey! hay una ',' extra!")
 def p_vars2(p):
         '''vars2 : VAR IDENTIFICADOR tipo EQUALS varcte vars1'''
         pass
@@ -496,11 +468,10 @@ def p_laberinto3(p):
 def p_expresion(p):
     '''expresion : termino exp'''
     pass 
-#Specific error generation
-def p_expresion_error(p):
-    '''expresion : error exp'''
+def p_termino_error(p):
+    '''termino : error'''
     global build_errors
-    build_errors.append("Error: Operacion matematica incorrecta")
+    build_errors.append("O no! Esa operacion esta mal escrita")
 def p_exp(p):
     '''exp :
             | exp2 exp'''
@@ -510,20 +481,21 @@ def p_exp2(p):
     '''exp2 : RESTA termino 
             | SUMA termino'''
     pass
-    pilaO.push(p[1])
-    if pilaO.top() == "+" or pilaO.top() == "-":
-        global counter,temp_counter
-        operador = pilaO.pop()
-        operDer = pOper.pop()
-        operIzq = pOper.pop()
-        #Construction of structure for operations on vm
-        dir_der = obtener_direccion(operDer)
-        dir_izq = obtener_direccion(operIzq)
-        dir_temp = obtener_direccion("temp"+str(temp_counter))
-        pOper.push("temp"+str(temp_counter))
-        temp_counter+=1
-        cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
-        counter+=1
+    if not pilaO.isEmpty():
+        pilaO.push(p[1])
+        if pilaO.top() == "+" or pilaO.top() == "-":
+            global counter,temp_counter
+            operador = pilaO.pop()
+            operDer = pOper.pop()
+            operIzq = pOper.pop()
+            #Construction of structure for operations on vm
+            dir_der = obtener_direccion(operDer)
+            dir_izq = obtener_direccion(operIzq)
+            dir_temp = obtener_direccion("temp"+str(temp_counter))
+            pOper.push("temp"+str(temp_counter))
+            temp_counter+=1
+            cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
+            counter+=1
 #Start of term definition
 #----------------------------------------------------
 def p_termino(p):
@@ -575,13 +547,13 @@ def p_varcte(p):
 def p_error(p):
     global build_errors
     if p:
-        build_errors.append("Error de escritura cerca de '%s'" % p.value)
-        build_errors.append("En linea %i"%p.lineno)
+        build_errors.append("Ups! Hubo un error al escribir '%s'" % p.value)
+        build_errors.append("Cerca de la linea %i"%p.lineno)
                 
     else:
         if not braces.isEmpty():
-            build_errors.append("Error: Falta '}' o ')'")
-        build_errors.append("Error de escritura al final del archivo")
+            build_errors.append("Cuidado! Falta '}' o ')'")
+        build_errors.append("Mmm algo salio mal, no esta bien escrito el programa")
 
 
 
