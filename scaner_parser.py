@@ -511,7 +511,7 @@ def p_termino3(p):
                 | MULTIPLICACION varcte'''
     pass
     pilaO.push(p[1])
-    if pilaO.top() == "*" or pilaO.top() == "/":
+    if (pilaO.top() == "*" or pilaO.top() == "/") and (pOper.size() > 1):
         global counter,temp_counter
         #To keep consistency in stacks
         operador = pilaO.pop()
@@ -543,6 +543,11 @@ def p_varcte(p):
     pass
     values.push(p[1])
     pOper.push(p[1])
+def p_varcte_error(p):
+    '''varcte : DIVISION
+                | MULTIPLICACION'''
+    global build_errors
+    build_errors.append("O no! Esa operacion esta mal escrita")
 #Error handling
 def p_error(p):
     global build_errors
