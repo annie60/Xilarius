@@ -34,6 +34,7 @@ input_file = gui.Input()
 last_position_x =0
 last_position_y =0
 loop_times =0
+score = 0
 execution_errors=[]
 can_execute = False
 build_error = []
@@ -46,6 +47,14 @@ hard_maze = [16,19]
 dificulty_level = 1
 running = True
 numero_hint = 1
+#Table for score points
+# expresion (+ / * -) +1
+# condition +5
+# assign +2
+# loop + 8
+# function + 2
+# negative + 3
+# convert +4
 
 #------------Virtual Machine---------------#
 
@@ -118,23 +127,35 @@ class Machine:
 
     # OPERATIONS FOLLOW:
     def plus(self,line):
+        global score
+        score +=1
         self.memory[line[3]] = int(self.memory[line[1]]) + int(self.memory[line[2]])
         self.instruction_pointer+=1
     def exit(self):
         sys.exit(0)
     def assign(self,line):
+        global score
+        score +=2
         self.memory[line[2]]= self.memory[line[1]]
         self.instruction_pointer+=1
     def minus(self,line):
+        global score
+        score +=1
         self.memory[line[3]] = int(self.memory[line[1]]) - int(self.memory[line[2]])
         self.instruction_pointer+=1
     def mul(self,line):
+        global score
+        score +=1
         self.memory[line[3]] = int(self.memory[line[1]]) * int(self.memory[line[2]])
         self.instruction_pointer+=1
     def div(self,line):
+        global score
+        score +=1
         self.memory[line[3]] = int( int(self.memory[line[1]]) / int(self.memory[line[2]]))
         self.instruction_pointer+=1
     def stop(self,line):
+        global score
+        score +=2
         self.instruction_pointer+=1
     def translate(self,value,objeto):
         #Transalte reserved word to instruction
@@ -175,18 +196,26 @@ class Machine:
         self.memory[line[3]] = not result
         self.instruction_pointer+=1
     def negative(self,line):
+        global score
+        score +=3
         self.memory[line[3]]= not self.memory[line[1]]
         self.instruction_pointer+=1
     def convert(self,line):
+        global score
+        score +=4
         self.memory[line[3]]= '"'+str(self.memory[line[1]])+'"'
         self.instruction_pointer+=1
     def gotof(self,line):
+        global score
+        score +=5
         addr=line[3]
         if not self.memory[line[1]]:
             self.instruction_pointer = addr
         else: self.instruction_pointer+=1
 
     def goto(self,line):
+        global score
+        score +=8
         global last_position_x,last_position_y,loop_times,execution_errors
         addr=line[3]
         #Checking for infinite loop
@@ -207,10 +236,13 @@ class Machine:
         if loop_times > 10:
             execution_errors.append("Oh oh hubo un error")
             execution_errors.append("El programa se ciclo!")
+            score = 0
         else:
             self.instruction_pointer = addr
         sleep(0.05)
     def bwd(self,line):
+        global score
+        score +=2
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
@@ -220,6 +252,8 @@ class Machine:
             total -=1
         self.instruction_pointer+=1
     def fwd(self,line):
+        global score
+        score +=2
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
@@ -229,6 +263,8 @@ class Machine:
             total -=1
         self.instruction_pointer+=1
     def right(self,line):
+        global score
+        score +=2
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
@@ -238,6 +274,8 @@ class Machine:
             total -=1
         self.instruction_pointer+=1
     def left(self,line):
+        global score
+        score +=2
         global characteer
         total = int(self.memory[line[1]])
         while(total > 0):
@@ -247,6 +285,8 @@ class Machine:
             total -=1
         self.instruction_pointer+=1
     def respond(self,line):
+        global score
+        score +=2
         Character_talk(self.memory[line[1]])
         self.instruction_pointer+=1
     def dump_vm(self):
@@ -394,13 +434,14 @@ def Character_talk(mensaje):
     character.stop_talk()
 #Cleans all variables used on the session    
 def Complete_cleanup(all):
-    global can_execute,executing,avatar_index,on_game,input_from_user,build_error,execution_errors,loop_times,input_from_user,input_initialized,used_help
+    global can_execute,score,executing,avatar_index,on_game,input_from_user,build_error,execution_errors,loop_times,input_from_user,input_initialized,used_help
     can_execute = False
     loop_times =0
     used_help = False
     del build_error[:]
     del execution_errors[:]
     executing = False
+    score =0
     avatar_index=0
     if all == 0:
         input_from_user = ""
@@ -444,7 +485,7 @@ def Restart():
                 mymaze = maze(hard_maze[0],hard_maze[1])
             mymaze.generate_maze()
             character = Character(mymaze)
-            
+
             #Checks if there was use of help on the last game
             if used_help:
                 #Cleans variables with exeption of code generated
@@ -452,7 +493,7 @@ def Restart():
             else:
                 #Cleans variables completly
                 Complete_cleanup(0)
-            #Creates solution for the new maze
+            #To remove the wall of avatars
             while True:
                 Window.fill(const.green)
                 character.show(Window)
@@ -753,6 +794,10 @@ while running:
         input_formatted = str(input_from_user)
         input_formatted = input_formatted.replace("\n","\n\n")
         entryForInput.set(input_formatted)
+        #Score
+        entry_score = Entry(Frame,width=60,height=10)
+        entry_score.place((150,30))
+        entry_score.set("Puntos:"+str(score))
         ##Sets miliseconds between a display loop            
         if pygame.time.get_ticks() - character_time >= const.time_character_poll:
             character_time = pygame.time.get_ticks()
