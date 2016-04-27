@@ -481,21 +481,20 @@ def p_exp2(p):
     '''exp2 : RESTA termino 
             | SUMA termino'''
     pass
-    if not pilaO.isEmpty():
-        pilaO.push(p[1])
-        if pilaO.top() == "+" or pilaO.top() == "-":
-            global counter,temp_counter
-            operador = pilaO.pop()
-            operDer = pOper.pop()
-            operIzq = pOper.pop()
-            #Construction of structure for operations on vm
-            dir_der = obtener_direccion(operDer)
-            dir_izq = obtener_direccion(operIzq)
-            dir_temp = obtener_direccion("temp"+str(temp_counter))
-            pOper.push("temp"+str(temp_counter))
-            temp_counter+=1
-            cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
-            counter+=1
+    pilaO.push(p[1])
+    if pilaO.top() == "+" or pilaO.top() == "-":
+        global counter,temp_counter
+        operador = pilaO.pop()
+        operDer = pOper.pop()
+        operIzq = pOper.pop()
+        #Construction of structure for operations on vm
+        dir_der = obtener_direccion(operDer)
+        dir_izq = obtener_direccion(operIzq)
+        dir_temp = obtener_direccion("temp"+str(temp_counter))
+        pOper.push("temp"+str(temp_counter))
+        temp_counter+=1
+        cuadruplos[counter] = [operador,dir_izq,dir_der,dir_temp]
+        counter+=1
 #Start of term definition
 #----------------------------------------------------
 def p_termino(p):

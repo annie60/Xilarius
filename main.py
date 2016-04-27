@@ -390,7 +390,7 @@ def Character_talk(mensaje):
         short_message = short_message[:11]
     character.talk(short_message)
     Update_display()
-    sleep(2)
+    sleep(1)
     character.stop_talk()
 #Cleans all variables used on the session    
 def Complete_cleanup(all):

@@ -1,0 +1,25 @@
+miPrograma Uno;
+{
+crearPersonaje Ana;
+var Actual numero = 1,
+var Anterior numero = 0,
+var Temporal numero = 0,
+var Otra escrita = "hola";
+Otra = hacerEscrita(Anterior);
+Ana.responder(Otra);
+
+repetirMientras(metaAbajo <> verdadero){
+Ana.derecha(1);
+Otra = hacerEscrita(Actual);
+Ana.responder(Otra);
+
+Temporal = Actual;
+Actual =Anterior + Temporal;
+Anterior = Temporal;
+
+
+Ana.abajo(1);
+Ana.izquierda(1);
+}
+
+}
