@@ -79,6 +79,11 @@ class Machine:
         ##While there is code to run and there is no error and the character hasn't arrive to the finish line
         while self.instruction_pointer < len(self.code) and len(execution_errors) == 0 and not character.isFinishLine(character.x,character.y):
             line = self.code[self.instruction_pointer]
+            #Pause event from the keyboard
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        Stop()
             operators = line[1:]
             #Enters the execution case
             for value in operators:
@@ -585,7 +590,9 @@ def Start_game():#Initialize game's screen and its controlers
     compile_button.place((435, 460))
     execute_button= Button(Window, text = "Paso 2", width = 95, height = 20, bordercolor = const.white, colour = const.green, fontsize = 16, target = Execute_instruction)
     execute_button.place((545, 460))
-  
+def Stop():
+    global execution_errors
+    execution_errors.append("Detenido")
 def Expert_mode():#Change dificulty level and calls to start game  
     global dificulty_level
     dificulty_level = 2
