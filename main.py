@@ -50,9 +50,9 @@ numero_hint = 1
 #Table for score points
 # expresion (+ / * -) +1
 # condition +5
-# assign +2
+# assign + 1
 # loop + 8
-# function + 2
+# function + 1
 # negative + 3
 # convert +4
 
@@ -135,7 +135,7 @@ class Machine:
         sys.exit(0)
     def assign(self,line):
         global score
-        score +=2
+        score +=1
         self.memory[line[2]]= self.memory[line[1]]
         self.instruction_pointer+=1
     def minus(self,line):
@@ -155,7 +155,7 @@ class Machine:
         self.instruction_pointer+=1
     def stop(self,line):
         global score
-        score +=2
+        score +=1
         self.instruction_pointer+=1
     def translate(self,value,objeto):
         #Transalte reserved word to instruction
@@ -242,7 +242,7 @@ class Machine:
         sleep(0.05)
     def bwd(self,line):
         global score
-        score +=2
+        score +=1
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
@@ -253,7 +253,7 @@ class Machine:
         self.instruction_pointer+=1
     def fwd(self,line):
         global score
-        score +=2
+        score +=1
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
@@ -264,7 +264,7 @@ class Machine:
         self.instruction_pointer+=1
     def right(self,line):
         global score
-        score +=2
+        score +=1
         global character
         total = int(self.memory[line[1]])
         while(total > 0):
@@ -275,7 +275,7 @@ class Machine:
         self.instruction_pointer+=1
     def left(self,line):
         global score
-        score +=2
+        score +=1
         global characteer
         total = int(self.memory[line[1]])
         while(total > 0):
@@ -286,7 +286,7 @@ class Machine:
         self.instruction_pointer+=1
     def respond(self,line):
         global score
-        score +=2
+        score +=1
         Character_talk(self.memory[line[1]])
         self.instruction_pointer+=1
     def dump_vm(self):
@@ -318,7 +318,7 @@ def But_path():
     character.go_to(road)
 #Compiles current code as input from user
 def Compile_instruction():
-    global can_execute,correct_message, loop_times,build_error,input_from_user,executing,executing_errors
+    global can_execute,correct_message,loop_times,build_error,input_from_user,executing,executing_errors
     ##Checks if there is not a previous instance running
     if not executing:
         scanner = Scanner(input_from_user)
@@ -366,17 +366,18 @@ def Show_production_errors():
     errors.set(final_errors)
 #Re renders objects on the screen with the changes made on the values
 def Update_display():
-    global character,character_time,Window
+    global character,character_time,Window,entry_score
     ##Sets miliseconds between a display loop            
     if pygame.time.get_ticks() - character_time >= const.time_character_poll:
         character_time = pygame.time.get_ticks()
         character.poll()
     character.show(Window)
+    entry_score.set("Puntos:"+str(score))
     render_widgets()
     pygame.display.flip()
 #Executes the intermediate code generated previously
 def Execute_instruction():
-    global can_execute, build_error,errors, executing, execution_Error
+    global can_execute, loop_times,build_error,errors, executing, execution_Error
     #If there where no mistakes during compilation and there is no
     #previous instance running then continue
     if can_execute and not executing:
@@ -406,12 +407,14 @@ def Execute_instruction():
         executing = False
         if len(execution_errors) == 0:
             errors.set("Tu programa termino!")
+            loop_times = 0
     elif(not can_execute and not executing):
         #If there are no errors but it can't execute then if means
         #it hasn't been compile
         if not build_error:
             build_error.append("Ups! No has hecho el paso uno")
             Show_production_errors()
+            del build_error[:]
 #Gets another image to display as the avatar            
 def Change_avatar():
     global avatar_index,character
@@ -472,8 +475,28 @@ def Exit():
     running = False
 #Creates new instance of the game with the same dificulty 
 def Restart():
-            global character,dificulty_level,used_help,Window,list_x2,list_x1
-            pygame.time.delay(300)       
+            global character,score,dificulty_level,used_help,Window,list_x2,list_x1
+            pygame.time.delay(300)
+            #Total score message
+            img = image.load(const.imagespath+"bubble_large.png").convert_alpha()
+            img.set_colorkey(RLEACCEL)
+            rect = Rect((80,75), (125, 200))
+            Window.blit(img,rect)
+            font = pygame.font.Font(None, 36)
+            text = font.render("Total de puntos: "+str(score), 1, const.red)
+            textpos = Rect((150,145),(165,235))
+            Window.blit(text, textpos)
+            #If the score is too low sends game over message else says its completed
+            if(score < 200):
+                text = font.render("Intenta de nuevo", 1, Color(1,72,152))
+                textpos = Rect((175,180),(175,245))
+                Window.blit(text, textpos)
+            else:
+                text = font.render("Muy bien!Prueba con experto", 1, Color(1,72,152))
+                textpos = Rect((175,180),(175,245))
+                Window.blit(text, textpos)
+            pygame.display.flip()
+            sleep(3.5)
             #Avatar wall displayed on the screen
             for Xil in list_x2:
                 Xil.show(Window)
@@ -769,6 +792,7 @@ while running:
         if keys:
             if keys[K_h] and not executing:
                 But_path()
+                executing = True
                 used_help =True
         ##Mouse events for the input detection
         mouse = pygame.mouse.get_pressed()
@@ -795,8 +819,8 @@ while running:
         input_formatted = input_formatted.replace("\n","\n\n")
         entryForInput.set(input_formatted)
         #Score
-        entry_score = Entry(Frame,width=60,height=10)
-        entry_score.place((150,30))
+        entry_score = Entry(Frame,width=90,height=10)
+        entry_score.place((120,30))
         entry_score.set("Puntos:"+str(score))
         ##Sets miliseconds between a display loop            
         if pygame.time.get_ticks() - character_time >= const.time_character_poll:
