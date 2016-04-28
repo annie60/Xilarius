@@ -48,6 +48,7 @@ const_mem_output={}
 temp_mem = {}
 temp_mem_output= {}
 global_mem_output= {}
+#Virutal memory counters
 global_mem_counter = 1000
 temp_mem_counter = 20000
 const_mem_counter = 25000
@@ -139,19 +140,19 @@ def convertir_valor(valor):
 #Defines compatiblity between types and operations
 #according to the semantics cube defined previously
 def operacion_compatible(operacion, tipouno,tipodos):
-    #Obtiene la informacion del parser
+    #Gets information from parser
     tipo=convertir_valor(tipouno)
     indiceValor = convertir_valor(tipodos)
     operador =var_operaciones.index(operacion)
     if indiceValor >= 0 and tipo >=0 :
         if (cubo_semantico[tipo][indiceValor][operador] == 1):
             return ""
-        else: #Operacion no compatible
+        else: #Non compatible operation
             if tipo == indiceValor:
                 return "Error: "+var_tipos[indiceValor]+" no es compatible con operacion "+operacion
             else:
                 return "Error: Tipos "+var_tipos[tipo]+" y "+var_tipos[indiceValor]+" no son compatibles con operacion "+operacion
-    elif tipo < 0:
+    elif tipo < 0: #Variable not found
         return "Error: Variable '"+tipouno+"' no declarada"
     else:
         return "Error:Variable '"+tipodos+"' no declarada"
@@ -222,6 +223,7 @@ def crear_archivo_salida(cuadruplos):
     temp_mem.clear()
     temp_mem_output.clear()
     global_mem_output.clear()
+    #Restart of counters
     global_mem_counter = 1000
     temp_mem_counter = 20000
     const_mem_counter = 25000

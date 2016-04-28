@@ -6,7 +6,7 @@
 # -----------------------------------------------------------------------------
 
 
-#-----------------------Libs import-----------------------#
+'''-----------------------Libs import-----------------------'''
 from __future__ import print_function
 import os,webbrowser
 import pygame, sys, ast
@@ -18,10 +18,10 @@ from Class import *
 from scaner_parser import Scanner
 from tygame.main import StaticFrame,Entry, Button, Label, render_widgets, handle_widgets #But you can put in ..\Python\Lib\site-packages
 
-#-------------------Window Position---------------------#
+'''-------------------Window Position---------------------'''
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (10,150)
 
-#-------------------Global variables---------------------#
+'''-------------------Global variables---------------------'''
 avatars = ["Character_boy","Character_Cat_girl",
             "Character_Horn_Girl","Character_Pink_Girl"]
 avatar_index=0
@@ -65,7 +65,7 @@ numero_hint = 1
 global_mem_range = [1000,19999]
 temp_mem_range = [20000,24999]
 const_mem_range = [25000,25999]
-#Starts all virtual machine functions
+'''--------------Virtual machine functions----------------'''
 class Machine:
     def __init__(self, globals,constants,temporary,cuadruplos):
         
@@ -89,6 +89,7 @@ class Machine:
                         self.memory[value]=self.constant[value]
                     elif not (value in self.memory) and (value > const_mem_range[1] or value > temp_mem_range[1]):
                         execution_errors.append("Error: Ya no hay memoria.")
+            #If there where no errors then continues the dispatch
             if len(execution_errors) == 0 :
                 self.dispatch(line)
                 Update_display()
@@ -245,6 +246,7 @@ class Machine:
         score +=1
         global character
         total = int(self.memory[line[1]])
+        #Executes action as many times as the user indicated
         while(total > 0):
             character.move(const.up)
             Update_display()
@@ -256,6 +258,7 @@ class Machine:
         score +=1
         global character
         total = int(self.memory[line[1]])
+        #Executes action as many times as the user indicated
         while(total > 0):
             character.move(const.down)
             Update_display()
@@ -267,6 +270,7 @@ class Machine:
         score +=1
         global character
         total = int(self.memory[line[1]])
+        #Executes action as many times as the user indicated
         while(total > 0):
             character.move(const.right)
             Update_display()
@@ -278,6 +282,7 @@ class Machine:
         score +=1
         global characteer
         total = int(self.memory[line[1]])
+        #Executes action as many times as the user indicated
         while(total > 0):
             character.move(const.left)
             Update_display()
@@ -292,9 +297,9 @@ class Machine:
     def dump_vm(self):
         self.memory = {}
 
-#---------------------Buttons functions--------------------#
-#Generates solution and solves current maze    
-def But_path():
+'''---------------------Buttons functions--------------------'''
+  
+def But_path():#Generates solution and solves current maze  
     global character,input_from_user
     character.yellow_road = []
     character.reverse = 0
@@ -316,8 +321,8 @@ def But_path():
     render_widgets()
     #Moves character accordingly
     character.go_to(road)
-#Compiles current code as input from user
-def Compile_instruction():
+
+def Compile_instruction():#Compiles current code as input from user
     global can_execute,correct_message,loop_times,build_error,input_from_user,executing,executing_errors
     ##Checks if there is not a previous instance running
     if not executing:
@@ -336,8 +341,8 @@ def Compile_instruction():
             loop_times = 0
         #Destroy exection errors each time its called
         del execution_errors[:]
-#Shows execution errors generated on the compilation
-def Show_execution_errors():
+
+def Show_execution_errors():#Shows execution errors generated on the compilation
     global execution_errors,errors
     totalerror = 0
     errors.set('')
@@ -349,8 +354,8 @@ def Show_execution_errors():
             totalerror += 1
             final_errors = final_errors+error+"\n"
     errors.set(final_errors)
-#Displays mistakes produced while running the application            
-def Show_production_errors():
+           
+def Show_production_errors():#Displays mistakes produced while running the application 
     global execution_errors,errors
     totalerror = 0
     errors.set('')
@@ -364,8 +369,8 @@ def Show_production_errors():
             final_errors = final_errors+error+"\n"
             
     errors.set(final_errors)
-#Re renders objects on the screen with the changes made on the values
-def Update_display():
+
+def Update_display():#Re renders objects on the screen with the changes made on the values
     global character,character_time,Window,entry_score
     ##Sets miliseconds between a display loop            
     if pygame.time.get_ticks() - character_time >= const.time_character_poll:
@@ -375,8 +380,8 @@ def Update_display():
     entry_score.set("Puntos:"+str(score))
     render_widgets()
     pygame.display.flip()
-#Executes the intermediate code generated previously
-def Execute_instruction():
+
+def Execute_instruction():#Executes the intermediate code generated previously
     global can_execute, loop_times,build_error,errors, executing, execution_Error
     #If there where no mistakes during compilation and there is no
     #previous instance running then continue
@@ -415,8 +420,8 @@ def Execute_instruction():
             build_error.append("Ups! No has hecho el paso uno")
             Show_production_errors()
             del build_error[:]
-#Gets another image to display as the avatar            
-def Change_avatar():
+           
+def Change_avatar():#Gets another image to display as the avatar 
     global avatar_index,character
     if avatar_index < len(avatars)-1:
         avatar_index+=1
@@ -424,8 +429,8 @@ def Change_avatar():
     else:
         avatar_index=0
         character.change_avatar(avatars[avatar_index])
-#Handles the use of character's dialog        
-def Character_talk(mensaje):
+      
+def Character_talk(mensaje):#Handles the use of character's dialog  
     global character,Window
     #Formats message so it can fit on the bubble
     short_message = mensaje[1:-1]
@@ -435,8 +440,8 @@ def Character_talk(mensaje):
     Update_display()
     sleep(1)
     character.stop_talk()
-#Cleans all variables used on the session    
-def Complete_cleanup(all):
+  
+def Complete_cleanup(all):#Cleans all variables used on the session  
     global can_execute,score,executing,avatar_index,on_game,input_from_user,build_error,execution_errors,loop_times,input_from_user,input_initialized,used_help
     can_execute = False
     loop_times =0
@@ -449,9 +454,8 @@ def Complete_cleanup(all):
     if all == 0:
         input_from_user = ""
     input_initialized = False
-#Renders initial screen for the game when return from an instance
-#of the game
-def Home():
+
+def Home():#Renders initial screen for the game when return from an instance of the game
     global on_game,executing,on_initial,change_button,Frame,execute_button,home_button, compile_button,dificulty_level,exit_button
     if not executing:
         dificulty_level = 1
@@ -473,8 +477,8 @@ def Home():
 def Exit():
     global running
     running = False
-#Creates new instance of the game with the same dificulty 
-def Restart():
+
+def Restart():#Creates new instance of the game with the same dificulty 
             global character,score,dificulty_level,used_help,Window,list_x2,list_x1
             pygame.time.delay(300)
             #Total score message
@@ -535,8 +539,8 @@ def Restart():
             
             list_x2 = fill_list_x2(list_x1)
             
-#Initialize game's screen and its controlers            
-def Start_game():
+          
+def Start_game():#Initialize game's screen and its controlers  
     global on_game,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,home_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button,exit_button
     #Load background music
     pygame.mixer.music.stop()
@@ -581,13 +585,12 @@ def Start_game():
     compile_button.place((435, 460))
     execute_button= Button(Window, text = "Paso 2", width = 95, height = 20, bordercolor = const.white, colour = const.green, fontsize = 16, target = Execute_instruction)
     execute_button.place((545, 460))
-#Change dificulty level and calls to start game    
-def Expert_mode():
+  
+def Expert_mode():#Change dificulty level and calls to start game  
     global dificulty_level
     dificulty_level = 2
     Start_game()
-#File treatment section
-#-------------------------------------
+'''-----------------File treatment section--------------------'''
 def open_file_browser(mode):
     d = gui.FileDialog()
     d.connect(gui.CHANGE, handle_file_browser_closed, d,mode)
@@ -607,9 +610,7 @@ def handle_file_browser_closed(dlg,write):
         file = open(file_name,'w')
         input_from_user = input_from_user.replace('\n\n','\n')
         file.write(input_from_user)
-#--------------------------------------------
-#Opens screen to handle text input from the user
-def Create_input():
+def Create_input():#Opens screen to handle text input from the user
     global Window, input_initialized,can_execute, Frame, input_from_user
     input_initialized = True
     
@@ -742,13 +743,9 @@ def Create_input():
     if dificulty_level == 1:
         my_container1.add(hint_btn,145,415)
     app.run(my_container1) 
-# FIN
 
-
-#---------------------Pygame init--------------------#
+'''---------------------Pygame init--------------------'''
 pygame.init()
-
-
 #Window creation
 WW, WH = 670, 500
 Window = pygame.display.set_mode((WW, WH))
@@ -759,11 +756,8 @@ pygame.display.set_caption("Xilarius")
 pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
 #TODO Activar
 #pygame.mixer.music.play(-1,0.0)
-# FIN
 
-
-##Main loop starts
-#----------------------------------------------#
+'''----------------Main loop starts----------------'''
 while running:
     pygame.time.Clock().tick(10)
     for event in handle_widgets():

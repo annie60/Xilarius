@@ -105,6 +105,7 @@ def t_error(t):
 def p_programa(p):
     '''program : declarar ENDLINE program2 personaje modulo CLOSEEXP'''
     pass
+    #Part of braces equality check
     if not braces.isEmpty():
         braces.pop()
     #At the end sends the intermediate code to an output file
@@ -584,6 +585,7 @@ class Scanner(object):
         braces.dispatch()
         pSaltos.dispatch()
         cuadruplos.clear()
+        #Counters restart
         temp_counter = 0
         counter = 0
         #Compiling entry
