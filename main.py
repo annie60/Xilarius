@@ -40,6 +40,7 @@ can_execute = False
 build_error = []
 errors = ''
 used_help = False
+in_pause = False
 input_initialized = False
 input_from_user =""
 easy_maze =[10,13]
@@ -77,13 +78,13 @@ class Machine:
     def run(self):
         global character,execution_errors
         ##While there is code to run and there is no error and the character hasn't arrive to the finish line
-        while self.instruction_pointer < len(self.code) and len(execution_errors) == 0 and not character.isFinishLine(character.x,character.y):
-            line = self.code[self.instruction_pointer]
+        while self.instruction_pointer < len(self.code) and len(execution_errors) == 0 and not character.isFinishLine(character.x,character.y): 
             #Pause event from the keyboard
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_p:
+                    if event.key == pygame.K_d:
                         Stop()
+            line = self.code[self.instruction_pointer]
             operators = line[1:]
             #Enters the execution case
             for value in operators:
@@ -347,7 +348,7 @@ def Compile_instruction():#Compiles current code as input from user
         #Destroy exection errors each time its called
         del execution_errors[:]
 
-def Show_execution_errors():#Shows execution errors generated on the compilation
+def Show_execution_errors():#Displays mistakes produced while running the application
     global execution_errors,errors
     totalerror = 0
     errors.set('')
@@ -360,8 +361,8 @@ def Show_execution_errors():#Shows execution errors generated on the compilation
             final_errors = final_errors+error+"\n"
     errors.set(final_errors)
            
-def Show_production_errors():#Displays mistakes produced while running the application 
-    global execution_errors,errors
+def Show_production_errors():#Shows execution errors generated on the compilation
+    global build_error,errors
     totalerror = 0
     errors.set('')
     final_errors=""
@@ -387,13 +388,16 @@ def Update_display():#Re renders objects on the screen with the changes made on 
     pygame.display.flip()
 
 def Execute_instruction():#Executes the intermediate code generated previously
-    global can_execute, loop_times,build_error,errors, executing, execution_Error
+    global can_execute,execution_errors,in_pause,loop_times,build_error,errors, executing, execution_Error
     #If there where no mistakes during compilation and there is no
     #previous instance running then continue
     if can_execute and not executing:
         errors.set("Ejecutando tu programa!\nPsst ve como Xilarius se mueve!")
         #Flag to disable any other feature meanwhile the program executes
         executing = True
+        in_pause = False
+        loop_times = 0
+        del execution_errors[:]
         #Divides file of compiled code
         file = open('result.txt','r')
         content = file.read()
@@ -447,10 +451,11 @@ def Character_talk(mensaje):#Handles the use of character's dialog
     character.stop_talk()
   
 def Complete_cleanup(all):#Cleans all variables used on the session  
-    global can_execute,score,executing,avatar_index,on_game,input_from_user,build_error,execution_errors,loop_times,input_from_user,input_initialized,used_help
+    global can_execute,score,in_pause,executing,avatar_index,on_game,input_from_user,build_error,execution_errors,loop_times,input_from_user,input_initialized,used_help
     can_execute = False
     loop_times =0
     used_help = False
+    in_pause = False
     del build_error[:]
     del execution_errors[:]
     executing = False
@@ -591,8 +596,10 @@ def Start_game():#Initialize game's screen and its controlers
     execute_button= Button(Window, text = "Paso 2", width = 95, height = 20, bordercolor = const.white, colour = const.green, fontsize = 16, target = Execute_instruction)
     execute_button.place((545, 460))
 def Stop():
-    global execution_errors
-    execution_errors.append("Detenido")
+    global execution_errors,in_pause
+    if not in_pause:
+        execution_errors.append("Detenido")
+        in_pause = True
 def Expert_mode():#Change dificulty level and calls to start game  
     global dificulty_level
     dificulty_level = 2
