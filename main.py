@@ -48,6 +48,7 @@ hard_maze = [16,19]
 dificulty_level = 1
 running = True
 numero_hint = 1
+images = []
 #Table for score points
 # expresion (+ / * -) +1
 # condition +5
@@ -286,7 +287,7 @@ class Machine:
     def left(self,line):
         global score
         score +=1
-        global characteer
+        global character
         total = int(self.memory[line[1]])
         #Executes action as many times as the user indicated
         while(total > 0):
@@ -551,7 +552,7 @@ def Restart():#Creates new instance of the game with the same dificulty
             
           
 def Start_game():#Initialize game's screen and its controlers  
-    global on_game,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,home_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button,exit_button
+    global on_game,images,entry_score,can_execute,on_initial,input_from_user,Label_gen,Frame,change_button,home_button,execute_button,character_time,entryForInput,character,list_x1,list_x2, compile_button,exit_button
     #Load background music
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
@@ -559,6 +560,12 @@ def Start_game():#Initialize game's screen and its controlers
     #pygame.mixer.music.play(-1,0.0)
     on_game = True
     on_initial = False
+    images.append(image.load(const.imagespath+"Ayuda1_Background.png").convert_alpha())
+    images.append(image.load(const.imagespath+"Ayuda2_Background.png").convert_alpha())
+    images.append(image.load(const.imagespath+"Ayuda3_Background.png").convert_alpha())
+    images.append(image.load(const.imagespath+"Ayuda4_Background.png").convert_alpha())
+    images.append(image.load(const.imagespath+"Ayuda5_Background.png").convert_alpha())
+ 
     Frame = StaticFrame(Window, colour = const.Pblue, header = False, bordercolor = const.Pgreen, borderwidth = 5, width = 235, height = 485)
     can_execute = False
     Frame.place((421, 0))
@@ -582,7 +589,23 @@ def Start_game():#Initialize game's screen and its controlers
     change_button.place((500, 10))
     exit_button= Button(Window, text = "Salir", width = 50, height = 20, bordercolor = const.white, colour = const.red, fontsize = 12, target = Exit)
     exit_button.place((600, 10))
-
+    
+    #Second set of widgets
+    Label_gen = Label(Frame, width = 220, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
+    Label_gen.place((7, 30))
+    #Widget for line counter
+    entry_line_no = Entry(Frame,width=12,height=270,textcolor = Color("blue"),bold=True)
+    entry_line_no.place((12,50))
+    line_no = ""
+    for value in range(1,50):
+        line_no = line_no+str(value)+"\n\n"
+    entry_line_no.set(line_no)
+    #Visual of current code , non editable
+    entryForInput = Entry(Frame,width=191,height=270)
+    entryForInput.place((27,50))
+    #Score
+    entry_score = Entry(Frame,width=90,height=10)
+    entry_score.place((120,30))
     #Errors output section
     Label_errors = Label(Frame, width = 220, height = 110, htitle = " Estado ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
     Label_errors.place((7, 330))
@@ -727,15 +750,15 @@ def Create_input():#Opens screen to handle text input from the user
         #Hint images for level 1
         if dificulty_level == 1:
             if numero_hint == 1:
-                img = image.load(const.imagespath+"Ayuda1_Background.png").convert_alpha()
+                img = images[0]
             elif numero_hint == 2:
-                img = image.load(const.imagespath+"Ayuda2_Background.png").convert_alpha()
+                img = images[1]
             elif numero_hint == 3:
-                img = image.load(const.imagespath+"Ayuda3_Background.png").convert_alpha()
+                img = images[2]
             elif numero_hint == 4:
-                img = image.load(const.imagespath+"Ayuda4_Background.png").convert_alpha()
+                img = images[3]
             elif numero_hint == 5:
-                img = image.load(const.imagespath+"Ayuda5_Background.png").convert_alpha()
+                img = images[4]
             img.set_colorkey(RLEACCEL)
             rect = Rect((-8,35), (0, 0))
             #Window.fill(const.green)
@@ -783,15 +806,15 @@ while running:
         #Hint images for level 1
         if dificulty_level == 1:
             if numero_hint == 1:
-                img = image.load(const.imagespath+"Ayuda1_Background.png").convert_alpha()
+                img = images[0]
             elif numero_hint == 2:
-                img = image.load(const.imagespath+"Ayuda2_Background.png").convert_alpha()
+                img = images[1]
             elif numero_hint == 3:
-                img = image.load(const.imagespath+"Ayuda3_Background.png").convert_alpha()
+                img = images[2]
             elif numero_hint == 4:
-                img = image.load(const.imagespath+"Ayuda4_Background.png").convert_alpha()
+                img = images[3]
             elif numero_hint == 5:
-                img = image.load(const.imagespath+"Ayuda5_Background.png").convert_alpha()
+                img = images[4]
             img.set_colorkey(RLEACCEL)
             rect = Rect((-8,35), (0, 0))
             Window.blit(img, rect)
@@ -810,25 +833,10 @@ while running:
                 if mousey > 60 and mousey < 325:
                     input_initialized = False
                     can_execute = False
-        #Second set of widgets
-        Label_gen = Label(Frame, width = 220, height = 290, htitle = " Programa ", htitlefont = "Verdana", htitlesize = 14, htitlecolor = Color(const.black[0], const.black[1], const.black[2]), colour = Color(const.Pgreen[0], const.Pgreen[1], const.Pgreen[2]))
-        Label_gen.place((7, 30))
-        #Widget for line counter
-        entry_line_no = Entry(Frame,width=12,height=270,textcolor = Color("blue"),bold=True)
-        entry_line_no.place((12,50))
-        line_no = ""
-        for value in range(1,50):
-            line_no = line_no+str(value)+"\n\n"
-        entry_line_no.set(line_no)
-        #Visual of current code , non editable
-        entryForInput = Entry(Frame,width=191,height=270)
-        entryForInput.place((27,50))
+        #Toolbar update
         input_formatted = str(input_from_user)
         input_formatted = input_formatted.replace("\n","\n\n")
         entryForInput.set(input_formatted)
-        #Score
-        entry_score = Entry(Frame,width=90,height=10)
-        entry_score.place((120,30))
         entry_score.set("Puntos:"+str(score))
         ##Sets miliseconds between a display loop            
         if pygame.time.get_ticks() - character_time >= const.time_character_poll:

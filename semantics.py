@@ -98,11 +98,15 @@ cubo_semantico = (
     (1,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,-1)
     )
     ) 
-#Function's table definition
+#Function's table definition, initializes main dictionary of globals
+#is a void function
 def crear_modulo(nombre,ambiente):
     global var_dicc_funciones
     var_dicc_funciones[ambiente] = (nombre,{})
-#Creates variable's table
+
+#Creates variable's table, adding the information to the dictionary
+#Gets the name, type and value (all strings)
+#and returns a string, null if there weren’t any mistakes
 def agregar_variable(nombre,valor,tipo):
     #Checks if the name is already in use
     if existe_variable(nombre):
@@ -120,7 +124,7 @@ def agregar_variable(nombre,valor,tipo):
         else:
             return "Error: Asignacion a '"+nombre+"' no compatible"
 
-#Transforms value to index of type's array
+#Transforms string value to index of type's array
 def convertir_valor(valor):
         if valor.isdigit():
             return 0
@@ -137,8 +141,11 @@ def convertir_valor(valor):
             return var_tipos.index(valor)
         else:
             return -1
-#Defines compatiblity between types and operations
+
+#Defines compatibility between types and operations
 #according to the semantics cube defined previously
+#Receives operation and the two types involve, all strings
+# and returns a string, null if there weren’t any mistakes
 def operacion_compatible(operacion, tipouno,tipodos):
     #Gets information from parser
     tipo=convertir_valor(tipouno)
@@ -156,7 +163,9 @@ def operacion_compatible(operacion, tipouno,tipodos):
         return "Error: Variable '"+tipouno+"' no declarada"
     else:
         return "Error:Variable '"+tipodos+"' no declarada"
+
 #Translates to virtual memory numbers or unique pointers
+#receives a string and returns an integer 
 def obtener_direccion(variable):
     global temp_mem,global_mem_counter,temp_mem_counter,const_mem_counter
     #Checks if variable is global,constant or temporary
@@ -192,19 +201,23 @@ def existe_variable(nombre):
         return True
     else:
         return False
-#Helper funtion to create specific constant slot of memory
+
+#Helper function to create specific constant slot of memory
 def crear_constante(valor):
     global const_mem,const_mem_counter
     const_mem[valor]=const_mem_counter
     const_mem_output[const_mem_counter] =valor
     const_mem_counter+=1
-#Helper funtion to create specific temporary slot of memory
+
+#Helper function to create specific temporary slot of memory
 def crear_temporal(valor):
     global temp_mem,const_mem_output,temp_mem_counter
     temp_mem[valor]=temp_mem_counter
     temp_mem_output[temp_mem_counter]=valor
     temp_mem_counter+=1
+
 #Generates intermediate code file
+#Is a void function
 def crear_archivo_salida(cuadruplos):
     global const_mem_output,temp_mem_output,global_mem_output,const_mem,temp_mem,global_mem_counter,temp_mem_counter,const_mem_counter
     file = open('result.txt','w')

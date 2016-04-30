@@ -1,0 +1,8 @@
+miPrograma Uno;
+{
+crearPersonaje Xilarius;
+siEs(paredAbajo == verdadero){
+Xilarius.arriba(1);
+}
+Xilarius.abajo(1);
+}
