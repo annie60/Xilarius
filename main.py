@@ -472,8 +472,7 @@ def Home():#Renders initial screen for the game when return from an instance of 
         dificulty_level = 1
         pygame.mixer.music.stop()
         pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
-        #TODO: Activar
-        #pygame.mixer.music.play(-1,0.0)
+        pygame.mixer.music.play(-1,0.0)
         on_game = False
         on_initial = True
         #Clears display
@@ -556,10 +555,10 @@ def Start_game():#Initialize game's screen and its controlers
     #Load background music
     pygame.mixer.music.stop()
     pygame.mixer.music.load(const.musicpath+"Bet_On_It.wav")
-    #TODO Activar
-    #pygame.mixer.music.play(-1,0.0)
+    pygame.mixer.music.play(-1,0.0)
     on_game = True
     on_initial = False
+    #Loads images fo tips
     images.append(image.load(const.imagespath+"Ayuda1_Background.png").convert_alpha())
     images.append(image.load(const.imagespath+"Ayuda2_Background.png").convert_alpha())
     images.append(image.load(const.imagespath+"Ayuda3_Background.png").convert_alpha())
@@ -699,7 +698,6 @@ def Create_input():#Opens screen to handle text input from the user
         my_container2.add(cancel_btn,575,10)
         second_app.run(my_container2)
         pygame.display.flip()
-
     #Help button
     help_btn = gui.Button("Instrucciones")
     help_btn.connect(gui.CLICK, help)
@@ -791,8 +789,11 @@ icone.set_colorkey(const.pink)
 pygame.display.set_icon(icone)
 pygame.display.set_caption("Xilarius")
 pygame.mixer.music.load(const.musicpath+"Ultralounge.wav")
-#TODO Activar
-#pygame.mixer.music.play(-1,0.0)
+pygame.mixer.music.play(-1,0.0)
+img_background = image.load(const.imagespath+"Main_Background.png").convert_alpha()
+img_character = image.load(const.imagespath+"Character_boy_Large.png").convert_alpha()
+img_bubble = image.load(const.imagespath+"bubble.png").convert_alpha()
+                        
 
 '''----------------Main loop starts----------------'''
 while running:
@@ -862,21 +863,17 @@ while running:
         expert_button= Button(Window, text = "Experto", width = 95, height = 30, bordercolor = const.white, colour = const.red, fontsize = 18, target = Expert_mode)
         expert_button.place((555, 64))
 	## Background image
-        img = image.load(const.imagespath+"Main_Background.png").convert_alpha()
-        img.set_colorkey(RLEACCEL)
+        img_background.set_colorkey(RLEACCEL)
         rect = Rect((0,0), (0, 0))
-        Window.blit(img, rect)
-        
+        Window.blit(img_background, rect)
         ## Character
-        img = image.load(const.imagespath+"Character_boy_Large.png").convert_alpha()
-        img.set_colorkey(RLEACCEL)
+        img_character.set_colorkey(RLEACCEL)
         rect = Rect((-10,115), (101, 171))
-        Window.blit(img, rect)
+        Window.blit(img_character, rect)
         ## Bubble message
-        img = image.load(const.imagespath+"bubble.png").convert_alpha()
-        img.set_colorkey(RLEACCEL)
+        img_bubble.set_colorkey(RLEACCEL)
         rect = Rect((75,70), (101, 171))
-        Window.blit(img, rect)
+        Window.blit(img_bubble, rect)
         # Bubble message text
         font = pygame.font.Font(None, 22)
         text = font.render("Bienvenid@ a", 1, Color(1,72,152))
