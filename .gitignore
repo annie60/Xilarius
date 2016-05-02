@@ -4,4 +4,5 @@ __pycache__/
 # Other files and folders
 *.out
 parsetab.py
-
+libraries/pygame/tests
+libraries/pygame/threads
