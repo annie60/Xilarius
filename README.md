@@ -31,10 +31,12 @@ __Dr. José Icaza__
 #### Interfaz Grafica y maquina virtual
 - En la consola ejecutar
 ` python main.py `
-- Ir a __'Principiante'__ o __'Experto'__
-- Teclear programa en la pantalla de texto y presionar __'Guardar'__ .
-- Presionar __'Compilar'__
-- Presionar __'Correr programa'__
+- Presionar __'Principiante'__ o __'Experto'__
+- Crear programa
+    * Teclear programa en la pantalla de texto y presionar __'Guardar'__ .
+    * O bien seleccionar la opción __"Archivo"__ y __"Abrir"__ para seleccionar un archivo __.txt__ con código.
+- Presionar __'Paso 1'__
+- Presionar __'Paso 2'__
 
 #### Estructuras basicas de un programa
 Revisar [Wiki](https://github.com/annie60/Xilarius/wiki/Sintaxis y lexico) para obtener léxico y sintaxis correctos.
@@ -82,9 +84,9 @@ miPrograma Primerprograma;
     Minombre.parar;
 ```
 ## Notas
-* Este proyecto esta probado correctamente para sistema operativo **Windows**, cualquier otro sistemas podria tener fallas.
-* Hubo cambios a la libreria tygame, en epecifico el archivo __main.py__ ,por lo que se tiene que tomar del directorio local en este repositorio.
-* Hubo cambios en la libreria pgu-gui, el archivo __textarea.py__ tiene que tomarse del repositorio.
+* Este proyecto esta probado correctamente para sistema operativo **Windows**, cualquier otro sistema podria tener fallas.
+* Hubo cambios a la librería tygame, en epecífico el archivo __main.py__ ,por lo que se tiene que tomar del directorio local en este repositorio.
+* Hubo cambios en la librería pgu-gui, el archivo __textarea.py__ tiene que tomarse del repositorio.
 * La base para la interfaz grafica del laberinto se tomo del codigo compartido en [Bipo Maze](http://www.pygame.org/project-Bipo+Maze-2159-.html)
 
 ## Licencia
