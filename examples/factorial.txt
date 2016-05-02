@@ -1,0 +1,17 @@
+miPrograma Uno;
+{
+crearPersonaje Ana;
+var Actual numero = 1,
+var Contador numero = 1,
+var Otra escrita = "hola";
+Actual = Actual * Contador;
+repetirMientras(metaAbajo <> verdadero){
+Ana.derecha(1);
+Otra = hacerEscrita(Actual);
+Ana.responder(Otra);
+Actual = Contador * Actual;
+Contador = Contador +1;
+Ana.abajo(1);
+Ana.izquierda(1);
+}
+}
